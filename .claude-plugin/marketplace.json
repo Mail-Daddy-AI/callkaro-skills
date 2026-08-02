@@ -1,0 +1,11 @@
+{
+  "name": "callkaro",
+  "owner": { "name": "CallKaro" },
+  "plugins": [
+    {
+      "name": "callkaro",
+      "source": "./",
+      "description": "CallKaro voice-AI skill pack — lets Claude build agents, run simulations, place calls, and manage batch campaigns through the `ck` CLI."
+    }
+  ]
+}

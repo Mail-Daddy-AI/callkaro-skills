@@ -1,0 +1,8 @@
+{
+  "name": "callkaro",
+  "description": "Build and operate CallKaro voice AI agents from Claude Code via the `ck` CLI: create agents, write prompts, pick voices/transcribers, run simulations, place calls, schedule batch campaigns, and read analytics.",
+  "version": "0.1.0",
+  "author": { "name": "CallKaro" },
+  "homepage": "https://callkaro.ai",
+  "keywords": ["voice-ai", "calling", "agents", "callkaro"]
+}
