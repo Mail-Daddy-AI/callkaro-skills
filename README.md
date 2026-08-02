@@ -19,7 +19,7 @@ ck login                       # opens your browser to sign in
 **Option A — Claude Code plugin (recommended):** inside Claude Code run
 
 ```
-/plugin marketplace add callkaro/callkaro-skills
+/plugin marketplace add Mail-Daddy-AI/callkaro-skills
 /plugin install callkaro@callkaro
 ```
 
