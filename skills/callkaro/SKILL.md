@@ -37,6 +37,7 @@ everything the CallKaro dashboard does, through the `ck` CLI.
 |---|---|
 | **How to think, plan, and operate (read once per session)** | [INSTRUCTIONS.md](INSTRUCTIONS.md) |
 | Sign in / account | [auth.md](auth.md) |
+| **BUILDING or EDITING an agent** — follow ai-fde's real production pipeline (plan → script → reflect → functions → parameters) | **[authoring-pipeline/README.md](authoring-pipeline/README.md)** |
 | **ANYTHING about agents or versions** — every field, value, and trap | **[agents/AGENT-VERSION-REFERENCE.md](agents/AGENT-VERSION-REFERENCE.md) first**, then [agents/README.md](agents/README.md) for the CLI commands |
 | Writing the system prompt / script (8 sections, modes, snippets) | [agents/prompts.md](agents/prompts.md) |
 | Create / update workflows + starter JSON | [agents/create-update.md](agents/create-update.md) |

@@ -1,5 +1,11 @@
 # Writing Agent Prompts
 
+> **Writing a script right now?** Use the production writer prompts in
+> [../authoring-pipeline/](../authoring-pipeline/README.md) —
+> `script-writer-agent.md` (types 0/1) or `multi-prompt-script-writer-agent.md`
+> (types 2/3), then critique with `reflect-agent.md`. This file is the
+> background theory; those are the operating instructions.
+
 The system prompt is the heart of the agent: who it is, its goal, how it
 behaves, what it must never do, the call flow, and objection handling. This
 file is HOW to write it well; field mechanics live in

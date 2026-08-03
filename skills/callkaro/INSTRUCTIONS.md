@@ -80,18 +80,20 @@ Which prompt type? (full guidance: [agents/prompts.md](agents/prompts.md))
 
 ## 5. Standard playbooks
 
-**"Build me an agent for X"**
-1. Extract requirements (§1) → pick type + language.
-2. Write the script per [agents/prompts.md](agents/prompts.md) (8 sections,
-   persona gender declared, every path covered).
-3. Assemble the JSON per [agents/create-update.md](agents/create-update.md),
-   voice from `ck voices` ([agents/voice.md](agents/voice.md)), transcriber per
-   [agents/transcriber.md](agents/transcriber.md), functions per
-   [agents/functions.md](agents/functions.md) (always include an `end` function).
-4. `ck agents create --file agent.json` → read back → create 2–3 simulation
-   test cases (cooperative / skeptical / wrong-number) → `ck sim run` → iterate
-   until PASS ([simulations.md](simulations.md)).
-5. Publish, assign a number if it will really call, offer a `--test` call.
+**"Build me an agent for X"** — run the **ai-fde pipeline**
+([authoring-pipeline/README.md](authoring-pipeline/README.md)); these are the
+production prompts our own agent-builder uses, stage by stage:
+1. Intake (`user-chatbot.md`) → plan (`planner-agent*.md`) → pick type + language.
+2. Script with the matching script-writer prompt, then **critique it with
+   `reflect-agent.md` and loop until clean** — never ship a first draft.
+3. `script-analyzer-for-functions-agent.md` → postcall vars + conversion; then
+   the function agents (+ `function-critic-agent.md`); then the call-parameter
+   agents (voice/transcriber via `ck voices`).
+4. Assemble one agent.json per [agents/create-update.md](agents/create-update.md)
+   (always include an `end` function) → `ck agents create --file agent.json`.
+5. Read back → 2–3 simulation test cases (cooperative / skeptical /
+   wrong-number) → `ck sim run` → iterate until PASS ([simulations.md](simulations.md)).
+6. Publish, assign a number if it will really call, offer a `--test` call.
 
 **"My agent is doing X wrong"**
 1. Reproduce: `ck calls list --agent <id>` → `ck calls get <callId> --json`,
