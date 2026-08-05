@@ -50,6 +50,7 @@ Everything else has sane defaults.
 | `ck agents publish <id> --versions <vid>` | publish (per-language; replaces that language's published version) |
 | `ck agents toggle-active <id> --versions <vid>` | activate/deactivate a version |
 | `ck agents ab <id> --versions "v1=60,v2=40"` / `--disable` | A/B traffic split (≥2 versions, ratios sum to 100) |
+| `ck agents ab-advanced <id> --rules @rules.json` / `--show` / `--disable` | **rule-based A/B**: if/elseif/else on call metadata → version or language (see [versions.md](versions.md)) |
 | `ck agents set-inbound / set-outbound <id> --number <nId>` | phone assignment — see [../numbers.md](../numbers.md) |
 
 ## Rules the server enforces (expect these errors)
