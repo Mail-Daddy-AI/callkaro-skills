@@ -80,7 +80,29 @@ Which prompt type? (full guidance: [agents/prompts.md](agents/prompts.md))
 
 ## 5. Standard playbooks
 
-**"Build me an agent for X"** — run the **ai-fde pipeline**
+**"Here's the PRD / BRD / PDF — build this bot"** (the most common real ask)
+The document is the source of truth for BOTH the script and the test suite.
+1. **Read the whole document first** (PDF/DOCX open directly; if it's a scanned
+   image with no extractable text, say so and ask for the text or key details).
+   Never build from the one-line description alone when a spec exists.
+2. **Extract a requirement sheet** and restate it back in a few lines before
+   building: business goal · language(s) · persona (name/gender/tone) · the
+   happy-path flow step by step · **exact phrases the doc mandates** · metadata
+   coming in · data to extract after the call · integrations/functions needed ·
+   every non-happy branch the doc mentions · what counts as a conversion.
+   Ask only about genuine gaps — don't re-ask what the doc already answers.
+3. **Build via the ai-fde pipeline** (below), feeding that sheet into the
+   planner/script stages. Quote mandated sentences verbatim into the prompt.
+4. **Derive the test suite from the doc**: one `ck sim` test per branch, using
+   the branch library in [agents/regression.md](agents/regression.md) as the
+   checklist of branches the doc must cover (a PRD usually names the happy path
+   and a few edge cases — the library catches the ones it forgot: DND, wrong
+   number, transfer, terminal close).
+5. **Full-suite gate before publishing**, per regression.md — not a single case.
+6. Report back mapped to the doc: what's implemented, what's placeholder
+   (missing API details), and any requirement you could not satisfy.
+
+**"Build me an agent for X"** (no document) — run the **ai-fde pipeline**
 ([authoring-pipeline/README.md](authoring-pipeline/README.md)); these are the
 production prompts our own agent-builder uses, stage by stage:
 1. Intake (`user-chatbot.md`) → plan (`planner-agent*.md`) → pick type + language.
@@ -102,7 +124,9 @@ production prompts our own agent-builder uses, stage by stage:
    function description not triggering? transcriber mishearing (check the
    transcript's STT quality — see [agents/transcriber.md](agents/transcriber.md))?
 3. Fix in a NEW version with `--commit`, simulate the exact failing scenario,
-   then publish/A/B.
+   **then re-run the full test set** — a narrow fix often breaks a neighbouring
+   branch. Branch library + audit checklist:
+   [agents/regression.md](agents/regression.md).
 
 **"Call this list of people"** → [batches.md](batches.md): validate the CSV
 (header, phone col 1, agent column or `--agent`), confirm row count + spend

@@ -17,6 +17,11 @@ publishing, and before any batch.
 | `ck sim runs <agentId> [--json]` | List past runs. |
 | `ck sim results <runId> [--json]` | Results: PASS/FAIL (`isTestSucceed`) + judge summary per test×version. `--json` includes the full `transcript`. |
 
+**What to write tests for:** [agents/regression.md](agents/regression.md) has
+the branch library (happy path, OTP, wrong number, DND, transfer, missing
+context, callback, upload error, duplicate, final close) — cover every branch,
+and treat the **full suite**, not one case, as the pass/fail gate.
+
 ## Writing good test cases
 
 - `--prompt` is the **customer**, not the agent: *"You are a busy shop owner who

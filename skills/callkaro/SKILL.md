@@ -37,6 +37,7 @@ everything the CallKaro dashboard does, through the `ck` CLI.
 |---|---|
 | **How to think, plan, and operate (read once per session)** | [INSTRUCTIONS.md](INSTRUCTIONS.md) |
 | Sign in / account | [auth.md](auth.md) |
+| **User handed you a PRD / BRD / PDF spec** ("build this bot") | [INSTRUCTIONS.md](INSTRUCTIONS.md) §5 first playbook — read doc → requirement sheet → pipeline → derive tests from the doc |
 | **BUILDING or EDITING an agent** — follow ai-fde's real production pipeline (plan → script → reflect → functions → parameters) | **[authoring-pipeline/README.md](authoring-pipeline/README.md)** |
 | **ANYTHING about agents or versions** — every field, value, and trap | **[agents/AGENT-VERSION-REFERENCE.md](agents/AGENT-VERSION-REFERENCE.md) first**, then [agents/README.md](agents/README.md) for the CLI commands |
 | Writing the system prompt / script (8 sections, modes, snippets) | [agents/prompts.md](agents/prompts.md) |
@@ -49,6 +50,7 @@ everything the CallKaro dashboard does, through the `ck` CLI.
 | Single calls, call history, exports, live queues | [calls.md](calls.md) |
 | Batch calling + CSV format | [batches.md](batches.md) |
 | Simulations & test cases | [simulations.md](simulations.md) |
+| **Auditing/fixing a live client agent** — branch coverage, exact phrases, full-suite gate | [agents/regression.md](agents/regression.md) |
 | Analytics / performance | [analytics.md](analytics.md) |
 
 ## The golden path (creating a working agent end-to-end)
