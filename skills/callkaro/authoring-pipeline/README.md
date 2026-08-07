@@ -33,6 +33,27 @@ difference between "an agent that works" and an ai-fde-grade agent.
 For an UPDATE, run only the stages the change touches — but ALWAYS re-run
 **reflect** after a script change, and **function-critic** after a function change.
 
+## Reading these prompts (they were written for ai-fde's internals)
+
+Each file is a verbatim production system prompt. When you run that stage,
+**adopt the role and follow its rules exactly**, translating its tooling:
+
+| It says | You do |
+|---|---|
+| "draft" / "save to draft" / sub-tools that persist fields | edit your working `agent.json` (or the `--set` patch you're building) |
+| `get-*-voices` / `get-*-transcriber` tools | `ck voices --json` + [../agents/voice-and-transcriber.md](../agents/voice-and-transcriber.md) |
+| read-version / "existing script/config" context | `ck agents get <agentId> --versions <vid> --json` |
+| "return JSON with exactly these keys" | produce that JSON object as the fields you write into the payload |
+
+## What these files own (and don't)
+
+They own the **role, judgement and output contract** of each stage — including
+the exact `source_code` protocols for advanced functions. They do **not** own
+field tables: for any field name, allowed value or provider table, use
+[../agents/AGENT-VERSION-REFERENCE.md](../agents/AGENT-VERSION-REFERENCE.md).
+Where a prompt restates a fact that the reference also covers, **the reference
+wins** (it tracks the live schema).
+
 ## Rules of the pipeline
 
 - **Each stage reads the previous one's output.** The script needs the plan;
@@ -45,7 +66,7 @@ For an UPDATE, run only the stages the change touches — but ALWAYS re-run
   the pipeline tells you *what to write*, the reference tells you *where it goes*.
 - Voice/transcriber tool calls in these prompts (`get-cartesia-voices`,
   `get-soniox-transcriber`, …) map to `ck voices --json` + the provider tables
-  in [../agents/transcriber.md](../agents/transcriber.md) and
-  [../agents/voice.md](../agents/voice.md).
+  in [../agents/voice-and-transcriber.md](../agents/voice-and-transcriber.md) and
+  [../agents/voice-and-transcriber.md](../agents/voice-and-transcriber.md).
 - The reflect loop is not optional. ai-fde never ships a first draft; neither
   should you.

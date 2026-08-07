@@ -15,7 +15,7 @@ field, its values, per-provider voice/transcriber sets, functions, pathways,
 traps). Load it before writing any agent/version payload.** Then
 [prompts.md](prompts.md) (how to write the script), [create-update.md](create-update.md)
 (CLI workflows + starter JSON), [versions.md](versions.md) (publish/A/B),
-[voice.md](voice.md) (voice picking), [transcriber.md](transcriber.md) (STT),
+[voice-and-transcriber.md](voice-and-transcriber.md) (voice + STT choices),
 [functions.md](functions.md) (abilities incl. advanced code).
 
 ## Prompt types (`systempromptType`)

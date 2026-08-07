@@ -122,7 +122,7 @@ production prompts our own agent-builder uses, stage by stage:
    read the transcript; or run a simulation that triggers the behavior.
 2. Locate the cause: contradictory prompt rules? missing path? wrong snippet?
    function description not triggering? transcriber mishearing (check the
-   transcript's STT quality — see [agents/transcriber.md](agents/transcriber.md))?
+   transcript's STT quality — see [agents/voice-and-transcriber.md](agents/voice-and-transcriber.md))?
 3. Fix in a NEW version with `--commit`, simulate the exact failing scenario,
    **then re-run the full test set** — a narrow fix often breaks a neighbouring
    branch. Branch library + audit checklist:

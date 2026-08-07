@@ -55,8 +55,7 @@ If a test is genuinely contradictory (it demands behaviour the BRD forbids),
 
 ## Audit checklist for a live agent
 
-Beyond the config sanity checks in [transcriber.md](transcriber.md) and
-[voice.md](voice.md) (language ↔ voice ↔ transcriber must agree):
+Beyond the config sanity checks in [voice-and-transcriber.md](voice-and-transcriber.md) (language ↔ voice ↔ transcriber must agree):
 
 - [ ] Prompt language, voice language and register all match the BRD.
 - [ ] Number-ish fields spoken correctly (`preFormatVariables`, e.g.
