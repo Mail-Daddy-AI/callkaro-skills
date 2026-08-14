@@ -492,10 +492,18 @@ Write **only** the keys the provider uses:
 | --- | --- | --- |
 | **Eleven Labs** | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `voice_category`, `voice_speed`, `voice_stability`, `voice_similarity_boost`, `voice_style` | models `eleven_flash_v2_5` (default), `eleven_turbo_v2_5`, `eleven_turbo_v2`, `eleven_flash_v2`; speed **0.7–1.2** (1.0); stability / similarity / style **0–1** (0.5 / 1 / 0.5); category `professional` |
 | **Cartesia** | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `voice_category`, `voice_speed`, `voice_volume`, `cartesia_emotions[]` | models `sonic-3` (default), `sonic-3.5`, `sonic-turbo`, `sonic-2`, `sonic`; speed **−1.0–1.0** (0); volume **0.5–2.0** (1.0); category `similarity`; emotions `[]` unless asked. Voices also carry a sublanguage (`hinglish-IN` vs `hi-IN`) — pick per script style |
-| **Sarvam** | `voice_provider`, `voice_id`, `voice_language`, `voice_model`, `voice_speed`, `voice_pitch` — **no `voice_name`, no `voice_category`** | model `bulbul:v3` (never `bulbul:v2` — no longer offered, so a config naming it can't be edited in the UI); language like `hi-IN`; speed **0.7–1.2** (1.0); pitch **−2–2** (0.5). Voice categories `Customer Care` (default) / `Content Creation` / `International` (v3 only) select *which voices exist*; they are not stored |
+| **Sarvam** | `voice_provider`, `voice_id`, `voice_language`, `voice_model`, `voice_speed`, `voice_pitch` — **no `voice_name`, no `voice_category`** | models `bulbul:v3` (default), `bulbul:v3-beta` — never `bulbul:v2` (no longer offered, so a config naming it can't be edited in the UI); language like `hi-IN`; speed **0.7–1.2** (1.0); pitch **−2–2** (0.5). Voice categories `Customer Care` (default) / `Content Creation` / `International` select *which voices exist*; they are not stored |
+| **Deepgram** | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model` | model `aura-2`; `voice_language` **`en` only**. Curated voices: `thalia` (default), `andromeda`, `helena`, `theia` (AU) / `apollo`, `arcas`, `aries`, `draco` (UK). No speed/pitch controls |
+| **Speechify** | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `speechify_loudness_normalization`, `speechify_text_normalization` | model `simba-multilingual`; locales `hi-IN en-IN en ur-IN bn-IN gu-IN mr-IN ta-IN te-IN`; both normalization flags default **false**. Voices are **locale-scoped** — resolve them for the chosen locale, they are not a fixed list |
+| **Murf** (restricted / per account) | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `voice_style`, `voice_speed`, `voice_pitch` | model `FALCON` only (GEN2 streaming deprecated 2026-08-16); 26 locales; `voice_id` is locale-prefixed (`hi-IN-aman`); `voice_style` e.g. `Conversation` (default), `Promo`, `Narration`, `Customer Support Agent`; speed / pitch default **0**. Curated voices exist for `hi-IN en-IN en-US en-UK en-AU ta-IN bn-IN` only. Don't select it unless the account exposes it |
 | **Azure** | `voice_provider`, `voice_name`, `voice_id` (ShortName), `voice_language` (full locale, e.g. `hi-IN`), `voice_speed`, `voice_pitch`, `azure_voice_style`, `azure_voice_style_degree`, `azure_voice_volume` — **no `voice_model`** | speed **−1.0–1.0** (0.2); pitch **−2–2** (0); style `default`; style degree **0.1–2.0** (0.5); volume **0–100** (100) |
 | **Open AI** | `voice_provider`, `voice_name` **only** | Voices `sage alloy ash ballad coral echo shimmer verse`. **Only** valid when `model` is a realtime model, and then it is the only valid provider. If an existing config is already on Open AI, leave provider/name/language alone unless explicitly asked. |
-| **Callkaro** (restricted / admin-gated) | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_speed`, plus generation controls `temperature`, `top_p`, `top_k`, `repetition_penalty` | speed **0.7–1.2**; temperature **0–2** (0.4); top_p **0–1** (0.85); top_k **−1–100** (30); repetition_penalty **1.1–2** (1.1). Don't select it unless the account exposes it |
+| **Callkaro** (restricted / admin-gated) | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `voice_gender`, `voice_speed`, plus generation controls `temperature`, `top_p`, `top_k`, `repetition_penalty` | model `ck-tts-v1`; languages `hi`, `en`; voices `aaryan` `raju` `mahesh` (male) / `kanika` `priya` `tarini` (female) — set `voice_gender` to match; speed **0.7–1.2**; temperature **0–2** (0.4); top_p **0–1** (0.85); top_k **−1–100** (30); repetition_penalty **1.1–2** (1.1). Don't select it unless the account exposes it |
+
+Discover all of this from the CLI rather than recalling it: `ck voices --providers` lists providers and
+models, `ck voices --provider <name> --fields` prints exactly the keys and ranges one provider takes,
+and `ck voices --provider <name> [--model m] [--language l] [--gender g]` lists the voices themselves
+(Speechify needs `--language`).
 
 Language coverage differs per provider: Cartesia, Azure and Eleven Labs are language-indexed (each
 voice has a language/locale), while Sarvam voices are multilingual and not language-indexed — which
@@ -517,7 +525,8 @@ Honour it, and never write a field the account has no control for.
 | **Azure** | **array** of locales (`hi-IN en-IN en-US kn-IN mr-IN ta-IN te-IN bn-IN gu-IN ml-IN pa-IN as-IN or-IN ur-IN`) — never a plain string | **none** | simultaneous multi-language recognition, `keywords[]` |
 | **Eleven Labs** | **string**: `hi en kn mr ta te bn gu ml multi` | required. `scribe_v2_realtime` (low latency — prefer for live calls), `scribe_v2` (higher accuracy) | code-mixing via `multi` |
 | **Soniox** | **array** (40+ codes: all major Indic plus `es fr de it pt nl pl ru uk tr ar fa he id ms vi th ja ko zh cs da fi no sv el hu ro`) | **none** | `keywords[]`, `transcriber_general_context[{key,value}]`, `transcriber_text_context`, `transcriber_translation_terms[{source,target}]` |
-| **Cartesia** | **string** | `ink-whisper` | — |
+| **Cartesia** | **string**: `hi en kn mr ta te bn gu ml` (`ink-2` is `en` only) | required. `ink-whisper` (default), `ink-2` | — |
+| **Gnani** | **string**: `en-IN,hi-IN` (Hinglish — one comma-joined string, *not* an array), `hi-IN en-IN bn-IN gu-IN kn-IN ml-IN mr-IN pa-IN ta-IN te-IN` | **none** | `transcriber_format` (`verbatim` default \| `transcribe`), `transcriber_itn_native_numerals` (bool, default false — renders numbers in the language's own numerals) |
 | **Callkaro** (restricted / admin-gated) | **array** | **none** | same context / keyword / translation fields as Soniox |
 
 Guidance:
@@ -535,6 +544,9 @@ Guidance:
 - Some accounts have the transcriber language **locked** — leave it unchanged there.
 - `useMultiTranscribers` (agent doc) makes the secondary run alongside the primary rather than only
   on failure.
+- Discover this from the CLI instead of recalling it: `ck transcribers` lists every provider/model with
+  its language field and languages, and `ck transcribers --provider <name> --fields` prints the exact
+  keys that provider takes.
 
 ---
 

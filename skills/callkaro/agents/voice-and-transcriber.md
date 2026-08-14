@@ -9,13 +9,21 @@
 ## Find real voices — never invent one
 
 ```bash
-ck voices [--provider azure|elevenlabs|cartesia] [--language hi] [--gender female] [--json]
+ck voices --providers                      # every provider + its models
+ck voices --provider cartesia --fields     # exact keys, ranges and defaults
+ck voices --provider sarvam --model bulbul:v3 --language hi-IN --gender female
+ck transcribers                            # every provider/model + languages
+ck transcribers --provider gnani --fields
 ```
 
-Returns `provider, name, id, language, gender, styles`. `--language hi` matches
-`hi-IN` too. **Copy `voice_name`/`voice_id` verbatim** — a remembered id goes
-stale or belongs to another provider. (Sarvam and Open AI voices are fixed
-lists in the reference, not in this catalog.)
+`ck voices` covers **all** providers — Eleven Labs, Cartesia, Sarvam, Azure,
+Speechify, Deepgram, Open AI, Murf (`--all` adds admin-gated ones). `--language hi`
+matches `hi-IN` too; Speechify **requires** `--language` because its voices are
+locale-scoped. **Copy `voice_name`/`voice_id` verbatim** — a remembered id goes
+stale or belongs to another provider.
+
+`--fields` is the fastest way to write a correct config: it prints only the keys
+that provider uses, so you never write one it ignores.
 
 ## Choosing a voice
 
@@ -35,7 +43,7 @@ lists in the reference, not in this catalog.)
 |---|---|
 | Single Indian language | Sarvam `saarika:v2.5` (`hi-IN`) or Deepgram `nova-3` |
 | English + a domain (finance, medical, phone) | Deepgram's domain models |
-| Code-mixed / Hinglish | Deepgram `multi`, Eleven Labs `multi`, or Sarvam `saaras:v3` with `transcriber_mode: "codemix"` |
+| Code-mixed / Hinglish | Deepgram `multi`, Eleven Labs `multi`, Sarvam `saaras:v3` with `transcriber_mode: "codemix"`, or Gnani `en-IN,hi-IN` |
 | Caller may switch languages mid-call | An **array**-language provider: Soniox (best) or Azure |
 | Brand/product words misheard | Add `keywords[]` **inside** the transcriber object |
 
