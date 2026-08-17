@@ -36,11 +36,38 @@ The name `send_text_message_on_whatsapp` is reserved.
 
 | | Basic | Advanced (`source_code`) |
 |---|---|---|
-| What it is | fixed API call described by fields (`api`, `method`, `parameters[]`, `headers[]`) | real code the platform executes |
+| What it is | fixed API call described by fields (`api`, `method`, `parameters[]`, `headers{}`) | real code the platform executes |
 | Choose when | one fixed URL, no logic | URL contains `{{variables}}`, branching/retries, payload built from variables, or the response needs processing |
 | Language | — | pre/in-call: **Python** · post-call: **JavaScript** |
 
 Advanced is always safe; basic is only for a fixed URL with no logic.
+
+### Secrets in functions
+
+In a basic function, the UI's **Headers → Key Name / Value** rows are stored as
+a header object. Put the secret reference in **Value**:
+
+```json
+{
+  "headers": {
+    "Authorization": "x_secrets.CRM_AUTH_HEADER",
+    "Content-Type": "application/json"
+  }
+}
+```
+
+Store the complete header value, such as `Bearer <token>`, under
+`CRM_AUTH_HEADER` in the secrets registry. In advanced `source_code`, a secret
+reference can also be embedded where the runtime value belongs, for example
+`{"Authorization": "Bearer x_secrets.CRM_API_TOKEN"}`; in that case the stored
+secret is the token only. Never add `Bearer ` both in code and in the stored
+secret.
+
+Never put a real or dummy credential in a function. If no matching registered
+secret exists, use a descriptive pending reference such as
+`x_secrets.CRM_API_TOKEN`. After a successful save, report every new reference
+and tell the user to add it at https://callkaro.ai/dashboard/settings/secrets
+or ask their admin to update the secrets registry.
 
 Constraints that bite either way (details in reference §6): parameter rows are
 only `{key_name, type:"string"|"number", description}` — no boolean/object/enum,

@@ -55,7 +55,8 @@ published version for its language).
   ],
   "conversion_reason": "Customer agreed to a demo or asked for a follow-up",
   "postcallmodel": "gpt-5-nano",
-  "webhook": ""
+  "webhook": "",
+  "webhook_headers": []
 }
 ```
 
@@ -82,6 +83,20 @@ ck agents update <agentId> --versions <vid> \
 # big patches from a file:
 ck agents update <agentId> --versions <vid> --set @patch.json --commit "rework"
 ```
+
+Webhook headers are version-level fields. For example, `patch.json` can contain:
+
+```json
+{
+  "webhook": "https://api.example.com/call-ended",
+  "webhook_headers": [
+    { "key_name": "Authorization", "value": "x_secrets.CRM_AUTH_HEADER" }
+  ]
+}
+```
+
+Use non-sensitive literals directly and `x_secrets.NAME` for credentials. After saving, report each
+new secret name and direct the user to `https://callkaro.ai/dashboard/settings/secrets` or their admin.
 
 Rules:
 - **Never include database-managed fields** in any payload: `_id`, `__v`,

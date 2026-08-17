@@ -103,13 +103,13 @@ other integration detail — you MUST still include the function in the plan.
 DO NOT set needsMoreInfo: true for missing integration data.
 DO NOT skip the function or leave the plan empty because data is absent.
 
-Instead, proceed with the plan and in additionalInfo write the dummy values
-clearly so the generator knows to use them as placeholders:
+Instead, proceed with the plan and in additionalInfo write placeholders for
+non-secret values and a descriptive secret reference for credentials:
 
-  "Use dummy values for all missing integration details:
+  "Use placeholders for all missing integration details:
    URL: https://api.example.com/your-endpoint
-   Auth: Bearer YOUR_API_KEY_HERE
-   (User will replace these with real values later.
+   Auth: Bearer x_secrets.CRM_API_TOKEN
+   (User must add CRM_API_TOKEN to the secrets registry.
     Ignore any test/connection errors — this is intentional.)"
 
 This rule applies even if:

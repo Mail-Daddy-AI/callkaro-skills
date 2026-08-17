@@ -31,7 +31,10 @@ UNDERSTAND → PLAN → GATHER FACTS → BUILD → VERIFY → REPORT
    ([agents/AGENT-VERSION-REFERENCE.md](agents/AGENT-VERSION-REFERENCE.md) §18).
 6. **Report** — tell the user what exists now (ids, version names, what's
    published), what you verified, and what's still placeholder (API keys,
-   transfer numbers).
+   transfer numbers). After every successful create or update, report any newly
+   introduced `x_secrets.NAME` references. Tell the user to add those names at
+   `https://callkaro.ai/dashboard/settings/secrets` or ask their admin to update
+   the secrets registry.
 
 ## 2. Session preamble (always)
 
@@ -72,8 +75,9 @@ Which prompt type? (full guidance: [agents/prompts.md](agents/prompts.md))
 - **Never invent**: ObjectIds, voice ids/names, model names, knowledge-base
   ids, template placeholders. List first, copy verbatim.
 - **Placeholders are fine, silence is not**: pending integrations get
-  `https://api.example.com/…` / `Bearer YOUR_API_KEY_HERE` — build it, then
-  TELL the user what's placeholder.
+   `https://api.example.com/...`; credentials get an `x_secrets.NAME` reference,
+   never a literal placeholder or value. Build it, then TELL the user what URL
+   and secret names still need configuration.
 - **When a write doesn't round-trip**, say so plainly. Never report success
   because the HTTP call returned 200.
 - Emergency brake for runaway dialing: `ck ongoing pause` (then investigate).

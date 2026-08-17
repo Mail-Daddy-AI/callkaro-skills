@@ -306,12 +306,19 @@ with no logic.
 - `api_mapping` and `parameters_mapping` persist as **objects/records** (`{key: value}`), not entry
   arrays.
 - Absent optional fields are normal — never treat a missing optional as an error.
-- Placeholder URLs and dummy credentials are expected while integrations are pending
-  (`https://api.example.com/endpoint`, `Bearer YOUR_API_KEY_HERE`, `+910000000000`,
-  `event_id_placeholder`). Never block on missing integration details: write the function with
-  placeholders and say so.
-- `headers` is an array of `{key, value}` (a `key_name` alias also appears in stored data).
-  `Content-Type: application/json` is the usual default.
+- Placeholder URLs and non-secret values are expected while integrations are pending
+  (`https://api.example.com/endpoint`, `+910000000000`, `event_id_placeholder`). Credentials must
+  use a descriptive `x_secrets.NAME` reference. Never block on missing integration details: write
+  the function with placeholders and say so.
+- The basic-function UI edits `headers` as `{key_name, value}` rows, then saves them as a
+  `{headerName: value}` object. `Content-Type: application/json` is the usual default.
+- For a basic function header, use the exact reference as the stored value, for example
+  `"Authorization": "x_secrets.CRM_AUTH_HEADER"`; store the complete `Bearer <token>` value under
+  that name. Advanced `source_code` may embed a reference, for example
+  `"Authorization": "Bearer x_secrets.CRM_API_TOKEN"`, where the registered secret is only the
+  token. Never duplicate the `Bearer ` prefix.
+- After saving, report every new secret reference and tell the user to add it at
+  https://callkaro.ai/dashboard/settings/secrets or ask their admin to update the secrets registry.
 
 ### Field sets per custom variant
 
@@ -619,7 +626,26 @@ change one field at a time. Fields, ranges and platform defaults:
 | `followup_prompt` | string \| null | Instructions for building that follow-up flow. |
 | `warm_transfer` / `warm_transfer_prompt` | bool `false` / string \| null | Version-level warm transfer. On types 0–2 these normally live on the `transfer` function; on type 3 they are lifted to version level at save (§6). |
 | `webhook` | string URL, `""` | Version-level webhook receiving the call-ended payload. |
+| `webhook_headers` | `[{key_name, value}]`, `[]` | Optional headers sent with the webhook. `value` is either a non-sensitive literal or an exact `x_secrets.NAME` reference. |
 | `time_limit`, `hold_disconnect_timeout` | see §11 | Duration caps. |
+
+Webhook header example:
+
+```json
+{
+  "webhook": "https://api.example.com/call-ended",
+  "webhook_headers": [
+    { "key_name": "Authorization", "value": "x_secrets.CRM_AUTH_HEADER" },
+    { "key_name": "Content-Type", "value": "application/json" }
+  ]
+}
+```
+
+Use `x_secrets.NAME` for API keys, tokens, passwords, and other credentials; never place their
+literal values in an agent payload or chat. The saved secret must contain the complete header value
+expected by the destination, including `Bearer ` when required. After every successful create or
+update, report each newly introduced secret name and tell the user to add it at
+`https://callkaro.ai/dashboard/settings/secrets` or ask their admin to update the secrets registry.
 
 ---
 
@@ -994,7 +1020,7 @@ Quality — nothing validates these, and they are what make the agent good:
   "type": "custom_post_call",
   "name": "push_outcome_to_crm",
   "description": "Push the call outcome to the CRM after the call ends",
-  "source_code": "async function pushOutcomeToCrm(context) {\n  const payload = {\n    phone: context.metadata?.phone,\n    interested: context.post_call?.interested ?? false\n  };\n  try {\n    const res = await fetch('https://api.example.com/crm/calls', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer YOUR_API_KEY_HERE' },\n      body: JSON.stringify(payload)\n    });\n    if (!res.ok) console.error('CRM push failed', res.status);\n  } catch (err) {\n    console.error('CRM push error', err);\n  }\n}",
+  "source_code": "async function pushOutcomeToCrm(context) {\n  const payload = {\n    phone: context.metadata?.phone,\n    interested: context.post_call?.interested ?? false\n  };\n  try {\n    const res = await fetch('https://api.example.com/crm/calls', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer x_secrets.CRM_API_TOKEN' },\n      body: JSON.stringify(payload)\n    });\n    if (!res.ok) console.error('CRM push failed', res.status);\n  } catch (err) {\n    console.error('CRM push error', err);\n  }\n}",
   "conditions": [
     { "id": "calltype_1731570000000_a1b2c3", "source": "call_type", "key": "connected" }
   ]
