@@ -44,6 +44,7 @@ Everything else has sane defaults.
 | `ck agents get <id> --versions <vid> --json` | ONE merged agent+version JSON — the full working config |
 | `ck agents versions <id> [--json]` | version list: name, id, language, type, active |
 | `ck agents create [json\|--file f.json]` | create from a single JSON object (`name` required; `versionName` defaults `v1`). **The new agent is immediately published.** |
+| `ck agents clone-version <id> --versions <sourceVid> --name <name> --prompt-type <0-3> --language <code>` | clone a source into a sibling version under the same agent; see [versions.md](versions.md) |
 | `ck agents update <id> --set '{json}' [--versions <vid>] [--commit "msg"]` | patch fields; see [create-update.md](create-update.md) for the level split |
 | `ck agents export <id> [--versions <ids>] [--file out.json]` | sanitized JSON (ids/publish state stripped, `x_agent_id` added) — re-importable |
 | `ck agents import file.json [--dry-run]` | object → one agent; array → one agent with several versions. Validates like the web importer first |

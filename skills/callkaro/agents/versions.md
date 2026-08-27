@@ -18,10 +18,49 @@
 
 ```bash
 ck agents versions <agentId> --json                 # name, id, language, type, active
+ck agents clone-version <agentId> --versions <sourceVid> --name <name> \
+  --prompt-type <0-3> --language <code>
 ck agents publish <agentId> --versions <vid>        # per-language publish
 ck agents toggle-active <agentId> --versions <vid>  # activate/deactivate
 ck agents ab <agentId> --versions "<vid1>=60,<vid2>=40"   # start A/B
 ck agents ab <agentId> --disable                    # stop A/B
+```
+
+### Clone a sibling version
+
+`clone-version` copies an existing version under the **same agent**. All four
+inputs are mandatory: source `--versions`, target `--name`, target
+`--prompt-type`, and target `--language`.
+
+```bash
+ck agents clone-version <agentId> \
+  --versions <sourceVid> \
+  --name "Hindi v1" \
+  --prompt-type 1 \
+  --language hi \
+  --set '{"silence_language":"hi"}' \
+  --json
+```
+
+Prompt types are `0` Basic, `1` Advanced, `2` Multi-prompt, and `3` Pathways.
+Languages are `en hi kn ta te mr gu bn ml`. A changed prompt type is migrated
+by the backend. Prompts, functions, models, capabilities, and other version
+settings are inherited from the source.
+
+`--set` is optional and accepts only `transcriber`, `secondary_transcriber`,
+`voice_configuration`, `secondary_voice_configuration`, and
+`silence_language`. It does not accept prompts, models, capabilities, or
+`default_language`; use the mandatory `--language` option for the latter.
+
+With `--json`, read the new id from `newVersion._id`. If the target language
+already has a published version, the clone is not published automatically. If
+none exists, the backend adds the clone to that language's published mapping.
+Edit the clone afterward with:
+
+```bash
+ck agents update <agentId> --versions <newVid> --set @changes.json
+ck agents get <agentId> --versions <newVid> --json
+ck agents versions <agentId> --json
 ```
 
 A/B rules (CLI validates before sending): **at least 2 versions**, ratios are
@@ -98,15 +137,18 @@ To add/remove/reorder a rule: edit the array (order = evaluation order; keep
 ```bash
 # 1. capture the current published version
 ck agents get <agentId> --versions <publishedVid> --json > current.json
-# 2. create a sibling version: export + import is the clean path, or update a
-#    scratch version. Give it a clear versionName like "v2-discount-fix".
-# 3. test it with simulations (see ../simulations.md) until PASS
+# 2. clone it into a sibling version under the same agent
+ck agents clone-version <agentId> --versions <publishedVid> \
+  --name "v2-discount-fix" --prompt-type <0-3> --language <code> --json
+# 3. read newVid from newVersion._id, then edit only the clone as needed
+ck agents update <agentId> --versions <newVid> --set @changes.json
+# 4. test it with simulations (see ../simulations.md) until PASS
 ck sim run <agentId> --tests <t1,t2> --versions <newVid>
-# 4. either flip over…
+# 5. either flip over…
 ck agents publish <agentId> --versions <newVid>
 # …or A/B it against the incumbent:
 ck agents ab <agentId> --versions "<oldVid>=50,<newVid>=50"
-# 5. after enough calls, read the scorecard and settle:
+# 6. after enough calls, read the scorecard and settle:
 ck analytics version <agentId> --json
 ck agents ab <agentId> --disable
 ck agents publish <agentId> --versions <winnerVid>
