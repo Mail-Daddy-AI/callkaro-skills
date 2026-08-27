@@ -104,11 +104,13 @@ DO NOT set needsMoreInfo: true for missing integration data.
 DO NOT skip the function or leave the plan empty because data is absent.
 
 Instead, proceed with the plan and in additionalInfo write placeholders for
-non-secret values and a descriptive secret reference for credentials:
+non-secret values and a descriptive secret name for credentials:
 
   "Use placeholders for all missing integration details:
    URL: https://api.example.com/your-endpoint
-   Auth: Bearer x_secrets.CRM_API_TOKEN
+  Secret name: CRM_API_TOKEN
+  Declarative header value: x_secrets.CRM_API_TOKEN
+  Advanced source access: x_secrets[\"CRM_API_TOKEN\"]
    (User must add CRM_API_TOKEN to the secrets registry.
     Ignore any test/connection errors — this is intentional.)"
 

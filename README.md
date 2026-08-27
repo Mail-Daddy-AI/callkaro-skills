@@ -41,6 +41,7 @@ and test it"* — and it will load the skill.
 |---|---|
 | `skills/callkaro/SKILL.md` | entry point: ground rules + where to look |
 | `INSTRUCTIONS.md` | how to think: operating loop, playbooks, safety rules |
+| `secrets.md` | account secret commands, names-only discovery, and safe reference syntax |
 | `agents/AGENT-VERSION-REFERENCE.md` | every agent/version field, its values, and the traps |
 | `agents/prompts.md` · `voice.md` · `transcriber.md` · `functions.md` | script writing, TTS, STT, abilities (incl. advanced Python/JS) |
 | `agents/create-update.md` · `versions.md` | workflows, publishing, A/B testing |

@@ -314,11 +314,12 @@ with no logic.
   `{headerName: value}` object. `Content-Type: application/json` is the usual default.
 - For a basic function header, use the exact reference as the stored value, for example
   `"Authorization": "x_secrets.CRM_AUTH_HEADER"`; store the complete `Bearer <token>` value under
-  that name. Advanced `source_code` may embed a reference, for example
-  `"Authorization": "Bearer x_secrets.CRM_API_TOKEN"`, where the registered secret is only the
-  token. Never duplicate the `Bearer ` prefix.
-- After saving, report every new secret reference and tell the user to add it at
-  https://callkaro.ai/dashboard/settings/secrets or ask their admin to update the secrets registry.
+  that name. Advanced `source_code` reads the runtime object/dict with
+  `x_secrets["CRM_API_TOKEN"]` and constructs `Bearer <token>` in code, where the registered secret
+  is only the token. Never duplicate the `Bearer ` prefix.
+- Run `ck secrets list --json` before authoring. After saving, report every missing secret name and
+  tell the user to run `ck secrets set <name>`, add it at
+  https://callkaro.ai/dashboard/settings/secrets, or ask their admin to update the registry.
 
 ### Field sets per custom variant
 
@@ -615,7 +616,9 @@ change one field at a time. Fields, ranges and platform defaults:
 | `bgNoise` | bool, `true` | Ambient office noise so the line sounds human rather than studio-silent. |
 | `bgNoiseVolume` | 0–1, `0.2` | Volume of that ambience. |
 | `noise_cancellation` | bool, `true` | Suppress the **caller's** background noise before transcription. |
-| `noise_cancellation_strategy` | `dtln` \| `deepfilternet` \| `noisereduce` \| `aicoustics`, `dtln` | Which denoiser to use. UI-exposed — check §18 before relying on it. |
+| `noise_cancellation_strategy` | `aicoustics` \| `dtln` \| `deepfilternet` \| `noisereduce`, `aicoustics` | Which denoiser to use. `aicoustics` is shown as CallKaro in the UI. |
+| `noise_cancellation_strength` | 0.05–1, `1` | Strength of caller-noise reduction; used when noise cancellation is enabled. |
+| `punctuations_to_remove` | string[], `[]` | Exact strings removed from caller transcriptions before they are processed. |
 | `voicemail_msg` | bool, `true` | Leave a message when the call lands on voicemail. |
 | `voicemail_custom_msg` | string, `""` | The message. **Empty = dynamic voicemail message** (generated from the prompt); non-empty = that exact text (supports `{{variables}}`). This single field encodes the "dynamic vs custom" choice the UI shows. |
 | `dtmf_collection_enabled` | bool, `false` | Let the agent collect fixed-length digits (OTP, PIN, pincode) from the keypad. The prompt must also instruct the agent to call `collect_digits_via_dtmf` with the expected digit count. UI-exposed — check §18. |
@@ -641,11 +644,13 @@ Webhook header example:
 }
 ```
 
-Use `x_secrets.NAME` for API keys, tokens, passwords, and other credentials; never place their
+Run `ck secrets list --json` before authoring sensitive headers and reuse matching names. Use exact
+`x_secrets.NAME` values for API keys, tokens, passwords, and other credentials; never place their
 literal values in an agent payload or chat. The saved secret must contain the complete header value
 expected by the destination, including `Bearer ` when required. After every successful create or
-update, report each newly introduced secret name and tell the user to add it at
-`https://callkaro.ai/dashboard/settings/secrets` or ask their admin to update the secrets registry.
+update, report each missing name and tell the user to run `ck secrets set <name>`, add it at
+`https://callkaro.ai/dashboard/settings/secrets`, or ask their admin to update the registry. See
+[../secrets.md](../secrets.md) for source-code syntax and the full workflow.
 
 ---
 
@@ -810,6 +815,9 @@ Everything the version document declares, with its default and the section that 
 | `bgNoise` | bool | `true` | 13 |
 | `bgNoiseVolume` | number 0–1 | `0.2` | 13 |
 | `noise_cancellation` | bool | `true` | 13 |
+| `noise_cancellation_strategy` | enum | `"aicoustics"` | 13 |
+| `noise_cancellation_strength` | number 0.05–1 | `1` | 13 |
+| `punctuations_to_remove` | string[] | `[]` | 13 |
 | `voicemail_msg` | bool | `true` | 13 |
 | `voicemail_custom_msg` | string | `""` | 13 |
 | `hold_disconnect_timeout` | int s | `30` | 11 |
@@ -832,6 +840,7 @@ Everything the version document declares, with its default and the section that 
 | `useOthersDropOffReason` | bool | `false` | 8 |
 | `conversion_reason` | string | `""` | 3, 8 |
 | `webhook` | string | `""` | 13 |
+| `webhook_headers` | object[] | `[]` | 13 |
 | `preFormatVariables` | object | `{}` | 14 |
 | `variableSource` | object | `{}` | 14 |
 | `insert_metadata_in_prompt` | bool | `true` | 14 |
@@ -845,8 +854,7 @@ Everything the version document declares, with its default and the section that 
 These appear in the web builder but are **not declared on the version document** in the deployment
 this reference was written against, which means a plain write is silently discarded:
 
-`dtmf_collection_enabled` · `noise_cancellation_strategy` · `noise_cancellation_strength` ·
-`callPropertyMapping`
+`dtmf_collection_enabled` · `callPropertyMapping`
 
 Before promising any of them to a user: write the value, read the version back, and confirm it
 round-tripped. If it didn't, say so plainly instead of reporting success — the write returns 200
@@ -1020,7 +1028,7 @@ Quality — nothing validates these, and they are what make the agent good:
   "type": "custom_post_call",
   "name": "push_outcome_to_crm",
   "description": "Push the call outcome to the CRM after the call ends",
-  "source_code": "async function pushOutcomeToCrm(context) {\n  const payload = {\n    phone: context.metadata?.phone,\n    interested: context.post_call?.interested ?? false\n  };\n  try {\n    const res = await fetch('https://api.example.com/crm/calls', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer x_secrets.CRM_API_TOKEN' },\n      body: JSON.stringify(payload)\n    });\n    if (!res.ok) console.error('CRM push failed', res.status);\n  } catch (err) {\n    console.error('CRM push error', err);\n  }\n}",
+  "source_code": "async function pushOutcomeToCrm(context) {\n  const payload = {\n    phone: context.metadata?.phone,\n    interested: context.post_call?.interested ?? false\n  };\n  try {\n    const res = await fetch('https://api.example.com/crm/calls', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${x_secrets['CRM_API_TOKEN']}` },\n      body: JSON.stringify(payload)\n    });\n    if (!res.ok) console.error('CRM push failed', res.status);\n  } catch (err) {\n    console.error('CRM push error', err);\n  }\n}",
   "conditions": [
     { "id": "calltype_1731570000000_a1b2c3", "source": "call_type", "key": "connected" }
   ]

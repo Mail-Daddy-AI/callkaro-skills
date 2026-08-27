@@ -61,6 +61,7 @@ file never restates a field table; it links to the Reference section.
 | Versions, publishing, A/B (incl. rule-based) | [agents/versions.md](agents/versions.md) |
 | Picking a voice or transcriber (`ck voices`, pairing, language traps) | [agents/voice-and-transcriber.md](agents/voice-and-transcriber.md) |
 | Which function to add, basic vs advanced, where to attach | [agents/functions.md](agents/functions.md) |
+| Account secrets (list/set/rename/remove and safe agent references) | [secrets.md](secrets.md) |
 | Phone numbers (list/buy/assign/spam/release) | [numbers.md](numbers.md) |
 | Single calls, call history, exports, live queues | [calls.md](calls.md) |
 | Batch calling + CSV format | [batches.md](batches.md) |

@@ -47,6 +47,10 @@ published version for its language).
   "speakfirst_inbound": { "value": 1, "message_interruption": false },
   "time_limit": 300,
   "end_call_msg": [],
+  "punctuations_to_remove": [],
+  "noise_cancellation": true,
+  "noise_cancellation_strategy": "aicoustics",
+  "noise_cancellation_strength": 1,
   "functions": [
     { "type": "end", "name": "end_call", "description": "End the call when the conversation is complete or the user asks to stop." }
   ],
@@ -95,8 +99,25 @@ Webhook headers are version-level fields. For example, `patch.json` can contain:
 }
 ```
 
-Use non-sensitive literals directly and `x_secrets.NAME` for credentials. After saving, report each
-new secret name and direct the user to `https://callkaro.ai/dashboard/settings/secrets` or their admin.
+Use non-sensitive literals directly and exact `x_secrets.NAME` values for credentials. Run
+`ck secrets list --json` before authoring the payload so existing names can be reused. After saving,
+report each missing secret name and direct the user to `ck secrets set <name>`,
+`https://callkaro.ai/dashboard/settings/secrets`, or their admin.
+
+Noise cancellation and transcription cleanup are also version-level fields:
+
+```json
+{
+  "punctuations_to_remove": ["...", "—"],
+  "noise_cancellation": true,
+  "noise_cancellation_strategy": "aicoustics",
+  "noise_cancellation_strength": 0.8
+}
+```
+
+`punctuations_to_remove` is an array of exact strings removed from caller
+transcriptions before processing. Noise-cancellation strength is `0.05`–`1`;
+the strategy is `aicoustics`, `dtln`, `deepfilternet`, or `noisereduce`.
 
 Rules:
 - **Never include database-managed fields** in any payload: `_id`, `__v`,

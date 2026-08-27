@@ -20,9 +20,11 @@ UNDERSTAND → PLAN → GATHER FACTS → BUILD → VERIFY → REPORT
    integrations. Ask only for what you cannot infer or default.
 2. **Plan** — decide which entities you'll touch (agent? version? numbers?
    batch?) and in what order. State the plan briefly before running commands.
-3. **Gather facts — never guess ids or catalogs.** `ck agents list --json`,
-   `ck agents versions <id> --json`, `ck voices --language <l> --json`,
-   `ck numbers list --json`. Everything you write into a payload must come from
+3. **Gather facts — never guess ids, catalogs, or secret names.** `ck agents
+   list --json`, `ck agents versions <id> --json`, `ck voices --language <l>
+   --json`, `ck numbers list --json`. When an integration needs credentials,
+   also run `ck secrets list --json`; give the LLM only those names and masked
+   values, never plaintext. Everything you write into a payload must come from
    a listing or from the user.
 4. **Build** — follow the authoring order (§3 below).
 5. **Verify** — read back what you wrote (`ck agents get <id> --versions <vid>
@@ -32,9 +34,9 @@ UNDERSTAND → PLAN → GATHER FACTS → BUILD → VERIFY → REPORT
 6. **Report** — tell the user what exists now (ids, version names, what's
    published), what you verified, and what's still placeholder (API keys,
    transfer numbers). After every successful create or update, report any newly
-   introduced `x_secrets.NAME` references. Tell the user to add those names at
-   `https://callkaro.ai/dashboard/settings/secrets` or ask their admin to update
-   the secrets registry.
+   introduced `x_secrets.NAME` references. Tell the user to run `ck secrets set
+   <name>`, add those names at `https://callkaro.ai/dashboard/settings/secrets`,
+   or ask their admin to update the secrets registry.
 
 ## 2. Session preamble (always)
 
@@ -78,6 +80,10 @@ Which prompt type? (full guidance: [agents/prompts.md](agents/prompts.md))
    `https://api.example.com/...`; credentials get an `x_secrets.NAME` reference,
    never a literal placeholder or value. Build it, then TELL the user what URL
    and secret names still need configuration.
+- **Use the right secret syntax**: declarative header values use the exact
+   `x_secrets.NAME` sentinel. Advanced Python/JavaScript source uses
+   `x_secrets["NAME"]` and constructs prefixes such as `Bearer ` at runtime.
+   See [secrets.md](secrets.md).
 - **When a write doesn't round-trip**, say so plainly. Never report success
   because the HTTP call returned 200.
 - Emergency brake for runaway dialing: `ck ongoing pause` (then investigate).
