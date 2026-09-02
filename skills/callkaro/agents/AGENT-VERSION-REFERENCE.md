@@ -166,10 +166,18 @@ Shared fields (both types):
 | `overwrite` | bool, `false` | `false` → the version `systemprompt` is **merged** with this prompt, so write only the phase-specific part. `true` → the base is **excluded** and this prompt must be fully self-contained (persona, tone, rules), or the agent changes character mid-call. |
 | `msg_while_switching_type` | `silent` \| `static` \| `dynamic` | What the caller hears while switching **into** this capability. `silent` (default) = nothing; `static` = speak `msg_while_switching` verbatim; `dynamic` = `msg_while_switching` is a *prompt* for generating a bridging line. |
 | `msg_while_switching` | string | The literal line, or the generation prompt. `""` for `silent`. |
+| `endpointing` | `{mode, min_delay, max_delay}` | Controls when the caller's turn is complete while this capability/node is active. `mode` is `fixed` or `dynamic`; `min_delay` is 0–1 seconds and `max_delay` is 0–6 seconds. Defaults: `{ "mode": "fixed", "min_delay": 0.5, "max_delay": 3 }`. See below. |
 | `llms` | `{primary_model, secondary_model, temperature}` | Per-capability model choice — how you control cost/quality per phase (cheap model for the greeting, stronger for negotiation). Defaults `gpt-4.1-mini` / `gpt-4.1-nano` / `0.2`. **`temperature` here is 0–1** (§7). |
 | `functions` | object[] | Functions callable while inside this capability (§6). |
 | `postcall` | object[] | Post-call variables scoped to this capability (§8). |
 | `use_filler` | bool | Use filler sounds during this capability. Only meaningful when version `filler_config.filler_type` ≠ `none`. |
+
+Endpointing behavior:
+
+- `min_delay` is the minimum silence after the caller stops speaking before the turn may end. Raising it reduces premature cutoffs but adds response latency.
+- `max_delay` is the maximum silence the system may wait before ending the turn. Raising it allows longer thinking pauses but can make responses feel slower.
+- `fixed` applies the configured timing consistently. `dynamic` adapts the wait to the caller's speech and conversation context while remaining between `min_delay` and `max_delay`.
+- Treat `endpointing` as one complete nested object. When changing one member, preserve the current values of the other members and send the complete object.
 
 Type-2 only:
 
@@ -956,6 +964,7 @@ Quality — nothing validates these, and they are what make the agent good:
       "stick_capability": false,
       "msg_while_switching_type": "silent",
       "msg_while_switching": "",
+      "endpointing": { "mode": "fixed", "min_delay": 0.5, "max_delay": 3 },
       "llms": { "primary_model": "gpt-4.1-mini", "secondary_model": "gpt-4.1-nano", "temperature": 0.2 },
       "functions": [],
       "postcall": []
@@ -988,6 +997,7 @@ Quality — nothing validates these, and they are what make the agent good:
       "when_to_jump": "",
       "msg_while_switching_type": "silent",
       "msg_while_switching": "",
+      "endpointing": { "mode": "fixed", "min_delay": 0.5, "max_delay": 3 },
       "llms": { "primary_model": "gpt-4.1-mini", "secondary_model": "gpt-4.1-nano", "temperature": 0.2 },
       "functions": [],
       "postcall": []
@@ -1003,6 +1013,7 @@ Quality — nothing validates these, and they are what make the agent good:
       "extract_variables": [],
       "msg_while_switching_type": "dynamic",
       "msg_while_switching": "Say a short bridging line before connecting a human",
+      "endpointing": { "mode": "fixed", "min_delay": 0.5, "max_delay": 3 },
       "functions": [
         {
           "type": "transfer", "name": "transfer_to_agent",

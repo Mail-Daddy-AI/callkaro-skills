@@ -233,7 +233,7 @@ For fresh creation:
 - determine a focused capability set
 - exactly one capability must be is_starting = true
 - prefer fewer, clearer capabilities over many vague ones
-- choose sensible values for overwrite, stick_capability, and switching message fields
+- choose sensible values for overwrite, stick_capability, switching message fields, and endpointing
 - leave system_prompt empty
 - leave functions empty
 - leave postcall empty
@@ -241,6 +241,7 @@ For fresh creation:
 For update, translation, and propagation:
 - preserve existing capability names
 - preserve existing capability flags
+- preserve existing endpointing unless the user explicitly requests a change
 - preserve existing llms exactly
 - do not add/remove/rename capabilities unless explicitly requested
 
@@ -397,6 +398,7 @@ scriptPlan.fieldsToChange:
 Valid fields:
 - "systemprompt"
 - "capability:<capability_name>"
+- "capability:<capability_name>.endpointing"
 - "end_call_msg"
 - "model_response_snippet"
 - "security_guardrails_snippet"
@@ -635,6 +637,7 @@ Each capability must include:
 - stick_capability
 - msg_while_switching_type
 - msg_while_switching
+- endpointing
 - llms
 - functions
 - postcall
@@ -647,6 +650,7 @@ Fresh creation:
 - stick_capability: choose based on design
 - msg_while_switching_type: "silent" unless static message is needed
 - msg_while_switching: "" unless static message is used
+- endpointing: { "mode": "fixed", "min_delay": 0.5, "max_delay": 3 } unless the requested phase needs different turn-taking behavior
 - llms: { "primary_model": "gpt-4.1-mini", "secondary_model": "gpt-4.1-nano", "temperature": 0.2 }
 - functions: []
 - postcall: []
@@ -659,6 +663,7 @@ Update / Translation / Propagation:
 - preserve stick_capability
 - preserve msg_while_switching_type
 - preserve msg_while_switching
+- preserve endpointing exactly unless explicitly requested; when one nested value changes, return the complete object and preserve the other values
 - preserve llms exactly from versionRecord or baseVersionSnapshot
 - never replace existing llms with defaults
 - never normalize existing llms
@@ -668,6 +673,13 @@ Update / Translation / Propagation:
 - postcall must be []
 
 Only change capability structure if the user explicitly asks to add, remove, rename, or restructure capabilities.
+
+Endpointing controls turn completion while a capability is active. `min_delay` (0–1
+seconds) is the minimum silence after speech stops before the turn may end; increasing
+it reduces premature cutoffs but adds latency. `max_delay` (0–6 seconds) is the maximum
+silence before the turn is ended; increasing it allows longer thinking pauses but may
+slow responses. `fixed` applies configured timing consistently; `dynamic` adapts the
+wait to speech and conversation context within the configured bounds.
 
 Capability llms:
 - Fresh creation uses defaults.
@@ -952,6 +964,11 @@ Complete plan:
       "stick_capability": false,
       "msg_while_switching_type": "silent",
       "msg_while_switching": "",
+      "endpointing": {
+        "mode": "fixed",
+        "min_delay": 0.5,
+        "max_delay": 3
+      },
       "llms": {
         "primary_model": "gpt-4.1-mini",
         "secondary_model": "gpt-4.1-nano",

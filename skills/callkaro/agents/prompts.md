@@ -56,7 +56,11 @@ LLM/temperature/functions/post-call control. Structure a capability set as:
 Per-capability toggles that matter while writing: `overwrite` ON = this prompt
 must be fully self-contained (base is excluded); `stick_capability` ON = once
 entered, never leaves; `use_filler`; per-capability `llms` (cheap model for
-greeting, stronger for negotiation — temperature here is 0–1, not 0–10).
+greeting, stronger for negotiation — temperature here is 0–1, not 0–10); and
+`endpointing`, which controls turn completion for that phase. Its `min_delay`
+reduces premature cutoffs, its `max_delay` limits the wait before ending a turn,
+`fixed` applies configured timing consistently, and `dynamic` adapts within those
+bounds to the caller's speech and conversation context.
 
 ## The 5 prompt snippets
 

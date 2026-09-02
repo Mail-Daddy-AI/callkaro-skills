@@ -24,7 +24,7 @@ Each request provides:
   Always read this block first. It tells you which language to write ALL content in
   and which values to set for silence_language and default_language.
 - CAPABILITIES — the list of capabilities with their names, flags (is_starting, overwrite,
-  stick_capability, msg_while_switching), and any existing system_prompt content.
+  stick_capability, msg_while_switching, endpointing), and any existing system_prompt content.
   Each capability's flags tell you how its system_prompt is used at runtime.
 - FULL CONVERSATION LOG — the complete ordered list of what the user asked.
   Use this as the source of truth for intent, not just the last message.
@@ -63,7 +63,8 @@ Return valid JSON with exactly these keys. No markdown wrapper. No code fences. 
   "capabilities": [
     {
       "capability": "<snake_case_identifier>",
-      "system_prompt": "<capability-specific prompt>"
+      "system_prompt": "<capability-specific prompt>",
+      "endpointing": { "mode": "fixed", "min_delay": 0.5, "max_delay": 3 }
     }
   ]
 }
@@ -79,7 +80,8 @@ Rules:
   • silence_language and default_language → always return; never omit.
   • capabilities → return one entry per capability. Always include ALL capabilities
     from the input — even unchanged ones. The capability identifier must match exactly
-    what was provided in the input. Populate system_prompt for every capability.
+    what was provided in the input. In create mode, populate system_prompt and include
+    the complete endpointing object. In update mode, follow the null rules below.
   • CREATE mode: return actual values for all fields and all capability system_prompts.
   • UPDATE mode: return null for every top-level field you are NOT modifying.
   For capabilities: set system_prompt to null for any capability you are NOT changing.
@@ -114,6 +116,15 @@ Each capability's system_prompt is used differently at runtime based on its flag
   msg_while_switching: "static"
     A hardcoded phrase is spoken aloud while the agent transitions to this capability.
     Do not generate this phrase in the system_prompt — it is defined separately.
+
+  endpointing
+    Controls when the caller's turn is considered complete for this capability.
+    min_delay (0–1 seconds) is the minimum silence after speech stops before the turn
+    may end; raising it reduces premature cutoffs but adds latency. max_delay (0–6
+    seconds) is the maximum silence before the turn is ended; raising it allows longer
+    thinking pauses but can slow responses. mode "fixed" applies configured timing
+    consistently; mode "dynamic" adapts within those bounds to speech and conversation
+    context. Default: { "mode": "fixed", "min_delay": 0.5, "max_delay": 3 }.
 
 ══════════════════════════════════════════════════════════════════════
  LANGUAGE CONFIGURATION
@@ -257,8 +268,10 @@ When no existing script is provided (systemprompt is empty and all capability sy
    • overwrite: false → phase-specific additions only; the base is merged at runtime.
    • overwrite: true → fully self-contained; the base is not available at runtime.
    • Cover only the scope of that capability. Do not bleed content across capabilities.
-6. Exactly one capability must be is_starting: true — its system_prompt handles the opening exchanges.
-7. Return ALL capabilities from the input, in the same order, with populated system_prompts.
+6. Return each capability's complete endpointing object. Use the default for newly created
+  capabilities unless the planner requests different turn-taking behavior.
+7. Exactly one capability must be is_starting: true — its system_prompt handles the opening exchanges.
+8. Return ALL capabilities from the input, in the same order, with populated system_prompts.
 
 ══════════════════════════════════════════════════════════════════════
  UPDATE MODE
@@ -276,6 +289,9 @@ PLANNER FIELD PLAN (if provided — authoritative, follow exactly):
   CAPABILITIES TO CHANGE — modify ONLY the capabilities listed by name in fieldsToChange.
   EVERYTHING ELSE — return null. Do not copy, reformat, or touch anything not explicitly listed.
   For unchanged capabilities, set system_prompt to null.
+  Return endpointing as null unless `capability:<capability_name>.endpointing` is listed.
+  When changing endpointing, return the COMPLETE { mode, min_delay, max_delay } object
+  and preserve any nested values the user did not request changing.
 
   silence_language and default_language in update mode:
   - If listed in fieldsToChange → set to the value in the change instruction.

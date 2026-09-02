@@ -132,6 +132,9 @@ Rules:
   fields like `voice_configuration`, `transcriber`, `filler_config`,
   `capabilities` are replaced whole — send the complete object, not one key.
   Read-modify-write: `ck agents get <id> --versions <vid> --json`, edit, send back.
+- A capability/node's `endpointing` is also one complete object. To change one nested
+  value, read the current `{mode, min_delay, max_delay}`, modify only the requested
+  value, and send all three back while preserving every other capability field.
 - `temperature` is 0–10 (stored ×10). `time_limit` must be non-zero.
 - Always pass `--commit "why"` on version changes — it snapshots the version
   (like a git commit) so changes are auditable/revertable in the dashboard.
