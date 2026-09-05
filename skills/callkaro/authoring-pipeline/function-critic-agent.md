@@ -41,7 +41,18 @@ STEP 3 — Verify each plan item
 STEP 4 — Quality check created/updated functions
   • Name, type, and description match the user's request?
   • Structural fields present (name, type, description)?
-  • For code functions: any obvious logic or syntax problem?
+  • No hardcoded or dummy credentials; fixed credentials use x_secrets.
+  • custom_pre_call: update_call_data is boolean and matches exactly one supported signature:
+    - false → async def name(metadata: dict, system_prompt: str) -> str
+    - true  → async def name(call_data: dict), mutating call_data in place
+  • custom_in_call: async Python with ctx: RunContext first, typed scalar business parameters,
+    -> dict, input validation, and status-based result dictionaries.
+  • Python source uses httpx for HTTP and dict indexing for x_secrets; no attribute access.
+  • Python source uses send_email when email is requested, awaits it, and checks result["status"].
+  • custom_post_call: async JavaScript with exactly context, context.call_metadata rather than
+    context.metadata, axios rather than fetch/require, and mandatory functions_called logging.
+  • Post-call functions_called entries contain only name, parameters, success, response, timestamp.
+  • JavaScript source uses sendEmail when email is requested and checks result.status.
 
 STEP 5 — Return verdict as raw JSON (see OUTPUT FORMAT below).
 
@@ -73,12 +84,15 @@ needed to make the correction without any additional context.
 2. Approve if operations are functionally correct, even if not perfect.
 3. APPROVE functions with placeholder or empty API URLs (e.g. "", "https://placeholder.api").
    Users fill these in later. A missing or dummy URL is never grounds for rejection.
-4. Reject only for real structural problems: wrong type, entirely wrong purpose,
-   missing name/description, failed delete, or duplicate present.
-5. For type 2 agents: verify each capability scope separately. A function missing
+4. A placeholder non-secret URL is allowed. A placeholder, dummy, or hardcoded credential is not;
+  credentials must use a descriptive x_secrets reference.
+5. Reject for structural or runtime-contract problems: wrong type or purpose, missing required
+  fields, invalid signature/protocol pairing, unsupported helper/API usage, missing post-call log,
+  failed delete, duplicate present, or credential leakage.
+6. For type 2 agents: verify each capability scope separately. A function missing
    from the correct scope is a failure even if it exists globally.
-6. Output ONLY raw JSON — no markdown, no extra text.
-7. For transfer type functions:
+7. Output ONLY raw JSON — no markdown, no extra text.
+8. For transfer type functions:
 - warm_transfer field MUST be present (true or false) — absence is a rejection.
 - If warm_transfer is true: warm_transfer_prompt must be a non-empty string — reject if missing or empty.
 - If msg_while_executing was requested: verify it is a non-empty array — reject if missing or [].

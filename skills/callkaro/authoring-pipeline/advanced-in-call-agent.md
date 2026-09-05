@@ -18,7 +18,9 @@ WHEN IT RUNS: DURING a live call. The voice AI reads "description" to decide whe
   "description":              "<trigger condition — Call this function when the user asks about X.>",
   "msg_while_executing_type": "dynamic" | "static",
   "msg_while_executing":      [] | ["<phrase 1>", "<phrase 2>"],
-  "source_code":              "<complete Python async function as a string>"
+  "source_code":              "<complete Python async function as a string>",
+  "update_call_data":         false,
+  "execute_while_switching":  <true only when explicitly requested; otherwise false>
 }
 
 ═══════════════════════════════════════════════════════════════════
@@ -61,7 +63,47 @@ RULES:
        return { "status": "error", "message": "Network error: ..." }
 10. Allowed signature types: str, int, float, bool, None. (Complex types must be handled internally via string deserialization).
 11. FORBIDDEN input types: dict, list, Any, Union types with unstructured shapes, File objects, custom classes, functions/lambdas.
-   
+
+PRE-IMPORTED HELPERS:
+  asyncio, httpx, json, pytz, datetime, timedelta, re, math, logger,
+  get_job_context, RunContext, num2words, get_local_time,
+  check_functions_called, custom_llm_completion, send_email, x_secrets.
+  Use them directly; do not import them.
+
+SECRETS:
+  x_secrets is a Python dict containing the account's decrypted secrets.
+  Read it with x_secrets["SECRET_NAME"] or x_secrets.get("SECRET_NAME").
+  Never use attribute access, expose a secret in a result or log, or accept a fixed credential as
+  an LLM-supplied function parameter.
+
+EMAIL HELPER EXAMPLE:
+  send_email never raises for delivery failures. Await it and check result["status"].
+
+async def send_follow_up_email(
+  ctx: RunContext,
+  recipient_email: str,
+  subject: str,
+  body: str,
+) -> dict:
+  """Sends a follow-up email requested during the call."""
+  if not recipient_email or "@" not in recipient_email:
+    return {"status": "error", "message": "A valid recipient email is required"}
+  if not subject or not body:
+    return {"status": "error", "message": "Subject and body are required"}
+
+  result = await send_email(
+    to=recipient_email,
+    subject=subject,
+    body=body,
+    username=x_secrets["SMTP_USERNAME"],
+    password=x_secrets["SMTP_APP_PASSWORD"],
+    reply_to=x_secrets.get("SUPPORT_EMAIL"),
+    from_name="CallKaro",
+  )
+  if result["status"] != "success":
+    return {"status": "error", "message": result["message"]}
+
+  return {"status": "success", "message": result["message"]}
 
 ═══════════════════════════════════════════════════════════════════
  SECURITY — STRICTLY FORBIDDEN
@@ -71,7 +113,8 @@ RULES:
 ✗ Filesystem access (open, read, write files)
 ✗ OS/subprocess commands (os.system, subprocess, etc.)
 ✗ Dynamic imports (importlib, __import__)
-✗ Hardcoded secrets or API keys (use ctx or function parameters)
+✗ Hardcoded secrets or API keys (use x_secrets for fixed credentials)
+✗ Returning or logging secret values
 
 ═══════════════════════════════════════════════════════════════════
  FIELD GENERATION RULES
@@ -105,7 +148,9 @@ source_code:
 1. Infer name and description from the request if not provided.
 2. Generate the complete Python async function following the protocol.
 3. Set msg_while_executing_type to "dynamic" unless the user gave specific phrases.
-4. Return the completed JSON object.
+4. Set update_call_data to false unless the function intentionally mutates call data.
+5. Set execute_while_switching to false unless the user explicitly requests it.
+6. Return the completed JSON object.
 
 ═══════════════════════════════════════════════════════════════════
  UPDATE MODE
@@ -120,4 +165,5 @@ source_code:
 • Output ONLY the raw JSON object — no markdown, no code fences, no commentary.
 • type must always be "custom_in_call".
 • source_code must be a valid Python async function string.
+• update_call_data and execute_while_switching must be booleans.
 • Never add fields outside the defined schema.

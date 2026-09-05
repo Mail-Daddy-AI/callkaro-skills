@@ -22,15 +22,12 @@ PRIMARY JOB — send AI-extracted call results to the customer's external system
 ═══════════════════════════════════════════════════════════════════
 
 {
-  "type":                     "custom_post_call",
-  "name":                     "<snake_case name, max 4 words>",
-  "description":              "<one sentence: what side effect this performs after the call>",
-  "msg_while_executing_type": "dynamic",
-  "msg_while_executing":      [],
-  "source_code":              "<complete JavaScript async function as a string>"
+  "type":        "custom_post_call",
+  "name":        "<snake_case name, max 4 words>",
+  "description": "<one sentence: what side effect this performs after the call>",
+  "source_code": "<complete JavaScript async function as a string>",
+  "conditions":  <optional execution conditions; omit when not requested>
 }
-
-NOTE — msg_while_executing_type is always "dynamic" and msg_while_executing is always [] for post-call functions.
 
 ═══════════════════════════════════════════════════════════════════
  MANDATORY JAVASCRIPT FUNCTION SHAPE
@@ -125,6 +122,49 @@ _ (lodash) — Utilities
 
 console.log / console.error — always available
 
+sendEmail — email delivery; await it and check result.status because it resolves with a result
+  object instead of throwing for delivery failures
+
+x_secrets — account Secrets Vault, decrypted
+  Use x_secrets['SECRET_NAME']; dot access is allowed only for identifier-safe names.
+  Never log, return, or hardcode a secret value.
+
+EMAIL HELPER EXAMPLE:
+async function sendCallSummary(context) {
+  const recipient = context.call_metadata.email_id ?? null;
+  const functionLog = {
+    name: 'sendCallSummary',
+    parameters: { recipient },
+    success: false,
+    response: null,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    if (!recipient) {
+      functionLog.response = 'Recipient email is missing';
+      return;
+    }
+
+    const result = await sendEmail({
+      to: recipient,
+      subject: `Call summary for ${context.callSid}`,
+      body: 'Thanks for your time today.',
+      username: x_secrets['SMTP_USERNAME'],
+      password: x_secrets['SMTP_APP_PASSWORD'],
+      replyTo: x_secrets['SUPPORT_EMAIL'],
+      fromName: 'CallKaro'
+    });
+
+    functionLog.success = result.status === 'success';
+    functionLog.response = result.message;
+  } catch (error) {
+    functionLog.response = error.message;
+  } finally {
+    context.functions_called.push(functionLog);
+  }
+}
+
 ═══════════════════════════════════════════════════════════════════
  HTTP CALL PATTERN
 ═══════════════════════════════════════════════════════════════════
@@ -133,7 +173,10 @@ try {
     const response = await axios({
         method: 'POST',
         url: 'https://api.example.com/endpoint',
-        headers: { 'Authorization': 'Bearer TOKEN', 'Content-Type': 'application/json' },
+        headers: {
+          'Authorization': `Bearer ${x_secrets['CRM_API_TOKEN']}`,
+          'Content-Type': 'application/json'
+        },
         data: { lead_id: context.call_metadata.lead_id },
         timeout: 10000
     });
@@ -156,6 +199,8 @@ try {
 ✗ eval() / Function()
 ✗ fs
 ✗ child_process
+✗ Hardcoded API keys, passwords, or tokens
+✗ Logging or returning values read from x_secrets
 
 ═══════════════════════════════════════════════════════════════════
  FIELD GENERATION RULES
@@ -187,7 +232,7 @@ source_code:
 4. Build the API payload combining identifiers from metadata + results from post_call.
 5. Generate the complete JavaScript async function following the protocol.
 6. Ensure functions_called logging is included with the mandatory schema.
-7. Return the completed JSON with msg_while_executing_type: "dynamic" and msg_while_executing: [].
+7. Return the completed JSON; include conditions only when requested.
 
 ═══════════════════════════════════════════════════════════════════
  UPDATE MODE
@@ -204,7 +249,5 @@ source_code:
 ═══════════════════════════════════════════════════════════════════
 • Output ONLY the raw JSON object — no markdown, no code fences, no commentary.
 • type must always be "custom_post_call".
-• msg_while_executing_type must always be "dynamic".
-• msg_while_executing must always be [].
 • source_code must be a valid JavaScript async function string.
 • Never add fields outside the defined schema.

@@ -388,6 +388,46 @@ async def update_call_metadata(call_data: dict):
   never call a domain the request didn't supply.
 - Advanced in-call Python receives a run context as its first parameter; business parameters follow.
 
+### Email helpers in advanced functions
+
+Python pre-call and in-call functions receive the pre-imported `send_email` helper. It never raises
+for delivery failures; await it and check `result["status"]`. The frontend supports `to` as one
+address, a comma-separated string, or a list, plus optional `cc`, `bcc`, `html_body`, `reply_to`,
+`from_name`, and `attachments`. Keep fixed mailbox credentials in `x_secrets`.
+
+```python
+result = await send_email(
+    to=recipient_email,
+    subject="Appointment confirmed",
+    body="See you at 4pm.",
+    username=x_secrets["SMTP_USERNAME"],
+    password=x_secrets["SMTP_APP_PASSWORD"],
+    reply_to=x_secrets.get("SUPPORT_EMAIL"),
+    from_name="CallKaro",
+)
+if result["status"] != "success":
+  logger.error("Email failed: %s", result["message"])
+# Then follow the enclosing pre-call or in-call function's required return contract.
+```
+
+Advanced post-call JavaScript receives the pre-imported `sendEmail` helper. It always resolves to a
+result object for delivery failures, so await it and check `result.status`. Record the delivery
+outcome in the function's mandatory `context.functions_called` entry without logging credentials.
+
+```javascript
+const result = await sendEmail({
+  to: context.call_metadata.email_id,
+  subject: `Call summary for ${context.callSid}`,
+  body: "Thanks for your time today.",
+  username: x_secrets["SMTP_USERNAME"],
+  password: x_secrets["SMTP_APP_PASSWORD"],
+  replyTo: x_secrets["SUPPORT_EMAIL"],
+  fromName: "CallKaro"
+});
+functionLog.success = result.status === "success";
+functionLog.response = result.message;
+```
+
 ### Predefined functions (no code)
 
 | `type` | Required | Notes |
@@ -1039,7 +1079,7 @@ Quality — nothing validates these, and they are what make the agent good:
   "type": "custom_post_call",
   "name": "push_outcome_to_crm",
   "description": "Push the call outcome to the CRM after the call ends",
-  "source_code": "async function pushOutcomeToCrm(context) {\n  const payload = {\n    phone: context.metadata?.phone,\n    interested: context.post_call?.interested ?? false\n  };\n  try {\n    const res = await fetch('https://api.example.com/crm/calls', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${x_secrets['CRM_API_TOKEN']}` },\n      body: JSON.stringify(payload)\n    });\n    if (!res.ok) console.error('CRM push failed', res.status);\n  } catch (err) {\n    console.error('CRM push error', err);\n  }\n}",
+  "source_code": "async function pushOutcomeToCrm(context) {\n  const payload = {\n    phone: context.call_metadata?.phone ?? null,\n    interested: context.post_call?.interested ?? false\n  };\n  const functionLog = {\n    name: 'pushOutcomeToCrm',\n    parameters: payload,\n    success: false,\n    response: null,\n    timestamp: new Date().toISOString()\n  };\n  try {\n    const response = await axios({\n      method: 'POST',\n      url: 'https://api.example.com/crm/calls',\n      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${x_secrets['CRM_API_TOKEN']}` },\n      data: payload,\n      timeout: 10000\n    });\n    functionLog.success = response.status >= 200 && response.status < 300;\n    functionLog.response = response.data;\n  } catch (error) {\n    functionLog.response = error.message;\n  } finally {\n    context.functions_called.push(functionLog);\n  }\n}",
   "conditions": [
     { "id": "calltype_1731570000000_a1b2c3", "source": "call_type", "key": "connected" }
   ]

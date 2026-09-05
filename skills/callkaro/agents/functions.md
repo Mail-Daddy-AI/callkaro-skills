@@ -97,6 +97,7 @@ the function. Write it as a condition, not a summary:
 
 ## Integrations that aren't ready yet
 
-Placeholders are expected and fine — `https://api.example.com/endpoint`,
-`Bearer YOUR_API_KEY_HERE`, `+910000000000`. Build the function, then **tell the
-user exactly what's placeholder**. Never block on missing credentials.
+Non-secret placeholders are expected and fine — `https://api.example.com/endpoint`,
+`+910000000000`, and placeholder event IDs. Credentials are the exception: never put a real,
+dummy, or placeholder credential in code. Use a descriptive `x_secrets` name and report that it
+must be registered. Build the function, then **tell the user exactly what's placeholder**.
