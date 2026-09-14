@@ -10,8 +10,8 @@ batch campaigns, and read analytics — all through the `ck` CLI.
 The skills drive the CallKaro CLI, so install it and sign in first:
 
 ```bash
-npm install -g @callkaro/cli   # or the tarball your team provides
-ck login                       # opens your browser to sign in
+npm install --global @callkaro-official/cli
+ck login
 ```
 
 ## Install the skills
