@@ -167,7 +167,7 @@ Shared fields (both types):
 | `msg_while_switching_type` | `silent` \| `static` \| `dynamic` | What the caller hears while switching **into** this capability. `silent` (default) = nothing; `static` = speak `msg_while_switching` verbatim; `dynamic` = `msg_while_switching` is a *prompt* for generating a bridging line. |
 | `msg_while_switching` | string | The literal line, or the generation prompt. `""` for `silent`. |
 | `endpointing` | `{mode, min_delay, max_delay}` | Controls when the caller's turn is complete while this capability/node is active. `mode` is `fixed` or `dynamic`; `min_delay` is 0–1 seconds and `max_delay` is 0–6 seconds. Defaults: `{ "mode": "fixed", "min_delay": 0.5, "max_delay": 3 }`. See below. |
-| `llms` | `{primary_model, secondary_model, temperature}` | Per-capability model choice — how you control cost/quality per phase (cheap model for the greeting, stronger for negotiation). Defaults `gpt-4.1-mini` / `gpt-4.1-nano` / `0.2`. **`temperature` here is 0–1** (§7). |
+| `llms` | `{primary_model, secondary_model, temperature}` | Per-capability model choice — how you control cost/quality per phase (cheap model for the greeting, stronger for negotiation). New-agent defaults are `callkaro/arjuna-2.5` / `gpt-5.4-nano` / `0.2`. **`temperature` here is 0–1** (§7). |
 | `functions` | object[] | Functions callable while inside this capability (§6). |
 | `postcall` | object[] | Post-call variables scoped to this capability (§8). |
 | `use_filler` | bool | Use filler sounds during this capability. Only meaningful when version `filler_config.filler_type` ≠ `none`. |
@@ -469,9 +469,9 @@ transfer function; expect to read them back at version level.
 
 | Field | Type | Default | Notes |
 | --- | --- | --- | --- |
-| `model` | string | `gpt-4o-mini` (document default) / `gpt-4.1-mini` (builder default for new agents) | Primary LLM driving the conversation. |
-| `secondary_model` | string | `gpt-4o-mini` / `gpt-4.1-nano` (builder) | Fallback LLM. |
-| `temperature` | number | `8` | **Version-level scale is 0–10** (slider 0–10; new-agent default 3). Capability `llms.temperature` is **0–1** (default 0.2). Never copy one into the other without ×10 / ÷10. |
+| `model` | string | `callkaro/arjuna-2.5` | Primary LLM driving new Basic and Advanced agents. |
+| `secondary_model` | string | `gpt-5.4-nano` | Fallback LLM for new agents. |
+| `temperature` | number | `3` | **Version-level scale is 0–10**. Capability `llms.temperature` is **0–1** (new-agent default 0.2). Never copy one into the other without ×10 / ÷10. |
 | `caching_strategy` | `response` \| `sentence` \| `none` | `response` | `response` caches whole responses (fastest repeats), `sentence` caches per sentence (more reuse, finer grain), `none` disables it. |
 
 Typical model families available: `gpt-4o`, `gpt-4o-mini`, `gpt-4.1`, `gpt-4.1-mini`, `gpt-4.1-nano`,
@@ -496,8 +496,9 @@ On type 3, version-level `model`/`secondary_model`/`temperature` do not drive ro
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `postcall` | object[] | `[]` | Variables extracted from the transcript **after** the call. |
-| `postcallmodel` | enum | `o4-mini` (document) / `gpt-5-nano` (builder) | Extraction model. Typical set: `o4-mini`, `gpt-4.1-mini`, `gpt-4.1`, `gpt-5-mini`, `gpt-5-nano`, `gpt-4o`, `gpt-5.4-nano`, plus Gemini options on some accounts. |
-| `post_call_strategy` | object | per-bucket `gpt-5-nano` | Model **per call-duration bucket** — keys `1-10`, `11-30`, `31-60`, `>60` (seconds) and `only_agent_turns`. Values are model names or `DEFAULT_VALUES` (skip analysis). `only_agent_turns` defaults to `DEFAULT_VALUES` — don't spend a model on calls where only the agent spoke. Falls back to `postcallmodel` when the object is empty. |
+| `postcallmodel` | enum | `callkaro/krishna-2.5` | Legacy fallback used when `post_call_strategy` is absent or empty. Preserve existing values; use the strategy fields for new configurations. |
+| `post_call_strategy` | object | four duration buckets use `callkaro/krishna-2.5`; `only_agent_turns` uses `DEFAULT_VALUES` | Primary model **per call-duration bucket** — keys `1-10`, `11-30`, `31-60`, `>60` (seconds) and `only_agent_turns`. `DEFAULT_VALUES` skips model extraction and uses configured field fallbacks. |
+| `secondary_post_call_strategy` | object | four duration buckets use `gpt-5.4-nano`; `only_agent_turns` uses `DEFAULT_VALUES` | Secondary post-call fallback with the same five-key shape. |
 | `post_call_analysis_prompt` | string | `""` | How to analyse the transcript. |
 | `conversion_reason` | string | `""` | What counts as a conversion. |
 | `default_disposition_reason` | string | `""` | Fallback disposition when none is extracted. |
@@ -883,8 +884,9 @@ Everything the version document declares, with its default and the section that 
 | `knowledges` | ObjectId[] | `[]` | 14 |
 | `msg_while_executing_knowledge_base` | string[] | `[]` | 14 |
 | `postcall` | object[] | `[]` | 8 |
-| `postcallmodel` | enum | `"o4-mini"` | 8 |
+| `postcallmodel` | enum | `"callkaro/krishna-2.5"` | 8 |
 | `post_call_strategy` | object | per-bucket default | 8 |
+| `secondary_post_call_strategy` | object | per-bucket fallback | 8 |
 | `post_call_analysis_prompt` | string | `""` | 8 |
 | `default_disposition_reason` | string | `""` | 8 |
 | `useOthersDropOffReason` | bool | `false` | 8 |
@@ -961,17 +963,18 @@ Quality — nothing validates these, and they are what make the agent good:
 {
   "name": "Riya – Service Reminder",
   "default_agent_language": "hi",
-  "outboundPhoneNumber": "<phoneNumberId>",
+  "agentStatus": "in-progress",
 
   "versionName": "v1",
+  "systempromptType": 0,
   "default_language": "hi",
   "silence_language": "hi",
   "systemprompt": "Role\nPersona gender: female\n... full script ...",
   "role": "", "goal": "", "callFlow": "",
   "instructions": [], "guardrails": [], "rebuttals": [],
   "end_call_msg": ["आपका दिन शुभ हो!", "धन्यवाद, आपसे बात करके अच्छा लगा।"],
-  "model": "gpt-4.1-mini",
-  "secondary_model": "gpt-4.1-nano",
+  "model": "callkaro/arjuna-2.5",
+  "secondary_model": "gpt-5.4-nano",
   "temperature": 3,
   "caching_strategy": "response",
   "voice_configuration": { "voice_provider": "Eleven Labs", "...": "resolved from the catalogue" },
@@ -1007,7 +1010,7 @@ Quality — nothing validates these, and they are what make the agent good:
       "msg_while_switching_type": "silent",
       "msg_while_switching": "",
       "endpointing": { "mode": "fixed", "min_delay": 0.5, "max_delay": 3 },
-      "llms": { "primary_model": "gpt-4.1-mini", "secondary_model": "gpt-4.1-nano", "temperature": 0.2 },
+      "llms": { "primary_model": "callkaro/arjuna-2.5", "secondary_model": "gpt-5.4-nano", "temperature": 0.2 },
       "functions": [],
       "postcall": []
     }
@@ -1040,7 +1043,7 @@ Quality — nothing validates these, and they are what make the agent good:
       "msg_while_switching_type": "silent",
       "msg_while_switching": "",
       "endpointing": { "mode": "fixed", "min_delay": 0.5, "max_delay": 3 },
-      "llms": { "primary_model": "gpt-4.1-mini", "secondary_model": "gpt-4.1-nano", "temperature": 0.2 },
+      "llms": { "primary_model": "callkaro/arjuna-2.5", "secondary_model": "gpt-5.4-nano", "temperature": 0.2 },
       "functions": [],
       "postcall": []
     },
