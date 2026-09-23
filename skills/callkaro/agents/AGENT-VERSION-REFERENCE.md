@@ -298,6 +298,7 @@ the name is the update/delete key. Use `snake_case`, e.g. `check_availability`.
 | `type` | When it runs | Basic | Advanced |
 | --- | --- | --- | --- |
 | `custom_pre_call` | before the call connects | fixed API call | **Python** async `source_code` |
+| `on_connected` | once after connection, or once upon entering its capability/node | fixed API call | **Python** async `source_code` |
 | `custom_in_call` | mid-call, model-triggered | fixed API call | **Python** async `source_code` |
 | `custom_post_call` | after the call ends | fixed API call | **JavaScript** async `source_code` |
 
@@ -349,6 +350,49 @@ Basic: `type`, `name`, `api`, `method`, `parameters` (**a JSON payload string**,
 `parameters_mapping{}`, `api_mapping{}`, `conditions[]`.
 Advanced: `type`, `name`, JavaScript `source_code`; retry/error handling lives **inside the code** —
 there is no retry field.
+
+**`on_connected`** — automatic side effects immediately after connection. A top-level copy runs
+exactly once after the call connects; a capability/node copy runs exactly once when the call enters
+that scope. It is never selected by the LLM and its return value is ignored.
+Basic: `type`, `name`, `description`, `api`, `method`, `headers?`, `parameters[]`, optional static
+execution message. Methods are `GET` | `POST` | `PUT` | `DELETE`; parameter types are `string` or
+`number`.
+Advanced: `type`, `name`, `description`, Python `source_code`, optional static execution message.
+The source must define exactly `async def <name>(ctx: JobContext, metadata: dict):`. Use
+`ctx.room`, `ctx.proc.userdata`, or `ctx.api`; do not use `ctx.session`, `ctx.userdata`, `RunContext`,
+filesystem/process APIs, or dynamic imports. `JobContext`, `httpx`, `logger`, and `x_secrets` are
+injected.
+
+```json
+{
+  "type": "on_connected",
+  "name": "record_call_connected",
+  "description": "Record that the call connected.",
+  "api": "https://api.example.com/calls/connected",
+  "method": "POST",
+  "parameters": [
+    { "key_name": "lead_id", "type": "string", "description": "Lead identifier from metadata." }
+  ],
+  "headers": {
+    "Authorization": "x_secrets.CRM_AUTH_HEADER"
+  }
+}
+```
+
+```python
+async def record_call_connected(ctx: JobContext, metadata: dict):
+    """Record the connection as a side effect."""
+  try:
+    async with httpx.AsyncClient(timeout=10.0) as client:
+      response = await client.post(
+        "https://api.example.com/calls/connected",
+        json={"lead_id": metadata.get("lead_id")},
+        headers={"Authorization": f"Bearer {x_secrets['CRM_API_TOKEN']}"},
+      )
+      response.raise_for_status()
+  except httpx.HTTPError as error:
+    logger.warning("Could not record call connection: %s", error)
+```
 
 Two flags worth knowing:
 

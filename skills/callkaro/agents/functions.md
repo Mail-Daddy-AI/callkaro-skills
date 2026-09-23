@@ -25,6 +25,7 @@ be unique **within a scope** and are the update/delete key. Use `snake_case`.
 | Check / book a calendar slot | `available` / `booking` |
 | Call an external API mid-call | `custom_in_call` |
 | Enrich metadata or rewrite the prompt before dialing | `custom_pre_call` |
+| Run a side effect automatically when the call connects or enters a capability/node | `on_connected` |
 | CRM push, notification, custom disposition after the call | `custom_post_call` |
 | WhatsApp message during/after the call | `whatsapp_in_call` / `whatsapp_post_call` (§15) |
 | Hand the contact to a chat agent | `assign_chat_agent` |
@@ -38,7 +39,7 @@ The name `send_text_message_on_whatsapp` is reserved.
 |---|---|---|
 | What it is | fixed API call described by fields (`api`, `method`, `parameters[]`, `headers{}`) | real code the platform executes |
 | Choose when | one fixed URL, no logic | URL contains `{{variables}}`, branching/retries, payload built from variables, or the response needs processing |
-| Language | — | pre/in-call: **Python** · post-call: **JavaScript** |
+| Language | — | pre/on-connected/in-call: **Python** · post-call: **JavaScript** |
 
 Advanced is always safe; basic is only for a fixed URL with no logic.
 
@@ -83,6 +84,10 @@ so pass `"true"`/`"false"` strings and normalise inside; methods are
   and node 4" means the transfer function goes on node 3.
 - Version level = callable in every phase; capability level = only inside it.
   Prefer capability scope so the model isn't offered irrelevant tools.
+- A version-level `on_connected` runs once after connection. A capability- or
+  pathway-node-scoped copy runs once automatically when the call enters that
+  scope. It is never offered to or selected by the model; do not duplicate the
+  same side effect globally and locally unless it must run at both lifecycle points.
 - Warm transfer (`warm_transfer: true`) **requires** a non-empty
   `warm_transfer_prompt`. On pathway agents (type 3) both are lifted to version
   level at save time (reference §6).
@@ -94,6 +99,13 @@ the function. Write it as a condition, not a summary:
 
 > ✅ "Call this when the user confirms a slot and has provided a 6-digit pincode."
 > ❌ "Checks availability."
+
+This trigger rule does not apply to `on_connected`: its description explains
+the side effect, but the platform invokes it automatically. Advanced
+`on_connected` code must define exactly
+`async def <name>(ctx: JobContext, metadata: dict):`; its return value is
+ignored, so use it only for side effects and never for conversation-critical
+data or prompt updates.
 
 ## Integrations that aren't ready yet
 
