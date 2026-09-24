@@ -1,17 +1,16 @@
 ---
 name: callkaro
 description: >
-  Operate CallKaro voice AI agents from the terminal via the `ck` CLI: create and
-  manage voice agents and their versions, buy/assign phone numbers, place single
-  or batch outbound calls, run simulations and test cases, and read call history
-  and analytics. Use whenever the user wants to build, test, call with, or analyze
-  a CallKaro voice agent.
+   Operate CallKaro voice and chat AI agents from the terminal via the `ck` CLI:
+   create and manage agents and versions, buy/assign phone numbers, place single
+   or batch outbound calls, run simulations and test cases, and read call history
+   and analytics. Use whenever the user wants to build, test, call with, or analyze
+   a CallKaro voice or chat agent.
 ---
 # CallKaro CLI (`ck`)
 
-CallKaro is a voice-AI platform: users build **voice agents** (LLM + voice +
-transcriber + prompt) that make and receive phone calls. This skill lets you do
-everything the CallKaro dashboard does, through the `ck` CLI.
+CallKaro supports **voice agents** for phone calls and **chat agents** for
+messaging channels. This skill operates both through the `ck` CLI.
 
 ## Ground rules (read first) 
 
@@ -55,6 +54,7 @@ file never restates a field table; it links to the Reference section.
 | **BUILDING or EDITING an agent** — run ai-fde's production pipeline (plan → script → reflect → functions → parameters) | **[authoring-pipeline/README.md](authoring-pipeline/README.md)**                                                          |
 | **Any field's name, allowed values, defaults, or a provider table**                                                         | **[agents/AGENT-VERSION-REFERENCE.md](agents/AGENT-VERSION-REFERENCE.md)** — look here first, always                     |
 | Agent concepts + the`ck agents` commands                                                                                        | [agents/README.md](agents/README.md)                                                                                            |
+| Chat-agent creation, functions, versions, and the `ck chat-agents` commands                                                      | [chat-agents.md](chat-agents.md)                                                                                                |
 | Writing the system prompt / script (8 sections, modes, snippets)                                                                  | [agents/prompts.md](agents/prompts.md)                                                                                          |
 | Create / update workflows + starter JSON                                                                                          | [agents/create-update.md](agents/create-update.md)                                                                              |
 | Versions, publishing, A/B (incl. rule-based)                                                                                      | [agents/versions.md](agents/versions.md)                                                                                        |
