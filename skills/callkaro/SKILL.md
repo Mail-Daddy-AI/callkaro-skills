@@ -66,6 +66,7 @@ file never restates a field table; it links to the Reference section.
 | Batch calling + CSV format                                                                                                        | [batches.md](batches.md)                                                                                                        |
 | Simulations & test cases                                                                                                          | [simulations.md](simulations.md)                                                                                                |
 | **Auditing/fixing a live agent** — branch coverage, exact phrases, full-suite gate                                         | [agents/regression.md](agents/regression.md)                                                                                    |
+| AI Auditor audit strategies (`ck audit-strategies`) — score live calls with an LLM against instructions + filters              | [audit-strategies.md](audit-strategies.md)                                                                                      |
 | Analytics / performance                                                                                                           | [analytics.md](analytics.md)                                                                                                    |
 
 ## The golden path (creating a working agent end-to-end)
