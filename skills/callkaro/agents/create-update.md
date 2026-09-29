@@ -46,7 +46,9 @@ Backend-enforced creation rules:
   initial pauses and silence values are non-negative. `speakfirst` and
   `speakfirst_inbound` use value `0`, `1`, or `2`; value `2` requires a non-empty
   `customMsg`. A custom silence mode requires at least one non-empty silence
-  prompt. Webhooks must be empty or valid URLs.
+  prompt. `silence_instructions` only takes effect when `silence_mode` is
+  `dynamic` or `ignore`; leave it unset unless the user asks for it. Webhooks
+  must be empty or valid URLs.
 - **Nested records:** function `type`/`name`, HTTP method, parameters, headers,
   conditions, and execution-message shape are validated. Warm transfer requires
   a non-empty `warm_transfer_prompt`. Static switch messages must be non-empty.
@@ -115,6 +117,7 @@ production export.
   "silence_wait": 6,
   "silence_mode": "default",
   "silence_prompts": [],
+  "silence_instructions": null,
   "silence_language": "en",
   "end_call_msg": [],
   "bgNoise": true,

@@ -581,6 +581,7 @@ agentBehavior:
   silence_wait
   silence_mode
   silence_prompts
+  silence_instructions (only used when silence_mode is dynamic or ignore; leave unset unless asked)
   language_switching
   language_switching_v1
   vad_configuration

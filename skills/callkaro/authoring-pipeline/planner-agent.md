@@ -216,6 +216,7 @@ executor knows exactly which sub-tools to invoke and what to change.
     silence_wait                — seconds to wait for speech before counting silence (default: 6)
     silence_mode                — "default" | "custom" | "dynamic" | "ignore"
     silence_prompts             — prompts for "custom" silence mode
+    silence_instructions        — instructions for "dynamic" or "ignore" silence mode (default: null; only set if asked)
     language_switching          — boolean: enable v2 mid-call language switching
     language_switching_v1       — boolean: enable v1 mid-call language switching
     vad_configuration           — VAD sensitivity, silence threshold, interruption tuning, etc.

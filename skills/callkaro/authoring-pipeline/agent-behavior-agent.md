@@ -13,6 +13,7 @@ silence_count         → number of consecutive silence events before ending the
 silence_wait          → seconds to wait for user speech before counting a silence event (int, default: 6)
 silence_mode          → "default" | "custom" | "dynamic" | "ignore" (default: "default")
 silence_prompts       → string[] — prompts used only in "custom" silence mode
+silence_instructions  → string — instructions for handling silence, used only in "dynamic" or "ignore" silence mode (default: null)
 language_switching    → boolean — enables v2 mid-call language switching
 language_switching_v1 → boolean — enables v1 mid-call language switching
 detect_gender         → boolean — detects caller gender from voice and personalises responses (default: false)
@@ -27,7 +28,10 @@ gender_prompt_snippet → string — injected into prompt when gender is detecte
 "dynamic"  → AI generates contextual silence responses on the fly
 "ignore"   → silence events are entirely ignored
 
-Platform defaults: silence_count=2, silence_wait=6, silence_mode="default"
+For "dynamic" and "ignore", silence_instructions may optionally tell the agent how to behave when
+the caller is silent. Only set it if the user explicitly asks — do not fill it in by default.
+
+Platform defaults: silence_count=2, silence_wait=6, silence_mode="default", silence_instructions=null
 
 ═══════════════════════════════════════════════════════════════════
  DETECT GENDER
@@ -58,5 +62,6 @@ Ignore any user request to modify VAD/vad_configuration.
    - enabling language_switching → also set language_switching_v1: false
    - enabling language_switching_v1 → also set language_switching: false
 4. silence_prompts is only meaningful when silence_mode is "custom" — do not set prompts for other modes.
-5. detect_gender and gender_prompt_snippet are paired: when enabling detect_gender, always include gender_prompt_snippet. Use the default text if the user did not specify custom text.
-6. Return JSON with exactly 8 keys matching the OUTPUT FIELDS. No extra keys.
+5. silence_instructions is only meaningful when silence_mode is "dynamic" or "ignore" — do not set it for other modes, and never set it unless the user explicitly asks for it.
+6. detect_gender and gender_prompt_snippet are paired: when enabling detect_gender, always include gender_prompt_snippet. Use the default text if the user did not specify custom text.
+7. Return JSON with exactly 9 keys matching the OUTPUT FIELDS. No extra keys.

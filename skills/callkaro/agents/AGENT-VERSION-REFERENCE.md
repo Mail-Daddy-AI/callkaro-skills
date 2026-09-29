@@ -675,6 +675,7 @@ Guidance:
 | `silence_count` | int, `2` | How many times the silence prompt repeats before the call ends. |
 | `silence_mode` | `default` \| `custom` \| `dynamic` \| `ignore`, `default` | `default` = platform prompts; `custom` = pick from `silence_prompts`; `dynamic` = the model generates one from context; `ignore` = never re-prompt on silence. |
 | `silence_prompts` | string[], `[]` | Used when `silence_mode: "custom"`. |
+| `silence_instructions` | string \| null, `null` | Instructions for how the agent should behave when the caller is silent. Used only when `silence_mode` is `dynamic` or `ignore`. Optional — leave unset unless the user asks for it. |
 | `silence_language` | enum + `multi`, `en` | Language of those prompts. |
 | `language_switching` | bool, `false` | Switch language based on the caller's **last message** (reactive, no confirmation). |
 | `language_switching_v1` | bool, `false` | Switch language only after the caller's **explicit consent/request**. Pair either flag with `language_switch_snippet` and `switchableLanguages`. |
@@ -903,6 +904,7 @@ Everything the version document declares, with its default and the section that 
 | `silence_wait` | int | `6` | 12 |
 | `silence_mode` | enum | `"default"` | 12 |
 | `silence_prompts` | string[] | `[]` | 12 |
+| `silence_instructions` | string \| null | `null` | 12 |
 | `language_switching` | bool | `false` | 12 |
 | `language_switching_v1` | bool | `false` | 12 |
 | `detect_gender` | bool | `false` | 12 |

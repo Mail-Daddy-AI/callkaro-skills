@@ -28,7 +28,7 @@ callInitTerm
   → speakfirst (outbound greeting), speakfirst_inbound, initial pause (outbound/inbound), end_call_msg
 
 agentBehavior
-  → silence_count, silence_wait, silence_mode, silence_prompts, language_switching, language_switching_v1
+  → silence_count, silence_wait, silence_mode, silence_prompts, silence_instructions, language_switching, language_switching_v1
 
 callSettings
   → auto_reschedule, followup, background noise, noise cancellation, voicemail, time_limit, webhook URL, number formatting
