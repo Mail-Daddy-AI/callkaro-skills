@@ -41,6 +41,30 @@ Useful JSON fields on a call: `name` (type), `from`, `to`, `agent.name`,
 `disposition_reason`, `conversion_status`, `total_credits`,
 `recording.recordingUrl`, `recording.transcription`, `recording.chat_history`.
 
+## Reading the raw call log
+
+```bash
+ck calls logs <callId> [query]
+```
+
+Runs a shell-style query over the call's raw execution log (agent process log —
+different from `recording.transcription`, which is the conversation transcript).
+`query` supports `grep`, `awk`, `sed`, `cut`, `sort`, `uniq`, `head`, `tail`, `wc`
+and pipes, e.g.:
+
+```bash
+ck calls logs <callId>                                         # default: grep -v _trace.py | tail -100
+ck calls logs <callId> "grep -iE 'error|warning' /call.log"    # just the problems
+ck calls logs <callId> "grep -v _trace.py /call.log | tail -50" # drop connection noise, last 50 lines
+ck calls logs <callId> "sed -n '100,200p' /call.log"           # page through a large log
+ck calls logs <callId> "awk -F' - ' '{print \$2}' /call.log | sort | uniq -c"  # count lines per level
+```
+
+The log is downloaded fresh each run (never written to disk) and referenced as
+the virtual file `/call.log`; the query runs in a sandboxed shell, not a real
+one. If there's no log yet, the command says so — retry shortly for a very
+recent call, otherwise it has expired (logs are kept 7 days).
+
 ## Live queues (ongoing calls)
 
 ```bash
