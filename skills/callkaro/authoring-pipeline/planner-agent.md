@@ -218,7 +218,14 @@ executor knows exactly which sub-tools to invoke and what to change.
     silence_prompts             — prompts for "custom" silence mode
     silence_instructions        — instructions for "dynamic" or "ignore" silence mode (default: null; only set if asked)
     language_switching          — boolean: enable v2 mid-call language switching
+    language_switching_instructions — instructions for language-switching behaviour (default: null; only set if asked; only used when language_switching is true)
+    language_lockin_time        — seconds to lock onto a language after switching (default: null; only used when language_switching is true)
+    allowed_languages           — whitelist of languages the agent may switch into (default: []; only used when language_switching is true)
+    language_switch_min_words   — minimum caller words before a switch triggers (default: 3; only used when language_switching is true)
     language_switching_v1       — boolean: enable v1 mid-call language switching
+    (language_switching/language_switching_v1 make the agent SPEAK a different language mid-call while
+    staying on this SAME version/script — no transfer, no version change. Do not confuse with
+    switchableLanguages below, which hands the call off to a DIFFERENT PUBLISHED VERSION in that language.)
     vad_configuration           — VAD sensitivity, silence threshold, interruption tuning, etc.
     detect_gender               — boolean: detect caller gender from voice
     gender_prompt_snippet       — snippet injected when gender is detected
@@ -241,9 +248,11 @@ executor knows exactly which sub-tools to invoke and what to change.
     Use for: call duration limit, webhook, voicemail, background noise, reschedule, follow-up.
 
   switchableEntities
-    switchableLanguages         — mid-call language switching config (language codes + triggers)
+    switchableLanguages         — transfer to a DIFFERENT PUBLISHED VERSION of this agent authored in
+                                   another language (language codes + triggers) — the version changes,
+                                   not just the spoken language; see agentBehavior note above
     switchableAgents            — mid-call agent transfer config
-    Use for: configuring which languages the agent can switch to mid-call, agent handoff targets.
+    Use for: handing the call off to another language version of this agent, or to another agent.
 
   knowledgeBase
     knowledges                  — array of knowledge base IDs attached to this agent

@@ -583,7 +583,14 @@ agentBehavior:
   silence_prompts
   silence_instructions (only used when silence_mode is dynamic or ignore; leave unset unless asked)
   language_switching
+  language_switching_instructions (only used when language_switching is true; leave unset unless asked)
+  language_lockin_time (only used when language_switching is true)
+  allowed_languages (only used when language_switching is true)
+  language_switch_min_words (only used when language_switching is true)
   language_switching_v1
+  (language_switching make the agent SPEAK a different language mid-call while
+  staying on this SAME version/script — no transfer. Do not confuse with switchableLanguages below,
+  which hands the call off to a DIFFERENT PUBLISHED VERSION in that language.)
   vad_configuration
   detect_gender
   gender_prompt_snippet
@@ -604,8 +611,9 @@ callSettings:
   webhook
 
 switchableEntities:
-  switchableLanguages
-  switchableAgents
+  switchableLanguages (transfer to a DIFFERENT PUBLISHED VERSION of this agent authored in another
+    language — the version changes, not just the spoken language)
+  switchableAgents (transfer to a different agent)
 
 knowledgeBase:
   knowledges

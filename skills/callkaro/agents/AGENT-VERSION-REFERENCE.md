@@ -677,7 +677,11 @@ Guidance:
 | `silence_prompts` | string[], `[]` | Used when `silence_mode: "custom"`. |
 | `silence_instructions` | string \| null, `null` | Instructions for how the agent should behave when the caller is silent. Used only when `silence_mode` is `dynamic` or `ignore`. Optional — leave unset unless the user asks for it. |
 | `silence_language` | enum + `multi`, `en` | Language of those prompts. |
-| `language_switching` | bool, `false` | Switch language based on the caller's **last message** (reactive, no confirmation). |
+| `language_switching` | bool, `false` | Switch language based on the caller's **last message** (reactive, no confirmation). Makes the agent SPEAK a different language mid-call while staying on this SAME version/script — no transfer. Do not confuse with `switchableLanguages` (§14), which hands the call off to a DIFFERENT PUBLISHED VERSION authored in that language. |
+| `language_switching_instructions` | string \| null, `null` | Instructions for how the agent should switch language mid-call. Used only when `language_switching` is true. Optional — leave unset unless the user asks for it; the platform falls back to a built-in multilingual detection prompt. |
+| `language_lockin_time` | number \| null, `null` | Seconds to lock onto a language after switching, before switching again. Used only when `language_switching` is true. |
+| `allowed_languages` | string[], `[]` | Whitelist of languages the agent may switch into. Empty means unrestricted. Used only when `language_switching` is true. |
+| `language_switch_min_words` | int, `3` | Minimum caller words required before a switch triggers. Used only when `language_switching` is true. |
 | `language_switching_v1` | bool, `false` | Switch language only after the caller's **explicit consent/request**. Pair either flag with `language_switch_snippet` and `switchableLanguages`. |
 | `detect_gender` | bool, `false` | Detect the caller's gender from audio and adapt address forms. |
 | `gender_prompt_snippet` | string \| null | Prompt injected when `detect_gender` is on. |
@@ -762,7 +766,7 @@ update, report each missing name and tell the user to run `ck secrets set <name>
 | `callPropertyMapping` | `{ "<externalProperty>": {field} }`, `{}` | Maps CallKaro call fields onto an external CRM's call properties for post-call write-back (HubSpot-Plus style). UI-exposed — check §18. |
 | `customPronunciations` | `{ "<word>": "<pronunciation>" }`, `{}` | Phonetic overrides for brand, product and place names the TTS mispronounces. Write the pronunciation the way it should sound in the target language. |
 | `filler_config` | object, `{}` | Filler sounds while the agent thinks (below). |
-| `switchableLanguages` | object[], `[]` | Mid-call language-switch rules (below). |
+| `switchableLanguages` | object[], `[]` | Rules for transferring the call to a DIFFERENT PUBLISHED VERSION of this agent in another language (below) — not the same-version `language_switching` behavior (§12). |
 | `switchableAgents` | object[], `[]` | Transfer-to-another-agent rules (below). |
 
 **Format keys** (for `preFormatVariables` values and `variableSource.format`):
@@ -906,6 +910,10 @@ Everything the version document declares, with its default and the section that 
 | `silence_prompts` | string[] | `[]` | 12 |
 | `silence_instructions` | string \| null | `null` | 12 |
 | `language_switching` | bool | `false` | 12 |
+| `language_switching_instructions` | string \| null | `null` | 12 |
+| `language_lockin_time` | number \| null | `null` | 12 |
+| `allowed_languages` | string[] | `[]` | 12 |
+| `language_switch_min_words` | int | `3` | 12 |
 | `language_switching_v1` | bool | `false` | 12 |
 | `detect_gender` | bool | `false` | 12 |
 | `formatToNumberAsIndian` | bool | `false` | 12 |

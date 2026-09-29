@@ -28,13 +28,16 @@ callInitTerm
   → speakfirst (outbound greeting), speakfirst_inbound, initial pause (outbound/inbound), end_call_msg
 
 agentBehavior
-  → silence_count, silence_wait, silence_mode, silence_prompts, silence_instructions, language_switching, language_switching_v1
+  → silence_count, silence_wait, silence_mode, silence_prompts, silence_instructions, language_switching, language_switching_instructions, language_lockin_time, allowed_languages, language_switch_min_words, language_switching_v1
+  language_switching/language_switching_v1 make the agent SPEAK a different language mid-call while staying
+  on this SAME version/script — no transfer, no version change. Do not confuse with switchableLanguages below.
 
 callSettings
   → auto_reschedule, followup, background noise, noise cancellation, voicemail, time_limit, webhook URL, number formatting
 
 switchableEntities
-  → switchableLanguages (mid-call language switch rules), switchableAgents (transfer to another agent rules)
+  → switchableLanguages (hand the call off to a DIFFERENT PUBLISHED VERSION of this agent authored in that
+    language — the version changes, not just the spoken language), switchableAgents (transfer to another agent)
 
 knowledgeBase
   → attach/detach knowledge base documents to the agent
