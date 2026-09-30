@@ -46,20 +46,22 @@ dial from it (test calls may use platform defaults).
 
 Voice numbers above come from CallKaro's own pool. **WhatsApp numbers do not**
 — they come from Meta, via the WhatsApp Business Account the user links **on
-the CallKaro dashboard** (not the CLI). There is no `ck whatsapp catalog` or
-`ck whatsapp buy`; if the user wants a new WhatsApp number, send them to the
-dashboard to link/add it, then use the commands below.
+the CallKaro dashboard, manually** (not the CLI/MCP). Adding a number is
+Meta's embedded signup ("+ Add Phone Number") — an interactive Facebook-login
+popup that cannot be driven headlessly. There is no `ck whatsapp catalog`,
+`buy`, or `register`; if the user wants a new WhatsApp number, send them to
+the dashboard, then use the commands below to list/assign what's already
+linked.
 
-Requires an **active WhatsApp subscription** on the account — every
-`ck whatsapp` command and the `set-whatsapp-*` commands below return a
+Requires an **active WhatsApp subscription** on the account — `ck whatsapp
+list` and the `set-whatsapp-*` commands below return a
 `SUBSCRIPTION_REQUIRED` / `SUBSCRIPTION_PAUSED` error otherwise. Surface that
 message as-is; it means the dashboard subscription needs activating, not a
 CLI/auth problem.
 
 | Command | What it does |
 |---|---|
-| `ck whatsapp list [--json]` | Numbers on the linked WhatsApp Business Account, with status/quality. |
-| `ck whatsapp register <phoneNumberId>` | Activate a number id already listed on that account (one-time, after linking on the dashboard). |
+| `ck whatsapp list [--json]` | Numbers on the linked WhatsApp Business Account, with status/quality. Read-only — the only way to add a new number is the dashboard. |
 | `ck agents set-whatsapp-outbound <agentId> --number <id>` / `--clear` | Set/clear a **voice agent's** WhatsApp outbound number. |
 | `ck agents set-whatsapp-inbound <agentId> --number <id>` / `--clear` | Set/clear a **voice agent's** WhatsApp inbound number. Unassigns it from any other agent first (one-agent rule, same as voice inbound). |
 
