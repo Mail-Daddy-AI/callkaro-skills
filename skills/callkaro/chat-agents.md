@@ -22,6 +22,20 @@ Read commands support `--file output.json`. Create accepts inline JSON, `@file`,
 `--file`, or stdin with the same parsing and validation. Prefer `--file` for
 prompts and function source code.
 
+## Assigning a WhatsApp number
+
+There's no dedicated `assign-whatsapp` command — set it via `ck chat-agents
+update`:
+
+```bash
+ck chat-agents update <agentId> --set '{"whatsappPhoneNumber":"<phoneNumberId>","whatsappDisplayPhN":"<display name>"}'
+```
+
+The number itself comes from Meta via the WhatsApp Business Account linked on
+the **CallKaro dashboard** — not the CLI, and not buyable. Run `ck whatsapp
+list` to see what's available (see `numbers.md` § WhatsApp numbers). Requires
+an active WhatsApp subscription on the account.
+
 ## Create safely
 
 1. Run `ck whoami`.
