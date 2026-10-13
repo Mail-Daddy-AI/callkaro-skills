@@ -4,8 +4,10 @@ description: >
    Operate CallKaro voice and chat AI agents from the terminal via the `ck` CLI:
    create and manage agents and versions, buy/assign phone numbers, place single
    or batch outbound calls, run simulations and test cases, and read call history
-   and analytics. Use whenever the user wants to build, test, call with, or analyze
-   a CallKaro voice or chat agent.
+   and analytics; build and edit workflows (call / WhatsApp / wait / branch / update
+   contact graphs) and manage CRM contacts, attributes, imports and workflow
+   enrolment. Use whenever the user wants to build, test, call with, or analyze
+   a CallKaro voice or chat agent, or to create a workflow or manage contacts.
 ---
 # CallKaro CLI (`ck`)
 
@@ -23,8 +25,9 @@ messaging channels. This skill operates both through the `ck` CLI.
    invent them. Phone-number commands also accept the raw number (with/without `+`).
 4. **Versions are selected with `--versions <id>`** on every command (never
    `--version`, which prints the CLI version).
-5. **Money moves**: `ck numbers buy`, `ck calls make` (without `--test`), and
-   `ck batches create` spend real credits / place real phone calls. Confirm with
+5. **Money moves**: `ck numbers buy`, `ck calls make` (without `--test`),
+   `ck batches create`, and `ck contacts assign` (into a workflow or an agent)
+   spend real credits / place real calls and send real WhatsApp messages. Confirm with
    the user before running them. Prefer `ck calls make --test` and `ck sim run`
    for iteration.
 6. **Exit codes**: non-zero = failure; the message on stderr says why.
@@ -54,16 +57,19 @@ file never restates a field table; it links to the Reference section.
 | **BUILDING or EDITING an agent** — run ai-fde's production pipeline (plan → script → reflect → functions → parameters) | **[authoring-pipeline/README.md](authoring-pipeline/README.md)**                                                          |
 | **Any field's name, allowed values, defaults, or a provider table**                                                         | **[agents/AGENT-VERSION-REFERENCE.md](agents/AGENT-VERSION-REFERENCE.md)** — look here first, always                     |
 | Agent concepts + the`ck agents` commands                                                                                        | [agents/README.md](agents/README.md)                                                                                            |
-| Chat-agent creation, functions, versions, and the `ck chat-agents` commands                                                      | [chat-agents.md](chat-agents.md)                                                                                                |
+| Chat-agent creation, functions, versions, the `ck chat-agents` commands, and the **inbox** (`ck inbox`: read a conversation, unread, clear, unassign, handoffs)                                                      | [chat-agents.md](chat-agents.md)                                                                                                |
 | Writing the system prompt / script (8 sections, modes, snippets)                                                                  | [agents/prompts.md](agents/prompts.md)                                                                                          |
-| Create / update workflows + starter JSON                                                                                          | [agents/create-update.md](agents/create-update.md)                                                                              |
+| Create / update an **agent** (step-by-step procedures + starter JSON; not CallKaro workflows)                                                                                          | [agents/create-update.md](agents/create-update.md)                                                                              |
 | Versions, publishing, A/B (incl. rule-based)                                                                                      | [agents/versions.md](agents/versions.md)                                                                                        |
 | Picking a voice or transcriber (`ck voices`, pairing, language traps)                                                           | [agents/voice-and-transcriber.md](agents/voice-and-transcriber.md)                                                              |
 | Which function to add, basic vs advanced, where to attach                                                                         | [agents/functions.md](agents/functions.md)                                                                                      |
 | Account secrets (list/set/rename/remove and safe agent references)                                                                | [secrets.md](secrets.md)                                                                                                        |
 | Phone numbers (list/buy/assign/spam/release); WhatsApp numbers (list/assign only — added manually on the dashboard, no buy/register) | [numbers.md](numbers.md)                                                                                                        |
-| Single calls, call history, exports, live queues, reading a call's raw log                                                        | [calls.md](calls.md)                                                                                                            |
+| Single calls, call history, exports, live queues, reading a call's raw log (a number's calls + messages together: `ck inbox chat`)                                                        | [calls.md](calls.md)                                                                                                            |
 | Batch calling + CSV format                                                                                                        | [batches.md](batches.md)                                                                                                        |
+| **Workflows** — create/edit/validate a graph, per-node edits, read a lead's run                                                 | [workflows.md](workflows.md)                                                                                                    |
+| **CRM contacts & attributes** — define attributes, import/export CSV, filter, assign to a workflow or agent                       | [contacts.md](contacts.md)                                                                                                      |
+| **Building a workflow that uses contacts** (attributes → graph → load → test on one number → scale)                                | [workflows-and-contacts.md](workflows-and-contacts.md)                                                                          |
 | Simulations & test cases                                                                                                          | [simulations.md](simulations.md)                                                                                                |
 | **Auditing/fixing a live agent** — branch coverage, exact phrases, full-suite gate                                         | [agents/regression.md](agents/regression.md)                                                                                    |
 | AI Auditor audit strategies (`ck audit-strategies`) — score live calls with an LLM against instructions + filters              | [audit-strategies.md](audit-strategies.md)                                                                                      |

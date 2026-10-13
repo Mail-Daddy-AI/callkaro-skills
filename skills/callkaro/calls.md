@@ -41,6 +41,9 @@ Useful JSON fields on a call: `name` (type), `from`, `to`, `agent.name`,
 `disposition_reason`, `conversion_status`, `total_credits`,
 `recording.recordingUrl`, `recording.transcription`, `recording.chat_history`.
 
+To see calls **together with the messages** for one number, use
+`ck inbox chat <phone>` (see [chat-agents.md](chat-agents.md) § Conversations).
+
 ## Reading the raw call log
 
 ```bash

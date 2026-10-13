@@ -3,7 +3,7 @@
 Teach Claude Code (or any AI coding agent) to build and operate
 [CallKaro](https://callkaro.ai) voice AI agents: create agents, write call
 scripts, pick voices and transcribers, run simulations, place calls, schedule
-batch campaigns, and read analytics — all through the `ck` CLI.
+batch campaigns, build workflows, manage CRM contacts, and read analytics — all through the `ck` CLI.
 
 ## Prerequisite
 
@@ -44,7 +44,10 @@ and test it"* — and it will load the skill.
 | `secrets.md` | account secret commands, names-only discovery, and safe reference syntax |
 | `agents/AGENT-VERSION-REFERENCE.md` | every agent/version field, its values, and the traps |
 | `agents/prompts.md` · `voice.md` · `transcriber.md` · `functions.md` | script writing, TTS, STT, abilities (incl. advanced Python/JS) |
-| `agents/create-update.md` · `versions.md` | workflows, publishing, A/B testing |
+| `agents/create-update.md` · `versions.md` | agent create/update procedures, publishing, A/B testing |
+| `workflows.md` | workflow graphs: node types, `ck workflows` commands, generate/edit/validate, reading a lead's run |
+| `contacts.md` | CRM contacts and attributes: import/export, filters, `ck contacts assign` |
+| `workflows-and-contacts.md` | the two together: attributes → graph → load contacts → smoke test → scale |
 | `auth.md` · `numbers.md` · `calls.md` · `batches.md` · `simulations.md` · `analytics.md` | the rest of the platform |
 
 ## Updating
