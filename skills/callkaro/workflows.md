@@ -90,7 +90,8 @@ ck whatsapp list --json                    # phoneNumberId + display number for 
 ck chat-agents templates --json            # template id / name / language / status (use APPROVED)
 ck chat-agents template <templateId> --json   # its variables[].id = the exact parameters[].key values
 ck contacts attributes list --json         # CRM attribute names for update-lead / contact conditions
-ck agents get <agentId> --json             # postcall[].name = post_call_variables fields (skip type call_drop_off_reason)
+ck agents get <agentId> --json             # publishedVersionId
+ck agents get <agentId> --versions <publishedVersionId> --json   # postcall[].name = post_call_variables fields (skip type call_drop_off_reason)
 # 3. write graph.json using ONLY ids/names from those listings
 ck workflows validate --file graph.json    # 4. fix every reported problem, repeat
 ck workflows create "Name" --file graph.json
