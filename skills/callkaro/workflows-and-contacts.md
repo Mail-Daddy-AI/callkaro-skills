@@ -24,10 +24,14 @@ ck contacts attributes set stage --type enum --options new,contacted,no_answer,q
 ck contacts attributes set first_name --type string
 
 # 2. GATHER real ids — never invent agentIds, template ids, number ids.
-ck workflows context --file ctx.json
-#    (add --post-call if a branch tests an agent's post-call variable)
+ck agents list --json                      # agentId for Send Call (prefer agentStatus "live")
+ck whatsapp list --json                    # phoneNumberId + display number for WhatsApp nodes
+ck chat-agents templates --json            # template id / name / language / status (use APPROVED)
+ck chat-agents template <templateId> --json   # its variables[].id = the exact parameters[].key values
+ck contacts attributes list --json         # CRM attribute names for update-lead / contact conditions
+ck agents get <agentId> --json             # postcall[].name = post_call_variables fields (skip type call_drop_off_reason)
 
-# 3. BUILD the graph from ctx.json only, then check it.
+# 3. BUILD the graph from those listings only, then check it.
 #    Start → Send Call → Conditions(connected_call) →
 #       connected:  Update Contact(stage=contacted) → End
 #       otherwise:  Send WhatsApp Template → Update Contact(stage=no_answer) → End
@@ -39,7 +43,9 @@ ck workflows get <workflowId> --json         # read back
 ck contacts upload leads.csv
 ck contacts list --attr stage=new --json     # confirm who is in
 
-# 5. TEST on ONE number first. Real call + real WhatsApp: get the user's yes.
+# 5. TEST on ONE number first. Preview, then (with the user's yes — this places a
+#    real call and a real WhatsApp message) run it for real.
+ck contacts assign --phones 9198XXXXXXXX --workflow <workflowId> --dry-run
 ck contacts assign --phones 9198XXXXXXXX --workflow <workflowId> --name "smoke test"
 
 # 6. VERIFY what actually happened
@@ -48,7 +54,9 @@ ck workflows run <workflowId> 9198XXXXXXXX   # step by step; why it took that br
 ck workflows journey <workflowId> 9198XXXXXXXX
 ck contacts get 9198XXXXXXXX                 # did update-lead write stage?
 
-# 7. SCALE, only after the smoke test looked right and the user agrees
+# 7. SCALE, only after the smoke test looked right and the user agrees. Preview the
+#    count first — --dry-run says exactly how many contacts the filter selects.
+ck contacts assign --attr stage=new --workflow <workflowId> --dry-run
 ck contacts assign --attr stage=new --workflow <workflowId> --window 10:00-19:00 --name "Oct batch"
 ```
 
@@ -61,7 +69,7 @@ ck contacts assign --attr stage=new --workflow <workflowId> --window 10:00-19:00
 3. **Enum attributes only accept their listed options.** An `update-lead` writing
    `"won"` to an enum without `won` is skipped for that contact. Add the option
    first (`attributes set stage --options …` — list **all** options you want to keep).
-4. **Always smoke-test with `--phones` on one number**, read the run with
+4. **Always `--dry-run` first, then smoke-test with `--phones` on one number**, read the run with
    `ck workflows run`, and only then assign by filter. Assigning places real
    calls and sends real WhatsApp messages; state the count and the workflow
    and wait for a yes.
@@ -96,4 +104,4 @@ ck contacts assign --attr stage=no_answer --workflow <retryWorkflowId> --name "S
 | Lead stuck / went the wrong way | `ck workflows run <id> <phone> --json` — the step statuses, the handle taken, and the variables the Conditions node tested |
 | Attribute wasn't updated | The value was **set by hand** (protected — `contacts get --json` shows `source: manual`), or the attribute is undefined, or the value is outside an enum; `run <id> <phone> --json` shows the `update-lead` step |
 | Contact "not in workflow" after assign | Already running there (skipped) — see the assign output; `--force` to restart |
-| Template node sends nothing | `context` → template `status` must be `APPROVED`, and every `parameters[].key` must be one `context` listed |
+| Template node sends nothing | `ck chat-agents templates` → `status` must be `APPROVED`, and every `parameters[].key` must be one of `ck chat-agents template <id>`'s `variables[].id` |

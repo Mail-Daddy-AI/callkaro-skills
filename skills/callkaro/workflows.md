@@ -58,7 +58,7 @@ method.
 - **Nothing leaves an End; nothing enters Start.** There must be a path Start → End.
 - A **dangling handle is legal** (the run ends there); an unreachable parked node is legal. Neither blocks a save.
 - **Conditions**: the exit with **no** `condition` is the fallback (`label: "otherwise"`). Sources `phone_number`, `connected_call`, `voicemail`, `hangup_reason`, `call_duration`, `conversion_status` take **no** `field`; `contact`, `post_call_variables`, `call_metadata`, `fn_response`, `static_value` **need** one.
-- `conversion_status` is `"true"`/`"false"`. `hangup_reason` values are in `ck workflows context`.
+- `conversion_status` is `"true"`/`"false"`. The `hangup_reason` values are printed by `ck workflows schema`.
 - `update-lead` and `contact`-source values use **CRM attribute names** (the `name`, not the display label). They must already exist — see [contacts.md](contacts.md).
 - **`wa-template` `parameters`**: one row per template variable, `{key, source, value}`, with `key` = `ORIGIN::token` (`BODY::{{1}}`, `HEADER::MEDIA`, `BUTTON_URL[0]::{{1}}`). `context` prints the exact keys per template — copy them, don't compose them.
 - `fn_response` fields are `<apiNodeId>.returned.<key>`.
@@ -68,7 +68,6 @@ method.
 | Command | What it does |
 |---|---|
 | `ck workflows schema` | The graph reference: every node type with a sample, edges, condition ops/sources |
-| `ck workflows context [--agent <ids>] [--post-call] [--file ctx.json]` | The account's real **agentIds (archived ones left out), WhatsApp numbers, templates (+ parameter keys), CRM attributes**, hangup reasons. `--agent` limits it to the named agents. `--post-call` adds post-call variable names — for the `--agent` ids, otherwise for **live** agents only (one request each; an agent that can't be read is counted under `unavailable`) |
 | `ck workflows list [--search] [--json]` / `get <id> [--json]` | Browse. `get --json` is the full graph |
 | `ck workflows create <name> [--file graph.json]` | Create (no graph = just Start and End) |
 | `ck workflows import --file x.json [--name]` | Create from a dashboard export or a bare graph |
@@ -85,18 +84,24 @@ method.
 
 ```bash
 ck workflows schema                        # 1. learn the shapes
-ck workflows context --file ctx.json       # 2. real ids — never invent them
-# 3. write graph.json using ONLY ids/names from ctx.json
+# 2. gather real ids — never invent them:
+ck agents list --json                      # agentId for Send Call (prefer agentStatus "live")
+ck whatsapp list --json                    # phoneNumberId + display number for WhatsApp nodes
+ck chat-agents templates --json            # template id / name / language / status (use APPROVED)
+ck chat-agents template <templateId> --json   # its variables[].id = the exact parameters[].key values
+ck contacts attributes list --json         # CRM attribute names for update-lead / contact conditions
+ck agents get <agentId> --json             # postcall[].name = post_call_variables fields (skip type call_drop_off_reason)
+# 3. write graph.json using ONLY ids/names from those listings
 ck workflows validate --file graph.json    # 4. fix every reported problem, repeat
 ck workflows create "Name" --file graph.json
 ck workflows get <id> --json               # 5. read back what was saved
 ```
 
-If `context` lists something under `unavailable` (e.g. no WhatsApp linked), do
+If a listing is empty (no WhatsApp number linked, no APPROVED template, no live agent), do
 not build a node that needs it — tell the user.
 
-When a value can't be listed — a `post_call_variables` name, `fn_response` or
-`call_metadata` key, a `conversion_status` — **ask the user**; don't guess.
+When a value can't be listed — a `fn_response` or `call_metadata` key — **ask the user**;
+don't guess.
 
 ## Edit an existing workflow
 

@@ -36,37 +36,6 @@ the **CallKaro dashboard** — not the CLI, and not buyable. Run `ck whatsapp
 list` to see what's available (see `numbers.md` § WhatsApp numbers). Requires
 an active WhatsApp subscription on the account.
 
-## Conversations (the inbox)
-
-Once a chat agent is live, its conversations land in the inbox. `ck inbox` reads
-them and does a little housekeeping. `--agent-phone-number` is the WhatsApp
-number the agent uses (digits; see `ck whatsapp list`).
-
-```bash
-ck inbox list [--search <phone>] [--channel whatsapp|instagram] [--agent-phone-number <n>] [--page n] [--page-size ≤20] [--json]
-ck inbox chat <phone> [--agent-phone-number <n>] [--channel c] [--page n] [--page-size ≤50] [--json]
-ck inbox unread                              # how many contacts have unread messages
-```
-
-`chat` is one contact's whole thread — messages **and** calls merged, newest
-first — plus who it is assigned to (status, assignee, whether it is yours). Use
-`--json` for full bodies, tool calls and delivery status; the table clips text.
-
-Housekeeping — these change state, so say what you will do and confirm first:
-
-| Command | Effect |
-|---|---|
-| `ck inbox mark-read <phone> [--agent-phone-number n] [--phone-number-id id]` | Marks the contact's inbound messages read. **With `--phone-number-id` it also sends WhatsApp read receipts** (the customer sees blue ticks) |
-| `ck inbox clear <phone> --agent-phone-number <n> [--yes]` | Adds a "chat cleared" marker: earlier messages **stop being used as AI context**. History is not deleted |
-| `ck inbox unassign <phone> --agent-phone-number <n> [--yes]` | Removes the chat-agent assignment for that contact on that number. `<phone>` must be 12 digits (e.g. `919876543210`) |
-| `ck inbox handoffs [--channel c]` | Live conversations handed to a human (default channel `instagram`); shows `from_id`, `to_id`, status, assignee |
-| `ck inbox release-handoff --channel c --from-id <id> --to-id <id> [--yes]` | Hands one back to the assistant — take the ids from `handoffs` |
-| `ck inbox export --agent-phone-number <n> --agent-phone-number-id <id> --email you@x.com [--search]` | Builds chat histories in the background and **emails** them (no direct download) |
-
-- `unassign` and `release-handoff` are refused when a Monitor employee is acting as a client — they are for the account's own team.
-- Don't pass `--yes` without the user's say-so.
-- There is **no command to send a message** or to claim/reply in the website live-chat widget; those are dashboard-only.
-
 ## Create safely
 
 1. Run `ck whoami`.

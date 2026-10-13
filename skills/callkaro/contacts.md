@@ -25,9 +25,8 @@ same attributes — see [workflows-and-contacts.md](workflows-and-contacts.md).
 | `ck contacts create <phone> [--attr name=value …] [--channel c …]` | Create, or merge into an existing contact |
 | `ck contacts update <phone> [--attr name=value …] [--clear name …]` | Set or clear attributes (validated against the definitions) |
 | `ck contacts delete <phone> [--yes]` | Delete |
-| `ck contacts analysis <phone> [--days n \| --start --end] [--json]` | Message totals (sent/ok/failed/cost) and a per-day table |
 | `ck contacts upload <file.csv> [--ignore-unknown]` | Bulk import |
-| `ck contacts export [filters] [--fields a,b] [--file out.csv] [--email you@x.com]` | Export. Over 5000 rows, or with chat history, it is **emailed** (`--email` required) |
+| `ck contacts export [filters] [--fields a,b] [--file out.csv] [--email you@x.com]` | Export. Over 5000 rows it is **emailed** (`--email` required) |
 | `ck contacts assign …` | Put contacts into a workflow or a voice-agent call run — see below |
 | `ck contacts attributes list [--json]` | The definitions: name, type, enum options, flags |
 | `ck contacts attributes set <name> [--type …] [--label] [--description] [--options a,b] [--manual-only\|--ai-updatable] [--required\|--optional] [--hidden\|--visible] [--default-mode drop\|type_default\|custom] [--default-value v]` | Create, or change **only the flags you pass** on an existing attribute |
@@ -35,11 +34,6 @@ same attributes — see [workflows-and-contacts.md](workflows-and-contacts.md).
 
 Attribute types: `string description enum number date boolean datetime time array object`.
 `enum` needs `--options`. `--manual-only` stops AI/functions overwriting it.
-
-A contact's conversation (messages and calls, plus who it is assigned to) is in
-the inbox: `ck inbox chat <phone>` — see [chat-agents.md](chat-agents.md)
-§ Conversations. `ck contacts list --assigned-to-me` narrows the list to
-contacts whose conversations are assigned to you.
 
 ## Attributes
 
@@ -94,10 +88,14 @@ as `list`) and a target — **exactly one** of:
 # into a workflow
 ck contacts assign --phones 919812345678 --workflow <workflowId> [--name "Test run"] [--at <ISO>] [--window 10:00-19:00] [--carry-over] [--priority n] [--force]
 
+# preview first: who would be assigned, where, and which --phones are not contacts. Starts nothing.
+ck contacts assign --phones 919812345678 --workflow <workflowId> --dry-run
+
 # straight to a voice agent (a call run)
 ck contacts assign --attr stage=new --agent <agentId> [--language en] [--at <ISO>] [--window 10:00-19:00] [--retries 2] [--gaps 30,60]
 ```
 
+- **Always `--dry-run` first**: it shows the target, how many contacts match, a sample, and any `--phones` that are not contacts (a real assign silently skips those). It starts nothing.
 - With **no** `--phones` and no filters it asks before assigning *every* contact. Don't bypass that.
 - Workflow: contacts **currently running** in it are **skipped** (the output says how many; nothing starts and it is not reported as a success); `--force` restarts them. A contact whose earlier run has **finished** is enrolled again normally.
 - A selection is capped server-side; the output says when it was truncated — narrow the filters to cover the rest.
