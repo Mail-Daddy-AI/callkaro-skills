@@ -1,94 +1,83 @@
 ---
 name: callkaro
 description: >
-   Operate CallKaro voice and chat AI agents from the terminal via the `ck` CLI:
-   create and manage agents and versions, buy/assign phone numbers, place single
-   or batch outbound calls, run simulations and test cases, and read call history
-   and analytics; build and edit workflows (call / WhatsApp / wait / branch / update
-   contact graphs) and manage CRM contacts, attributes, imports and workflow
-   enrolment. Use whenever the user wants to build, test, call with, or analyze
-   a CallKaro voice or chat agent, or to create a workflow or manage contacts.
+  Operate CallKaro voice and chat AI agents with the ck CLI. Use for creating,
+  testing, calling with, or analyzing agents; managing versions, numbers,
+  batches, workflows, contacts, secrets, simulations, and analytics.
 ---
-# CallKaro CLI (`ck`)
+# CallKaro skill graph
 
-CallKaro supports **voice agents** for phone calls and **chat agents** for
-messaging channels. This skill operates both through the `ck` CLI.
+Use `ck` to build and operate CallKaro voice and chat agents. Start with
+[How to Work](skill/INSTRUCTIONS.md), then open only the nodes needed for the
+task. Links between nodes are graph edges; follow them when their detail is
+relevant.
 
-## Ground rules (read first) 
+Keep these invariants: check authentication first, prefer JSON read commands,
+discover IDs instead of inventing them, use `--versions` for version selection,
+and obtain explicit confirmation before a command spends credits or starts real
+calls/messages.
 
-1. **Check auth before anything**: run `ck whoami`. If it fails, the user must
-   sign in — run `ck login` (opens their browser; never ask for a password in
-   the terminal). You cannot complete login for them; wait until it succeeds.
-2. **Always prefer `--json`** on read commands — parse the output instead of
-   scraping tables.
-3. **IDs are Mongo ObjectIds** (24-hex). Get them from list commands; never
-   invent them. Phone-number commands also accept the raw number (with/without `+`).
-4. **Versions are selected with `--versions <id>`** on every command (never
-   `--version`, which prints the CLI version).
-5. **Money moves**: `ck numbers buy`, `ck calls make` (without `--test`),
-   `ck batches create`, and `ck contacts assign` (into a workflow or an agent)
-   spend real credits / place real calls and send real WhatsApp messages. Confirm with
-   the user before running them. Prefer `ck calls make --test` and `ck sim run`
-   for iteration.
-6. **Exit codes**: non-zero = failure; the message on stderr says why.
+## Nodes
 
-## How this pack is organised — one fact, one home
+<!-- BEGIN AUTO-GENERATED SKILL GRAPH -->
 
-Four layers. **Never look for the same thing in two of them** — each owns
-something different, and where they overlap the owner below wins.
+Every linked file is a graph node. Follow links inside a node only when relevant.
 
-| Layer                        | Owns                                                                        | Files                                                                                                     |
-| ---------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| **Method**             | how to think, plan, decide                                                  | `INSTRUCTIONS.md` (operating loop, playbooks, safety rules)                                             |
-| **Reference**          | **every field, allowed value, enum, per-provider table** — the facts | `agents/AGENT-VERSION-REFERENCE.md` (the single source of truth for config)                             |
-| **Craft**              | how to make good choices in one area                                        | `agents/prompts.md`, `voice-and-transcriber.md`, `functions.md`, `versions.md`, `regression.md` |
-| **Production prompts** | the exact role + output contract ai-fde uses at each build stage            | `authoring-pipeline/*` (verbatim; also owns the `source_code` protocols)                              |
+### Core operations
 
-So: **facts → Reference. Judgement → Craft. Stage roles → pipeline.** A Craft
-file never restates a field table; it links to the Reference section.
+- [Analytics](skill/analytics.md) — Three views, mirroring the dashboard. Default window when no dates are given: the last ~6 days. Dates are YYYY-MM-DD.
+- [Audit Strategies (AI Auditor)](skill/audit-strategies.md) — An audit strategy scores calls with an LLM against free-text instructions (--strategy), scoped to a subset of an agent's calls via structured filters (call type, hangup reason, ...
+- [Auth & Account](skill/auth.md) — State lives in ~/.config/callkaro/config.json (a revocable ck… token). The user stays signed in until ck logout. Endpoints (backend/web/call URLs) are baked into the CLI — nothi...
+- [Batch Calls](skill/batches.md) — A batch = a CSV of leads dialed by an agent. Creating one starts real calls immediately — always show the user the row count and get confirmation first.
+- [Calls — placing, history, live queues](skill/calls.md) — - --test marks it a test call — use this by default while iterating; omit it only when the user explicitly wants a real production call. - A real call costs credits and phones a...
+- [Chat agents](skill/chat-agents.md) — Chat agents are separate from voice agents. Use ck chat-agents; do not send a chat-agent payload to ck agents.
+- [Contacts (CRM)](skill/contacts.md) — A contact is a phone number plus attributes. Attributes are fields the account defines first (name, type, optional allowed values); contacts can only hold attributes that have a...
+- [How to Work — operating instructions for AI agents using CallKaro](skill/INSTRUCTIONS.md) — You are acting as a CallKaro solutions engineer (the role our own ai-fde agent plays). This file is HOW to think; the entity files are WHAT to run. Read this once per session be...
+- [Phone Numbers](skill/numbers.md) — Numbers come from CallKaro's own pool (no bring-your-own). A number can be: - outbound for MANY agents (caller ID for outgoing calls) - inbound for exactly ONE agent (the server...
+- [Account Secrets](skill/secrets.md) — Use the account Secrets Vault for API keys, tokens, passwords, and other credentials referenced by agent functions or webhook headers. Never place a secret value in an agent JSO...
+- [Simulations & Test Cases](skill/simulations.md) — Simulations let you test an agent without phone calls or credits-per-minute: an LLM plays the customer (from a test case's userPrompt), talks to a chosen agent version, and an L...
+- [Workflows + Contacts together](skill/workflows-and-contacts.md) — Contacts are who; a workflow is what happens to them. They meet in three places, and getting these right is most of the work:
+- [Workflows](skill/workflows.md) — A workflow is a graph of steps run per contact: call them, wait, WhatsApp them, branch on what happened, update their CRM record. The dashboard draws it on a canvas; the CLI rea...
 
-## Entity map — which file to read
+### Agents
 
-| You need to…                                                                                                                     | Read                                                                                                                           |
-| --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **How to think, plan, and operate (read once per session)**                                                                 | [INSTRUCTIONS.md](INSTRUCTIONS.md)                                                                                              |
-| Sign in / account                                                                                                                 | [auth.md](auth.md)                                                                                                              |
-| **User handed you a PRD / BRD / PDF spec** ("build this bot")                                                               | [INSTRUCTIONS.md](INSTRUCTIONS.md) §5 first playbook — read doc → requirement sheet → pipeline → derive tests from the doc |
-| **BUILDING or EDITING an agent** — run ai-fde's production pipeline (plan → script → reflect → functions → parameters) | **[authoring-pipeline/README.md](authoring-pipeline/README.md)**                                                          |
-| **Any field's name, allowed values, defaults, or a provider table**                                                         | **[agents/AGENT-VERSION-REFERENCE.md](agents/AGENT-VERSION-REFERENCE.md)** — look here first, always                     |
-| Agent concepts + the`ck agents` commands                                                                                        | [agents/README.md](agents/README.md)                                                                                            |
-| Chat-agent creation, functions, versions, and the `ck chat-agents` commands                                                      | [chat-agents.md](chat-agents.md)                                                                                                |
-| Writing the system prompt / script (8 sections, modes, snippets)                                                                  | [agents/prompts.md](agents/prompts.md)                                                                                          |
-| Create / update an **agent** (step-by-step procedures + starter JSON; not CallKaro workflows)                                                                                          | [agents/create-update.md](agents/create-update.md)                                                                              |
-| Versions, publishing, A/B (incl. rule-based)                                                                                      | [agents/versions.md](agents/versions.md)                                                                                        |
-| Picking a voice or transcriber (`ck voices`, pairing, language traps)                                                           | [agents/voice-and-transcriber.md](agents/voice-and-transcriber.md)                                                              |
-| Which function to add, basic vs advanced, where to attach                                                                         | [agents/functions.md](agents/functions.md)                                                                                      |
-| Account secrets (list/set/rename/remove and safe agent references)                                                                | [secrets.md](secrets.md)                                                                                                        |
-| Phone numbers (list/buy/assign/spam/release); WhatsApp numbers (list/assign only — added manually on the dashboard, no buy/register) | [numbers.md](numbers.md)                                                                                                        |
-| Single calls, call history, exports, live queues, reading a call's raw log                                                        | [calls.md](calls.md)                                                                                                            |
-| Batch calling + CSV format                                                                                                        | [batches.md](batches.md)                                                                                                        |
-| **Workflows** — create/edit/validate a graph, per-node edits, read a lead's run                                                 | [workflows.md](workflows.md)                                                                                                    |
-| **CRM contacts & attributes** — define attributes, import/export CSV, filter, assign to a workflow or agent                       | [contacts.md](contacts.md)                                                                                                      |
-| **Building a workflow that uses contacts** (attributes → graph → load → test on one number → scale)                                | [workflows-and-contacts.md](workflows-and-contacts.md)                                                                          |
-| Simulations & test cases                                                                                                          | [simulations.md](simulations.md)                                                                                                |
-| **Auditing/fixing a live agent** — branch coverage, exact phrases, full-suite gate                                         | [agents/regression.md](agents/regression.md)                                                                                    |
-| AI Auditor audit strategies (`ck audit-strategies`) — score live calls with an LLM against instructions + filters              | [audit-strategies.md](audit-strategies.md)                                                                                      |
-| Analytics / performance                                                                                                           | [analytics.md](analytics.md)                                                                                                    |
+- [CallKaro Agents & Versions — Complete Reference](skill/agents/AGENT-VERSION-REFERENCE.md) — Read this before doing ANYTHING with agents or versions — creating, editing, scripts, prompts, capabilities/pathways, functions, voice, transcriber, LLM, post-call variables, pu...
+- [Creating & Updating Agents](skill/agents/create-update.md) — ck agents create takes ONE JSON object mixing agent-level + version-level fields (the server splits them). name is required; versionName defaults to v1. The new agent is immedia...
+- [Functions — giving the agent abilities](skill/agents/functions.md) — Field shapes for every function type: AGENT-VERSION-REFERENCE.md §6 (and §15 for WhatsApp). Writing sourcecode: use the production generator prompts — advanced-pre-call-agent.md...
+- [Writing Agent Prompts](skill/agents/prompts.md) — Writing a script right now? Use the production writer prompts in ../authoring-pipeline/ — script-writer-agent.md (types 0/1) or multi-prompt-script-writer-agent.md (types 2/3), ...
+- [Voice Agents — the core entity](skill/agents/README.md) — A CallKaro agent is a phone-calling AI: an LLM + voice (TTS) + transcriber (STT) + a prompt/script, plus call behavior (turn-taking, silence handling, functions/tools, post-call...
+- [Client Regression — branch coverage & verification discipline](skill/agents/regression.md) — Use when building from a PRD/BRD (this is the checklist that turns a spec into a test suite), auditing a live client agent, fixing a reported misbehaviour, or hardening an agent...
+- [Versions, Publishing & A/B Testing](skill/agents/versions.md) — - Each version is a full standalone config (prompt + LLM + voice + everything version-level) under one agent, identified by versionName + defaultlanguage. - Publishing is per-la...
+- [Voice (TTS) & Transcriber (STT) — choosing them](skill/agents/voice-and-transcriber.md) — Field tables live in AGENT-VERSION-REFERENCE.md §9 (voice) and §10 (transcriber) — every provider's exact keys, models, ranges and defaults. Don't restate them; look them up the...
 
-## The golden path (creating a working agent end-to-end)
+### Authoring Pipeline
 
-```bash
-ck whoami                                   # 1. logged in?
-ck voices --json                            # 2. pick a voice for the language
-ck agents create --file agent.json          # 3. create (see agents/create-update.md)
-ck sim create <agentId> --name "smoke" \
-  --prompt "You are a customer asking about pricing" \
-  --criteria "Agent explains pricing and offers a follow-up"
-ck agents versions <agentId> --json         # get the version id
-ck sim run <agentId> --tests <testId> --versions <versionId>
-ck sim results <runId>                      # iterate on the prompt until PASS
-ck agents publish <agentId> --versions <versionId>
-ck numbers list --json                      # 4. pick/buy a number
-ck agents set-outbound <agentId> --number <numberId>
-ck calls make --agent <agentId> --to <phone> --test   # 5. test call
-```
+- [Advanced In-Call Function Agent](skill/authoring-pipeline/advanced-in-call-agent.md) — You are a Python code generator for CallKaro — a voice AI platform. You generate ONLY "customincall" functions. You will be given either a CREATE or an UPDATE task. Your only jo...
+- [Advanced Post-Call Function Agent](skill/authoring-pipeline/advanced-post-call-agent.md) — You are a JavaScript code generator for CallKaro — a voice AI platform. You generate ONLY "custompostcall" functions. You will be given either a CREATE or an UPDATE task. Your o...
+- [Advanced Pre-Call Function Agent](skill/authoring-pipeline/advanced-pre-call-agent.md) — You are a Python code generator for CallKaro — a voice AI platform. You generate ONLY "customprecall" functions. You will be given either a CREATE or an UPDATE task. Your only j...
+- [Agent Behavior Agent](skill/authoring-pipeline/agent-behavior-agent.md) — You are an agent behavior configuration agent for CallKaro — a voice AI platform. You will receive a user request and the current behavior config. Return ONLY what changed — set...
+- [Call Flow JSON Agent](skill/authoring-pipeline/call-flow-json-agent.md) — You are a call flow JSON generation agent for CallKaro — a voice AI platform. You convert a text-based call flow description into a structured JSON node graph for the visual cal...
+- [Call Initiation & Termination Agent](skill/authoring-pipeline/call-init-term-agent.md) — You are a call initiation and termination configuration agent for CallKaro — a voice AI platform. You will receive a user request and the current init/termination config. Return...
+- [Call Parameters Planner](skill/authoring-pipeline/call-params-planner-agent.md) — You are a configuration planner for CallKaro — a voice AI platform. Your job is to read a user request and determine which configuration sub-tools need to run. You have NO tools...
+- [Call Settings Agent](skill/authoring-pipeline/call-settings-agent.md) — You are a call settings configuration agent for CallKaro — a voice AI platform. You will receive a user request and the current settings. Return ONLY what changed — set null for...
+- [Filler & Pronunciation Agent](skill/authoring-pipeline/filler-pronunciation-agent.md) — You are a filler sound and pronunciation configuration agent for CallKaro — a voice AI platform. You will receive a user request and the current filler/pronunciation config. Ret...
+- [Function Critic Agent](skill/authoring-pipeline/function-critic-agent.md) — You are a function quality critic for CallKaro — a voice AI platform. Your job is to verify that planned function operations were executed correctly and return a structured verd...
+- [Function Planner Agent](skill/authoring-pipeline/function-planner-agent.md) — You are the function planning agent for CallKaro — a voice AI platform. Your job is to decide what CREATE / UPDATE / DELETE operations are needed on the voice agent's functions,...
+- [In-Call Basic Function Agent](skill/authoring-pipeline/in-call-basic-agent.md) — You are a JSON factory for CallKaro's customincall functions. You will be given either a CREATE or an UPDATE task. Your only job is to return a single valid JSON object — no mar...
+- [LLM & Caching Agent](skill/authoring-pipeline/llm-caching-agent.md) — You are an LLM and caching configuration agent for CallKaro — a voice AI platform. You will receive a user request and the current model/caching config. Return ONLY what changed...
+- [Multi-Prompt Script Writer](skill/authoring-pipeline/multi-prompt-script-writer-agent.md) — You are a call-script generator for voice AI agents. You write scripts exclusively for Multi-Prompt agents (systempromptType = 2).
+- [Planner (Multi-Prompt)](skill/authoring-pipeline/planner-agent-multiprompt.md) — You are the planning brain for CallKaro, a voice AI platform for outbound calling.
+- [Planner](skill/authoring-pipeline/planner-agent.md) — You are the planning brain for CallKaro — a voice AI platform for outbound calling. Your ONLY job is to produce a structured, actionable execution plan. You NEVER execute change...
+- [Post-Call Basic Function Agent](skill/authoring-pipeline/post-call-basic-agent.md) — You are a JSON factory for CallKaro's custompostcall functions. You will be given either a CREATE or an UPDATE task. Your only job is to return a single valid JSON object — no m...
+- [Pre-Call Basic Function Agent](skill/authoring-pipeline/pre-call-basic-agent.md) — You are a JSON factory for CallKaro's customprecall functions. You will be given either a CREATE or an UPDATE task. Your only job is to return a single valid JSON object — no ma...
+- [Pre-Format Variables Agent](skill/authoring-pipeline/pre-format-agent.md) — You are a variable pre-formatting configuration agent for CallKaro — a voice AI platform. You manage the preFormatVariables map — a { variableName: formatKey } object that defin...
+- [Predefined Functions Agent](skill/authoring-pipeline/predefined-agent.md) — You are a JSON factory for CallKaro's predefined (no-code) voice-agent functions. You will be given either a CREATE or an UPDATE task. Your only job is to return a single valid ...
+- [The ai-fde Authoring Pipeline — build agents the way our own AI does](skill/authoring-pipeline/README.md) — These files are the actual production prompts of ai-fde, CallKaro's agent-building AI. When you build or edit an agent, don't improvise: run this pipeline, adopting each file's ...
+- [Reflect Agent](skill/authoring-pipeline/reflect-agent.md) — You are the quality reviewer for CallKaro — a voice AI platform.
+- [Script Analyzer for Functions](skill/authoring-pipeline/script-analyzer-for-functions-agent.md) — You are a post-call analysis designer for CallKaro, a voice AI platform.
+- [Script Writer](skill/authoring-pipeline/script-writer-agent.md) — You are a call-script generator for voice AI agents. You write scripts for two agent types: - Type 0 (basic): a single self-contained systemprompt field. - Type 1 (advanced): st...
+- [Switchable Entities Agent](skill/authoring-pipeline/switchable-entities-agent.md) — You are a switchable entities configuration agent for CallKaro — a voice AI platform. You manage two arrays: switchableLanguages (mid-call language switching) and switchableAgen...
+- [Chatbot Supervisor](skill/authoring-pipeline/user-chatbot.md) — You are the CallKaro Orchestrator. Your only job is to build, update, and publish voice AI agents by calling tools in the correct order. You never generate agent content yoursel...
+- [Voice & Transcriber Agent](skill/authoring-pipeline/voice-transcriber-agent.md) — You are the voice and transcriber configuration agent for CallKaro — a voice AI platform.
+
+<!-- END AUTO-GENERATED SKILL GRAPH -->

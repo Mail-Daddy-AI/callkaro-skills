@@ -39,16 +39,34 @@ and test it"* — and it will load the skill.
 
 | File | Covers |
 |---|---|
-| `skills/callkaro/SKILL.md` | entry point: ground rules + where to look |
-| `INSTRUCTIONS.md` | how to think: operating loop, playbooks, safety rules |
-| `secrets.md` | account secret commands, names-only discovery, and safe reference syntax |
-| `agents/AGENT-VERSION-REFERENCE.md` | every agent/version field, its values, and the traps |
-| `agents/prompts.md` · `voice.md` · `transcriber.md` · `functions.md` | script writing, TTS, STT, abilities (incl. advanced Python/JS) |
-| `agents/create-update.md` · `versions.md` | agent create/update procedures, publishing, A/B testing |
-| `workflows.md` | workflow graphs: node types, `ck workflows` commands, generate/edit/validate, reading a lead's run |
-| `contacts.md` | CRM contacts and attributes: import/export, filters, `ck contacts assign` |
-| `workflows-and-contacts.md` | the two together: attributes → graph → load contacts → smoke test → scale |
-| `auth.md` · `numbers.md` · `calls.md` · `batches.md` · `simulations.md` · `analytics.md` | the rest of the platform |
+| `skills/callkaro/SKILL.md` | the single entry point and generated graph router |
+| `skills/callkaro/skill/INSTRUCTIONS.md` | how to think: operating loop, playbooks, safety rules |
+| `skills/callkaro/skill/secrets.md` | account secret commands, names-only discovery, and safe reference syntax |
+| `skills/callkaro/skill/agents/AGENT-VERSION-REFERENCE.md` | every agent/version field, its values, and the traps |
+| `skills/callkaro/skill/agents/` | prompts, voice/STT, functions, creation, versions, and regression testing |
+| `skills/callkaro/skill/authoring-pipeline/` | production authoring stages linked as a subgraph |
+| `skills/callkaro/skill/workflows.md` · `contacts.md` | workflow graphs and CRM contacts |
+| `skills/callkaro/skill/auth.md` · `numbers.md` · `calls.md` · `batches.md` · `simulations.md` · `analytics.md` | the rest of the platform |
+
+## Maintaining the skill graph
+
+There is only one discoverable `SKILL.md`. Every `.md` file below
+`skills/callkaro/skill/` is a graph node, and relative Markdown links between
+files are directed edges. Add a new node anywhere below that directory, give it
+an H1 title and a short first paragraph, then run:
+
+```bash
+python3 scripts/sync_skill_graph.py
+```
+
+The command updates only the generated node catalog in `SKILL.md` and validates
+local graph links. Use an optional `<!-- graph-summary: Short routing text. -->`
+in a node to override its inferred catalog summary. CI can enforce a clean graph
+without rewriting files:
+
+```bash
+python3 scripts/sync_skill_graph.py --check
+```
 
 ## Updating
 
