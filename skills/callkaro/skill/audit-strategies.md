@@ -1,4 +1,5 @@
 # Audit Strategies (AI Auditor)
+<!-- graph-summary: Create and manage AI-auditor strategies that score a sampled share of an agent's calls against free-text instructions; commands, filters, models, and the rule not to invent filter values. -->
 
 An audit strategy scores calls with an LLM against free-text instructions
 (`--strategy`), scoped to a subset of an agent's calls via structured filters

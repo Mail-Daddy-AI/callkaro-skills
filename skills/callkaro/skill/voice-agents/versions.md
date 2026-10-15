@@ -1,4 +1,5 @@
 # Versions, Publishing & A/B Testing
+<!-- graph-summary: Versions, commits and publishing, cloning a sibling version, ratio and rule-based A/B tests, and the safe iteration recipe that avoids editing production in place. -->
 
 ## How versions work
 
@@ -142,7 +143,7 @@ ck agents clone-version <agentId> --versions <publishedVid> \
   --name "v2-discount-fix" --prompt-type <0-3> --language <code> --json
 # 3. read newVid from newVersion._id, then edit only the clone as needed
 ck agents update <agentId> --versions <newVid> --set @changes.json
-# 4. test it with simulations (see ../simulations.md) until PASS
+# 4. test it with simulations (see ../simulations/simulation-playbook.md) until PASS
 ck sim run <agentId> --tests <t1,t2> --versions <newVid>
 # 5. either flip over…
 ck agents publish <agentId> --versions <newVid>

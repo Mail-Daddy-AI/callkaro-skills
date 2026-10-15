@@ -1,4 +1,5 @@
 # CallKaro Agents & Versions — Complete Reference
+<!-- graph-summary: The complete field reference for agent and version documents: which doc a key belongs to, script and capability/pathway fields, functions, LLM, post-call, voice, transcriber, call settings, WhatsApp, versioning, a pre-flight checklist and minimal payloads. Load before writing any payload. -->
 
 **Read this before doing ANYTHING with agents or versions** — creating, editing,
 scripts, prompts, capabilities/pathways, functions, voice, transcriber, LLM,

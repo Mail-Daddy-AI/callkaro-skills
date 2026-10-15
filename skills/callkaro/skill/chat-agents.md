@@ -1,4 +1,5 @@
 # Chat agents
+<!-- graph-summary: Chat agents are a separate entity from voice agents: ck chat-agents commands, WhatsApp number assignment, safe creation, prompt/model setup, functions and versions. -->
 
 Chat agents are separate from voice agents. Use `ck chat-agents`; do not send a
 chat-agent payload to `ck agents`.

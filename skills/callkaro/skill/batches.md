@@ -1,4 +1,5 @@
 # Batch Calls
+<!-- graph-summary: Create or schedule batch calls from a CSV (format rules, row-count confirmation), monitor status, re-dial unreached rows, download results. Creating a batch starts real calls immediately. -->
 
 A batch = a CSV of leads dialed by an agent. Creating one **starts real calls
 immediately** — always show the user the row count and get confirmation first.

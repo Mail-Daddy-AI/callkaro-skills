@@ -1,4 +1,5 @@
 # Workflows
+<!-- graph-summary: Build and run workflow graphs per contact: node types, the rules that bite, commands, generating a graph from a request using real ids, editing, and reading results. -->
 
 A workflow is a **graph of steps run per contact**: call them, wait, WhatsApp
 them, branch on what happened, update their CRM record. The dashboard draws it

@@ -1,4 +1,5 @@
 # How to Work — operating instructions for AI agents using CallKaro
+<!-- graph-summary: Start here. The operating loop, session preamble, agent authoring order, decision rules that prevent damage, standard playbooks (build from a doc, build from scratch, debug a bad agent) and when to ask the user. -->
 
 You are acting as a CallKaro solutions engineer (the role our own ai-fde agent
 plays). This file is HOW to think; the entity files are WHAT to run. Read this
@@ -30,7 +31,7 @@ UNDERSTAND → PLAN → GATHER FACTS → BUILD → VERIFY → REPORT
 5. **Verify** — read back what you wrote (`ck agents get <id> --versions <vid>
    --json`) and confirm the fields round-tripped; then simulate. A 200 response
    is NOT proof — some fields drop silently
-   ([agents/AGENT-VERSION-REFERENCE.md](agents/AGENT-VERSION-REFERENCE.md) §18).
+   ([voice-agents/AGENT-VERSION-REFERENCE.md](voice-agents/AGENT-VERSION-REFERENCE.md) §18).
 6. **Report** — tell the user what exists now (ids, version names, what's
    published), what you verified, and what's still placeholder (API keys,
    transfer numbers). After every successful create or update, report any newly
@@ -56,7 +57,7 @@ functions need the metadata and post-call variables; the transcriber language
 must match the script language. Jumping straight to "set the voice" on a
 not-yet-scripted agent produces rework.
 
-Which prompt type? (full guidance: [agents/prompts.md](agents/prompts.md))
+Which prompt type? (full guidance: [voice-agents/prompts.md](voice-agents/prompts.md))
 - Short, single-purpose call → **0 Basic**.
 - Complex but linear, team-maintained → **1 Advanced**.
 - Long multi-stage script → **2 Multi-prompt**.
@@ -70,7 +71,7 @@ Which prompt type? (full guidance: [agents/prompts.md](agents/prompts.md))
   `ck batches send-next-try/send-untriggered`. State what it costs/does, wait
   for a yes. `--test` calls and simulations are free to run.
 - **Never edit a published version for an experiment** — create a new version,
-  simulate, then publish or A/B ([agents/versions.md](agents/versions.md)).
+  simulate, then publish or A/B ([voice-agents/versions.md](voice-agents/versions.md)).
 - **Read-modify-write for object fields** (`voice_configuration`,
   `transcriber`, `capabilities`, …): fetch the current object, edit, send the
   whole thing back. A partial object erases the rest.
@@ -101,10 +102,10 @@ The document is the source of truth for BOTH the script and the test suite.
    coming in · data to extract after the call · integrations/functions needed ·
    every non-happy branch the doc mentions · what counts as a conversion.
    Ask only about genuine gaps — don't re-ask what the doc already answers.
-3. **Build via the ai-fde pipeline** (below), feeding that sheet into the
-   planner/script stages. Quote mandated sentences verbatim into the prompt.
+3. **Build the agent** (flow below), feeding that sheet into the
+   script and function steps. Quote mandated sentences verbatim into the prompt.
 4. **Derive the test suite from the doc**: one `ck sim` test per branch, using
-   the branch library in [agents/regression.md](agents/regression.md) as the
+   the branch library in [voice-agents/regression.md](voice-agents/regression.md) as the
    checklist of branches the doc must cover (a PRD usually names the happy path
    and a few edge cases — the library catches the ones it forgot: DND, wrong
    number, transfer, terminal close).
@@ -112,19 +113,18 @@ The document is the source of truth for BOTH the script and the test suite.
 6. Report back mapped to the doc: what's implemented, what's placeholder
    (missing API details), and any requirement you could not satisfy.
 
-**"Build me an agent for X"** (no document) — run the **ai-fde pipeline**
-([authoring-pipeline/README.md](authoring-pipeline/README.md)); these are the
-production prompts our own agent-builder uses, stage by stage:
-1. Intake (`user-chatbot.md`) → plan (`planner-agent*.md`) → pick type + language.
-2. Script with the matching script-writer prompt, then **critique it with
-   `reflect-agent.md` and loop until clean** — never ship a first draft.
-3. `script-analyzer-for-functions-agent.md` → postcall vars + conversion; then
-   the function agents (+ `function-critic-agent.md`); then the call-parameter
-   agents (voice/transcriber via `ck voices`).
-4. Assemble one agent.json per [agents/create-update.md](agents/create-update.md)
+**"Build me an agent for X"** (no document)
+1. Settle the requirements (goal, language, persona, flow, data to capture, integrations),
+   then pick the type and language.
+2. Write the script per [voice-agents/prompts.md](voice-agents/prompts.md); never ship a first draft.
+3. Add post-call variables and conversion rules, then the functions
+   ([voice-agents/functions.md](voice-agents/functions.md); code rules in
+   [voice-agents/function-code.md](voice-agents/function-code.md)), then the call parameters
+   (voice and transcriber via `ck voices`).
+4. Assemble one agent.json per [voice-agents/create-update.md](voice-agents/create-update.md)
    (always include an `end` function) → `ck agents create --file agent.json`.
-5. Read back → 2–3 simulation test cases (cooperative / skeptical /
-   wrong-number) → `ck sim run` → iterate until PASS ([simulations.md](simulations.md)).
+5. Check it against [voice-agents/verify-and-review.md](voice-agents/verify-and-review.md), then run a
+   simulation suite ([simulations](simulations/simulation-playbook.md)) and iterate until PASS.
 6. Publish, assign a number if it will really call, offer a `--test` call.
 
 **"My agent is doing X wrong"**
@@ -132,11 +132,11 @@ production prompts our own agent-builder uses, stage by stage:
    read the transcript; or run a simulation that triggers the behavior.
 2. Locate the cause: contradictory prompt rules? missing path? wrong snippet?
    function description not triggering? transcriber mishearing (check the
-   transcript's STT quality — see [agents/voice-and-transcriber.md](agents/voice-and-transcriber.md))?
+   transcript's STT quality — see [voice-agents/voice-and-transcriber.md](voice-agents/voice-and-transcriber.md))?
 3. Fix in a NEW version with `--commit`, simulate the exact failing scenario,
    **then re-run the full test set** — a narrow fix often breaks a neighbouring
    branch. Branch library + audit checklist:
-   [agents/regression.md](agents/regression.md).
+   [voice-agents/regression.md](voice-agents/regression.md).
 
 **"Call this list of people"** → [batches.md](batches.md): validate the CSV
 (header, phone col 1, agent column or `--agent`), confirm row count + spend
@@ -147,7 +147,7 @@ with the user, create, monitor `ck batches status`, retry misses.
 `ck calls list --hangup`.
 
 **"Compare two prompts / which is better?"** → two versions + `ck agents ab`
-+ `ck analytics version` ([agents/versions.md](agents/versions.md)); or
++ `ck analytics version` ([voice-agents/versions.md](voice-agents/versions.md)); or
 offline: same sim tests against both versions and compare PASS rates.
 
 ## 6. Escalate to the user (don't decide alone)

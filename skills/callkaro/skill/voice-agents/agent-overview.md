@@ -1,4 +1,5 @@
 # Voice Agents — the core entity
+<!-- graph-summary: The agent versus version split, the four prompt types (basic, advanced, multi-prompt, pathway), the minimum viable agent, core commands, and the errors the server enforces. -->
 
 A CallKaro **agent** is a phone-calling AI: an LLM + voice (TTS) + transcriber
 (STT) + a prompt/script, plus call behavior (turn-taking, silence handling,
@@ -16,7 +17,9 @@ traps). Load it before writing any agent/version payload.** Then
 [prompts.md](prompts.md) (how to write the script), [create-update.md](create-update.md)
 (CLI workflows + starter JSON), [versions.md](versions.md) (publish/A/B),
 [voice-and-transcriber.md](voice-and-transcriber.md) (voice + STT choices),
-[functions.md](functions.md) (abilities incl. advanced code).
+[functions.md](functions.md) (abilities) and [function-code.md](function-code.md) (advanced code),
+[snippets.md](snippets.md) (default behaviour snippets), and
+[verify-and-review.md](verify-and-review.md) (check an agent before publishing).
 
 ## Prompt types (`systempromptType`)
 

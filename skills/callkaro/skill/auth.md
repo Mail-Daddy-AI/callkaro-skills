@@ -1,4 +1,5 @@
 # Auth & Account
+<!-- graph-summary: Sign-in, register, logout, whoami and config; whoami is the auth gate before any workflow, and it shows the credits balance. -->
 
 State lives in `~/.config/callkaro/config.json` (a revocable `ck_…` token). The
 user stays signed in until `ck logout`. Endpoints (backend/web/call URLs) are

@@ -1,4 +1,5 @@
 # Contacts (CRM)
+<!-- graph-summary: CRM contacts and their attributes: define attributes first, import and export CSV, assign contacts to a workflow or an agent, and the protection of hand-set values from workflows. -->
 
 A contact is a **phone number plus attributes**. Attributes are fields the
 account **defines first** (name, type, optional allowed values); contacts can

@@ -1,10 +1,10 @@
 # Voice (TTS) & Transcriber (STT) — choosing them
+<!-- graph-summary: How to choose a voice and transcriber: find real voices with ck voices, pick by language and gender, the two traps, and verifying after writing. -->
 
 > **Field tables live in [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md)
 > §9 (voice) and §10 (transcriber)** — every provider's exact keys, models,
 > ranges and defaults. Don't restate them; look them up there.
-> This file is *how to choose*. For the full production selection policy, the
-> pipeline stage is [../authoring-pipeline/voice-transcriber-agent.md](../authoring-pipeline/voice-transcriber-agent.md).
+> This file is *how to choose*.
 
 ## Find real voices — never invent one
 

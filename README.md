@@ -42,11 +42,10 @@ and test it"* — and it will load the skill.
 | `skills/callkaro/SKILL.md` | the single entry point and generated graph router |
 | `skills/callkaro/skill/INSTRUCTIONS.md` | how to think: operating loop, playbooks, safety rules |
 | `skills/callkaro/skill/secrets.md` | account secret commands, names-only discovery, and safe reference syntax |
-| `skills/callkaro/skill/agents/AGENT-VERSION-REFERENCE.md` | every agent/version field, its values, and the traps |
-| `skills/callkaro/skill/agents/` | prompts, voice/STT, functions, creation, versions, and regression testing |
-| `skills/callkaro/skill/authoring-pipeline/` | production authoring stages linked as a subgraph |
+| `skills/callkaro/skill/voice-agents/AGENT-VERSION-REFERENCE.md` | every agent/version field, its values, and the traps |
+| `skills/callkaro/skill/voice-agents/` | prompts, voice/STT, functions, creation, versions, and regression testing |
 | `skills/callkaro/skill/workflows.md` · `contacts.md` | workflow graphs and CRM contacts |
-| `skills/callkaro/skill/auth.md` · `numbers.md` · `calls.md` · `batches.md` · `simulations.md` · `analytics.md` | the rest of the platform |
+| `skills/callkaro/skill/auth.md` · `numbers.md` · `calls.md` · `batches.md` · `simulations/simulation-playbook.md` · `analytics.md` | the rest of the platform |
 
 ## Maintaining the skill graph
 

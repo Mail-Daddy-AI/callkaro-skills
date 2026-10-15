@@ -1,13 +1,14 @@
 # Workflows + Contacts together
+<!-- graph-summary: End-to-end recipe for using workflows with contacts: define attributes, gather ids, build the graph, load contacts, test on one number, verify, then scale. -->
 
 Contacts are **who**; a workflow is **what happens to them**. They meet in
 three places, and getting these right is most of the work:
 
-| Meeting point | How |
-|---|---|
-| **Attributes feed the graph** | A Conditions branch or a WhatsApp template parameter with `source: "contact"` reads a CRM attribute **by its `name`**; the contact's data personalises each run |
-| **The graph writes attributes back** | An `update-lead` node sets attributes on the contact (`static_value`, or a value from the last call: `post_call_variables`, `hangup_reason`, …) |
-| **Enrolment** | `ck contacts assign --workflow <id>` starts one run per contact |
+| Meeting point                              | How                                                                                                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Attributes feed the graph**        | A Conditions branch or a WhatsApp template parameter with`source: "contact"` reads a CRM attribute **by its `name`**; the contact's data personalises each run |
+| **The graph writes attributes back** | An`update-lead` node sets attributes on the contact (`static_value`, or a value from the last call: `post_call_variables`, `hangup_reason`, …)                  |
+| **Enrolment**                        | `ck contacts assign --workflow <id>` starts one run per contact                                                                                                        |
 
 Read [workflows.md](workflows.md) and [contacts.md](contacts.md) for the
 commands; this file is the order of operations.
@@ -98,11 +99,11 @@ ck contacts assign --attr stage=no_answer --workflow <retryWorkflowId> --name "S
 
 ## Debugging
 
-| Symptom | Look at |
-|---|---|
-| `create`/`update` rejected | The error lists each problem with a `nodeId`; `ck workflows validate --file …` shows them all at once |
-| Upload refused | "not a defined attribute" → `contacts attributes set …`, or `--ignore-unknown` |
-| Lead stuck / went the wrong way | `ck workflows run <id> <phone> --json` — the step statuses, the handle taken, and the variables the Conditions node tested |
-| Attribute wasn't updated | The value was **set by hand** (protected — `contacts get --json` shows `source: manual`), or the attribute is undefined, or the value is outside an enum; `run <id> <phone> --json` shows the `update-lead` step |
-| Contact "not in workflow" after assign | Already running there (skipped) — see the assign output; `--force` to restart |
-| Template node sends nothing | `ck chat-agents templates` → `status` must be `APPROVED`, and every `parameters[].key` must be one of `ck chat-agents template <id>`'s `variables[].id` |
+| Symptom                                | Look at                                                                                                                                                                                                                        |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `create`/`update` rejected         | The error lists each problem with a`nodeId`; `ck workflows validate --file …` shows them all at once                                                                                                                      |
+| Upload refused                         | "not a defined attribute" →`contacts attributes set …`, or `--ignore-unknown`                                                                                                                                            |
+| Lead stuck / went the wrong way        | `ck workflows run <id> <phone> --json` — the step statuses, the handle taken, and the variables the Conditions node tested                                                                                                  |
+| Attribute wasn't updated               | The value was**set by hand** (protected — `contacts get --json` shows `source: manual`), or the attribute is undefined, or the value is outside an enum; `run <id> <phone> --json` shows the `update-lead` step |
+| Contact "not in workflow" after assign | Already running there (skipped) — see the assign output;`--force` to restart                                                                                                                                                |
+| Template node sends nothing            | `ck chat-agents templates` → `status` must be `APPROVED`, and every `parameters[].key` must be one of `ck chat-agents template <id>`'s `variables[].id`                                                           |

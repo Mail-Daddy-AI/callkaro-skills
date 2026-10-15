@@ -1,4 +1,5 @@
 # Account Secrets
+<!-- graph-summary: The account secrets vault: list names, set, rename and remove secrets, and the x_secrets reference syntax used in function headers and code. Never put a credential in an agent payload. -->
 
 Use the account Secrets Vault for API keys, tokens, passwords, and other
 credentials referenced by agent functions or webhook headers. Never place a

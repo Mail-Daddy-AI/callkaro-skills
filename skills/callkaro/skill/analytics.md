@@ -1,4 +1,5 @@
 # Analytics
+<!-- graph-summary: ck analytics overview / performance / version commands, their filters and output fields, and which one answers: agent health, A/B winner, cost, why calls fail. -->
 
 Three views, mirroring the dashboard. Default window when no dates are given:
 the last ~6 days. Dates are `YYYY-MM-DD`.

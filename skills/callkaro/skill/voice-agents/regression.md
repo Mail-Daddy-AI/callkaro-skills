@@ -1,10 +1,11 @@
 # Client Regression — branch coverage & verification discipline
+<!-- graph-summary: Branch library to cover when building from a PRD (happy path, wrong number, DND, transfer, callback, upload error and more), the four rules behind most regressions, two-pass verification and an audit checklist for live agents. -->
 
 Use when **building from a PRD/BRD** (this is the checklist that turns a spec
 into a test suite), auditing a live client agent, fixing a reported
 misbehaviour, or hardening an agent before it ships. The mechanics (export,
 patch, simulate) are in [create-update.md](create-update.md),
-[versions.md](versions.md) and [../simulations.md](../simulations.md) — this
+[versions.md](versions.md) and [../simulations/simulation-playbook.md](../simulations/simulation-playbook.md) — this
 file is **what to test** and **what each branch must do**.
 
 ## Branch library — every client agent needs these covered

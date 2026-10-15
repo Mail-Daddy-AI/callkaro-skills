@@ -1,10 +1,5 @@
 # Writing Agent Prompts
-
-> **Writing a script right now?** Use the production writer prompts in
-> [../authoring-pipeline/](../authoring-pipeline/README.md) —
-> `script-writer-agent.md` (types 0/1) or `multi-prompt-script-writer-agent.md`
-> (types 2/3), then critique with `reflect-agent.md`. This file is the
-> background theory; those are the operating instructions.
+<!-- graph-summary: How to write a good prompt: the 8 sections, multi-prompt structure, the 5 snippets, rules that stop prompts breaking, Indian-language and persona conventions, closing lines and update rules. -->
 
 The system prompt is the heart of the agent: who it is, its goal, how it
 behaves, what it must never do, the call flow, and objection handling. This
@@ -76,7 +71,7 @@ platform default; set `""` to suppress it entirely.
 | `language_switch_snippet` | when/how to change language smoothly |
 | `hold_call_snippet` | hold behaviour: go on hold, stay silent until the caller returns |
 
-(`gender_prompt_snippet` is a sixth, used only with `detect_gender: true`.)
+(`gender_prompt_snippet` is a sixth, used only with `detect_gender: true`.) The default texts are in [snippets.md](snippets.md).
 
 ## Rules for prompts that don't break
 
@@ -94,7 +89,7 @@ platform default; set `""` to suppress it entirely.
   person, and ending the call. **Explicitly say when the right action is to do
   nothing** — otherwise the agent invents something.
 - Train it like a new human hire: walk the call step by step.
-- After writing: **simulate** (../simulations.md) and fix every step where more
+- After writing: **simulate** (../simulations/simulation-playbook.md) and fix every step where more
   than one action was possible.
 
 ## Language & persona conventions (Indian-language agents)
@@ -109,3 +104,15 @@ platform default; set `""` to suppress it entirely.
 - Never translate capability names, function names, or `{{placeholder}}` names.
 - Every `{{metadata}}` reference needs a fallback so an empty value is never
   spoken.
+
+## Closing lines, variables, updates
+
+- `end_call_msg`: 2–3 natural closing lines in the agent's persona and language, for example
+  `["ठीक है, आपका दिन शुभ हो!", "धन्यवाद, अलविदा!"]`. The call ends the moment the agent says one, so
+  keep them to genuine final lines.
+- Language codes: `en hi kn ta te mr gu bn ml`. Set `default_language` and `silence_language` to the
+  language you actually wrote the script in.
+- Placeholders: `{{name}}` is filled before the call from metadata, and `{name}` is captured or
+  resolved during the call (full rules in [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §3).
+- Updating an existing script: change only what was asked and keep its style, agent name and brand,
+  and any custom placeholders. See [verify-and-review.md](verify-and-review.md).

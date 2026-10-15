@@ -1,4 +1,5 @@
 # Phone Numbers
+<!-- graph-summary: Phone numbers: list, browse the buyable catalog, buy, release and spam-flag; assigning a number to an agent (outbound caller ID, inbound); the WhatsApp number pool, which has no buy. -->
 
 Numbers come from CallKaro's own pool (no bring-your-own). A number can be:
 - **outbound** for MANY agents (caller ID for outgoing calls)

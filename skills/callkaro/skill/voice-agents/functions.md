@@ -1,13 +1,10 @@
 # Functions — giving the agent abilities
+<!-- graph-summary: Choosing function types (end, transfer, hold, booking, in-call, pre/post-call, WhatsApp), basic versus advanced, secrets in functions, where to attach a function, and writing its description as a trigger. -->
 
 > **Field shapes** for every function type: [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §6 (and §15 for WhatsApp).
-> **Writing `source_code`**: use the production generator prompts —
-> [advanced-pre-call-agent.md](../authoring-pipeline/advanced-pre-call-agent.md),
-> [advanced-in-call-agent.md](../authoring-pipeline/advanced-in-call-agent.md),
-> [advanced-post-call-agent.md](../authoring-pipeline/advanced-post-call-agent.md).
-> They own the exact protocols (signatures, allowed imports, forbidden types,
-> security rules) and are stricter than any summary. Review generated code with
-> [function-critic-agent.md](../authoring-pipeline/function-critic-agent.md).
+> **Writing `source_code`**: [function-code.md](function-code.md) (in-call Python, post-call JavaScript),
+> and the advanced pre-call protocols in reference §6. Review generated functions with
+> [verify-and-review.md](verify-and-review.md).
 >
 > This file is the **decision layer**: which function, basic or advanced, where to attach it.
 

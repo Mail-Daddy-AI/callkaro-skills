@@ -1,4 +1,5 @@
 # Calls — placing, history, live queues
+<!-- graph-summary: Place a single call (use --test while iterating), list, get and export call history with filters, read raw call logs, and inspect live call queues. -->
 
 ## Place a single call
 

@@ -83,7 +83,7 @@ def render_catalog(nodes: list[Node], skill_file: Path) -> str:
         grouped.setdefault(group_name(node.relative), []).append(node)
 
     lines = [START, "", "Every linked file is a graph node. Follow links inside a node only when relevant."]
-    priority = {"Core operations": 0, "Agents": 1, "Authoring Pipeline": 2}
+    priority = {"Core operations": 0, "Voice Agents": 1, "Simulations": 2}
     for group in sorted(grouped, key=lambda name: (priority.get(name, 99), name.lower())):
         members = grouped[group]
         lines.extend(("", f"### {group}", ""))
