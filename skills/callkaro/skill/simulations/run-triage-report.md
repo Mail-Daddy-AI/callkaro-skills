@@ -13,7 +13,7 @@
    epochs. AI decides: one run per tier (P0 at 5, P1 at 3, P2 at 3, P3 at 2). Name runs `<agent short name> <version> <tier> <date>`.
 5. **Wait for completion**: results count = `totalRuns` ([F14](how-simulation-works.md#12-verified-behaviour-you-must-design-around)). An empty or partial list means still running.
 6. **Read every result in this order**, not just the flag:
-   1. **Validity.** INVALID if the summary says "Failed to run LLM analysis" ([F9](how-simulation-works.md#12-verified-behaviour-you-must-design-around)), or if the caller left its
+   1. **Validity.** INVALID if `analysisStatus` is `failed` (or, on older records, the summary says "Failed to run LLM analysis") ([F9](how-simulation-works.md#12-verified-behaviour-you-must-design-around)), or if the caller left its
       script (took another name, volunteered facts, ignored a scripted beat, hung up early contrary to
       its rules) whatever `isPerformedLikeUser` says ([F11](how-simulation-works.md#12-verified-behaviour-you-must-design-around)). Rerun invalid results once; if the caller
       drifts again, fix the caller script.

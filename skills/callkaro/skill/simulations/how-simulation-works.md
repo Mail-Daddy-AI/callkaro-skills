@@ -16,7 +16,7 @@ They were verified against real runs; anything not verified is listed separately
   - `transcript`: each turn, with the function calls made on that turn (name, arguments, result, `is_mock`);
   - `ended_by` (e.g. `user_hangup`), `total_turns`, `duration_seconds`;
   - `post_call`: each extracted field with a value and the extractor's comment;
-  - `isTestSucceed`, `testResultSummary` from the grader;
+  - `analysisStatus` (`ok` or `failed`), `isTestSucceed` and `testResultSummary` from the grader;
   - `isPerformedLikeUser`: the grader's view of whether the simulated caller followed its script;
   - costs (agent, simulator, analysis) and `logfile_url`.
 - A run executes **every test × every version × epochs**. `totalRuns` on the run equals that product.
@@ -33,7 +33,7 @@ They were verified against real runs; anything not verified is listed separately
 | F6 | `on_connected` functions leave no trace in results. | Not observable. Manual-QA list. |
 | F7 | Post-call extraction runs and its values are returned. | Every post-call field can and must be asserted with an expected value. |
 | F8 | The simulated caller usually ends the call (`ended_by: user_hangup`). Across 15+ runs, an agent with `end_call` never called it, and no grader noticed. | Unless a test is about the caller leaving, the caller script must NOT hang up first, so the agent's own closing and `end_call` get tested. Criteria must check the close explicitly. |
-| F9 | Grader failure is reported as `isTestSucceed: false` with summary "Failed to run LLM analysis on simulation results." | A grader crash looks exactly like a failed test. Classify it INVALID, not FAIL, and rerun. |
+| F9 | Grader failure is reported as `analysisStatus: "failed"`, with `isTestSucceed: false` and summary "Failed to run LLM analysis on simulation results." Records saved before `analysisStatus` existed carry only the summary text. | `isTestSucceed` means nothing when `analysisStatus` is `failed`. Classify the run INVALID, not FAIL, and rerun. For older records, match the summary text. |
 | F10 | The grader passes whatever the criteria do not forbid. A real run passed a bot that "confirmed" a booking with no booking function, re-asked for known details and never ended the call. | Criteria must be exhaustive, evidence-based, and include the universal FAIL lines (section [6.3](write-tests.md#63-successcriteria-the-graders-checklist)). |
 | F11 | The simulated caller can drift: one took the agent's own name, yet `isPerformedLikeUser` came back true. | Caller scripts must pin identity and behaviour tightly. Read transcripts for drift yourself; do not trust `isPerformedLikeUser` alone. |
 | F12 | Behaviour varies between epochs: 1 of 5 identical runs invented a wait estimate and a "priority booking". | Several epochs catch this, but simulation costs money, so the user chooses the epoch mode (section [5.3](plan-the-suite.md#53-epoch-preference-always-ask-before-running)). |
