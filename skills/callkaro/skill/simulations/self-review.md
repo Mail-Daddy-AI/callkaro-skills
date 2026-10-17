@@ -14,6 +14,7 @@ create tests until it passes.
 
 **Each test**
 - [ ] One primary target and one test move.
+- [ ] `userPersona` and `userPrompt` are both filled: persona holds identity, style and knowledge; prompt holds goal, beats and rules.
 - [ ] The caller script has every fact the bot will ask for, consistent with `testVariables`.
 - [ ] The caller cannot "help" the bot or hint at the answer.
 - [ ] The caller holds back from hanging up, unless the test is about leaving.

@@ -1,5 +1,5 @@
 # Interfaces
-<!-- graph-summary: Test case fields, the MCP tools and ck sim commands, and the check that the CLI can send mocks, variables and epochs before you use it. -->
+<!-- graph-summary: Test case fields, the MCP tools and ck sim commands, including `userPersona`, mocks, variables, epochs and the default caller model. -->
 
 You can work through the CallKaro MCP tools or the `ck` CLI. The fields matter more than the interface.
 
@@ -8,11 +8,12 @@ You can work through the CallKaro MCP tools or the `ck` CLI. The fields matter m
 | Field | Purpose | Required by this skill |
 |---|---|---|
 | `testcaseName` | Name in the fixed format ([6.1](write-tests.md#61-name)) | Yes |
+| `userPersona` | Who the caller is: identity, background, language and tone, what they know and do not know. Joined ahead of `userPrompt` | Yes |
 | `userPrompt` | Instructions to the simulated caller | Yes |
 | `successCriteria` | Numbered checks for the grader | Yes |
 | `testVariables` | Values for every `{{variable}}` and every pre-call output field | Yes, whenever the version uses any variable |
 | `testFunctions` | Mocks: `[{ "name": "<exact function name>", "response": <object> }]` | Yes, whenever the version has any in-call function |
-| `testLLMModel` | Model that plays the caller | Yes: use one strong model (at least `gpt-4.1`) for the whole suite |
+| `testLLMModel` | Model that plays the caller. Omit for the platform default; list allowed ones with `list_llm_models` (category `simulation`) or `ck sim models` | Use one model for the whole suite; the platform default is fine |
 
 ## 2.2 MCP tools
 
@@ -33,14 +34,12 @@ You can work through the CallKaro MCP tools or the `ck` CLI. The fields matter m
 |---|---|
 | `ck agents versions <agentId> --json` | Version IDs |
 | `ck sim tests <agentId> [--json]` | List tests |
-| `ck sim create <agentId> --name … --prompt … --criteria … [--model …]` | Create a test |
+| `ck sim create <agentId> --name … --prompt … --criteria … [--persona … --model … --variables <json\|@file> --functions <json\|@file>]` | Create a test (mocks and variables supported) |
+| `ck sim update <testCaseId> [same flags]` | Change only the passed fields |
+| `ck sim models` | Allowed caller models and the default |
 | `ck sim delete <testCaseId> [--yes]` | Delete a test |
-| `ck sim run <agentId> --tests <ids> --versions <ids> [--name …]` | Start a run (async) |
+| `ck sim run <agentId> --tests <ids> --versions <ids> [--name … --epoch <n>]` | Start a run (async) |
 | `ck sim runs <agentId> [--json]` | List runs |
 | `ck sim results <runId> --json` | Read results with transcripts |
 
-Before creating tests with the CLI, run `ck sim create --help` and `ck sim run --help` and check that you
-can pass `testVariables`, `testFunctions` and epochs. **If the CLI cannot send mocks or variables, do not
-create tests that need them through the CLI.** Use the MCP `create_test_case` tool instead, or stop and report
-the gap. A test without its mocks is worse than no test, because it passes or fails for the wrong reason ([F4](how-simulation-works.md#12-verified-behaviour-you-must-design-around)).
-If the CLI cannot set epochs, use the MCP `create_simulation_run` tool for gated runs.
+The CLI can send `testVariables`, `testFunctions` and epochs, so it is as capable as MCP for building and running tests.

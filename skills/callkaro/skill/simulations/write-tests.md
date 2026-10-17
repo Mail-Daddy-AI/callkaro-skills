@@ -32,6 +32,13 @@ written in the call's language and register, in quotes.
 
 **Template**
 
+The caller script has two fields, and both are required. `userPersona` is sent to the caller model ahead of `userPrompt`, so together they read as one script.
+
+- **`userPersona`**: who the caller is. Identity, relationship to the business, language and register, what they know (exact values, consistent with `testVariables`) and what they do not know. Vary it across tests (elderly and slow, terse, chatty, rushed) without changing the scripted beats.
+- **`userPrompt`**: what happens in this call. The goal, the numbered beats with the test move, and the rules.
+
+`userPersona`
+
 ```text
 You are {full name}, {who you are, your relationship to the business, why you might be called or calling}.
 You are on a phone call. Speak {language and register, e.g. "Hinglish, casual, Latin script"} in short
@@ -42,7 +49,11 @@ What you know:
 - {Every fact you hold, with exact values: "Your pin code is 560034", "Your booking ID is BK-2291",
   "You want a 2BHK under 1.2 crore"}
 - {What you do NOT know: "You do not know the price, the timings or any offers. Never guess them."}
+```
 
+`userPrompt`
+
+```text
 Your goal: {what you want from this call, in one sentence}.
 
 How the call goes:
@@ -80,7 +91,7 @@ Rules:
   (U6, not-interested exits), and then write "After saying X, say nothing more."
 - **No impossible behaviours.** Do not ask the caller to interrupt mid-sentence, stay silent for 10
   seconds, press keys or speak over the agent ([F1](how-simulation-works.md#12-verified-behaviour-you-must-design-around)). Use the speech-realism emulations in [5.5](plan-the-suite.md#55-derive-tests-from-features-phase-d) instead.
-- **Personas for P3 and P2 vary**: elderly and slow, terse, chatty, rushed, polite but confused,
+- **Personas for P3 and P2 vary** (in `userPersona`): elderly and slow, terse, chatty, rushed, polite but confused,
   first-time vs repeat customer, but the persona never replaces the scripted beats.
 
 ## 6.3 successCriteria: the grader's checklist
@@ -183,6 +194,6 @@ behaviour came from the safe default, not from the prompt.
 
 ## 6.7 Simulator model
 
-Use one strong model (at least `gpt-4.1`) for the whole suite. Weaker caller models drift off script and
+Use one model for the whole suite; omit `testLLMModel` to take the platform default (`ck sim models` or `list_llm_models` category `simulation` shows the allowed ones). Weaker caller models drift off script and
 invalidate tests ([F11](how-simulation-works.md#12-verified-behaviour-you-must-design-around)). Never mix caller models within a suite; differences between tests must come from the
 scenario, not the caller.

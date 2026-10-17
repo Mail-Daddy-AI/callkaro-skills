@@ -33,7 +33,7 @@ Open the files in this order. The two marked **mandatory** are read before any t
 | Step | File | Phase | When |
 |---|---|---|---|
 | 1 | [how-simulation-works.md](how-simulation-works.md) | Facts F1–F14 | **Mandatory, first.** Many later rules exist only because of these facts. |
-| 2 | [interfaces.md](interfaces.md) | Tools | Before touching MCP or `ck`; check the CLI can send mocks, variables and epochs. |
+| 2 | [interfaces.md](interfaces.md) | Tools | Before touching MCP or `ck`; test case fields, tools and CLI flags. |
 | 3 | [profile-the-bot.md](profile-the-bot.md) | A. Profile | Always. No test before the dossier is complete. |
 | 4 | [lint-config-and-prompt.md](lint-config-and-prompt.md) | B. Lint | Always, before any test runs. |
 | 5 | [plan-the-suite.md](plan-the-suite.md) | C–E. Classify, derive, prioritise | After the dossier; yields the test plan and the manual-QA list. |
