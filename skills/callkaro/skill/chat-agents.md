@@ -174,3 +174,10 @@ ck chat-agents publish <agentId> --versions <newVersionId>
 `cloneFrom` must identify a version belonging to the same chat agent. Creating
 or updating a version does not publish it. Omitting `--versions` from get or
 update targets the currently published version.
+
+## Testing with simulations
+
+Test a chat agent before publishing with chat simulations: an AI plays the
+user, the agent replies in test mode, and a grader scores each conversation.
+Start with [Chat Simulations & Test Cases](chat-simulations/chat-simulation-playbook.md);
+commands are under `ck chat-sim`.
