@@ -69,7 +69,7 @@ Which prompt type? (full guidance: [voice-agents/prompts.md](voice-agents/prompt
 - **Money/dial actions need explicit user confirmation**: `ck numbers buy`,
   `ck calls make` without `--test`, `ck batches create`,
   `ck batches send-next-try/send-untriggered`. State what it costs/does, wait
-  for a yes. `--test` calls and simulations are free to run.
+  for a yes.
 - **Never edit a published version for an experiment** — create a new version,
   simulate, then publish or A/B ([voice-agents/versions.md](voice-agents/versions.md)).
 - **Read-modify-write for object fields** (`voice_configuration`,
