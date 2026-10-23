@@ -45,6 +45,9 @@ lists what changes for chat. Read
   - FAIL if the agent states a fact that no function result or prompt line supports.
   - FAIL if the agent asks again for information the user already gave.
   - FAIL if the agent replies outside the language the user is writing in, unless told to.
+  Write a send as what the customer receives — "sends the price list document
+  with a one-line caption" — not as a call with arguments: a send never reaches
+  the grader as one, and the file's link is never shown to it (C8, C13).
 - **function_mocks**: one per custom function the scenario touches, shaped
   like the real response. To test a failure path, mock the failure
   (`{"status":"error","message":"Order not found"}`) in its own test (C7).
