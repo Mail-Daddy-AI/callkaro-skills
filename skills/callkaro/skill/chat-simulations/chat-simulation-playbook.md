@@ -22,7 +22,7 @@ lists what changes for chat. Read
 | Phase | Reuse | What changes for chat |
 |---|---|---|
 | A. Profile | [profile-the-bot.md](../simulations/profile-the-bot.md) | Read `chatAgentSystemPrompt` (Basic) or the persona and flow steps (Advanced), `functions`, `followUpFunctions` and models. There are no pre-call variables, transcriber or voice settings. |
-| B. Lint | [lint-config-and-prompt.md](../simulations/lint-config-and-prompt.md) | Skip voice items (opening line, end-call, transfer, language switch by speech). Check every function description is a clear trigger, every `send_template` has `varDescriptions`, and the prompt says what to do when a function fails. |
+| B. Lint | [lint-config-and-prompt.md](../simulations/lint-config-and-prompt.md) | Skip voice items (opening line, end-call, transfer, language switch by speech). Check every function description is a clear trigger, every `send_template` variable has a `varDescriptions` entry or is pinned in `varSources`, every media link is pinned or described, and the prompt says what to do when a function fails. |
 | C. Classify | [plan-the-suite.md](../simulations/plan-the-suite.md) | Manual-QA list: agent-first messages (C1), anything depending on a filled CRM contact (C4), real side effects of sends and functions (C3), scheduled follow-ups, media the user sends. |
 | D–E. Derive, prioritise | [plan-the-suite.md](../simulations/plan-the-suite.md) | Same tiers and epoch question. Ask the user about epochs before running — runs cost credits (C12). |
 | F. Write | below | The voice templates apply with the substitutions below. |

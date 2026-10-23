@@ -125,6 +125,9 @@ Predefined function types are `send_template`, `send_contact`, `send_call`,
   replaces `templateId` with that object, and sends the authoritative data.
 - `send_contact` requires a phone number or email in `contactData`.
 - `send_call` requires `callAgentId`; its call window must end after it starts.
+- A media send takes its `link` — and a document's `filename`, and the
+  `caption` — from the model at run time unless the function pins it in
+  `sources`. See *Pinned values* below.
 - Function names must be unique within each function list.
 
 Before creating or updating a template function, list the available WhatsApp
@@ -140,7 +143,8 @@ The template detail response includes `variables`. Use every `variables[].id`
 as an exact `varDescriptions` key. Infer its meaning from `context` and
 `example`, but describe where the agent obtains the real runtime value rather
 than copying the example. Ask the user when the meaning is ambiguous. The CLI
-rejects missing descriptions before creating or updating the agent.
+rejects missing descriptions before creating or updating the agent — except for
+variables pinned in `varSources`, which the model is never asked for.
 
 Variable IDs are derived by the CLI from the provider template:
 
@@ -172,6 +176,42 @@ Use the ID in `functions` or `followUpFunctions`:
   "trackClicks": true
 }
 ```
+
+### Pinned values
+
+A send function's media link — and a document's file name, and the caption —
+can be fixed in the configuration instead of produced by the model. A pinned
+field is dropped from the tool the model sees, so it is never asked for it and
+the value cannot come back truncated, translated or invented.
+
+- `send_template`: `varSources`, keyed by the same IDs as `varDescriptions`.
+  In practice only `HEADER::MEDIA` is worth pinning. `HEADER::FILENAME` is not
+  a parameter of the chat template tool, so pinning it does nothing.
+- `send_image`, `send_document`, `send_video`, `send_audio`: `sources`, keyed
+  by tool parameter — `link`, `filename` (document only), `caption` (not
+  audio).
+
+Each entry is `{"type": "fixed", "value": "..."}` or `{"type": "ai"}`. A field
+with no entry is the model's, which is how every agent saved before this
+existed behaves, so never add `sources` or `varSources` to a function you are
+editing for an unrelated reason.
+
+```json
+{
+  "name": "send_price_list",
+  "type": "send_document",
+  "description": "Send the price list when the customer asks about pricing",
+  "sources": {
+    "link": { "type": "fixed", "value": "https://cdn.example.com/price-list.pdf" },
+    "filename": { "type": "fixed", "value": "Acme Price List 2026.pdf" },
+    "caption": { "type": "ai" }
+  }
+}
+```
+
+Pin what identifies the file; leave the caption to the model so it follows the
+conversation's language. A fixed `link` or `HEADER::MEDIA` must be `https://`,
+and a fixed field with an empty value is rejected.
 
 Never place secret values in a payload. Use supported `x_secrets.NAME`
 references in headers.
