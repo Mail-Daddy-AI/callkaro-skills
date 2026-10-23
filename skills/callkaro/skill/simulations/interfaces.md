@@ -12,7 +12,7 @@ You can work through the CallKaro MCP tools or the `ck` CLI. The fields matter m
 | `userPrompt` | Instructions to the simulated caller | Yes |
 | `successCriteria` | Numbered checks for the grader | Yes |
 | `testVariables` | Values for every `{{variable}}` and every pre-call output field | Yes, whenever the version uses any variable |
-| `testFunctions` | Mocks: `[{ "name": "<exact function name>", "response": <object> }]` | Yes, whenever the version has any in-call function |
+| `testFunctions` | Mocks: `[{ "name": "<exact function name>", "mock": true, "response": <object> }]` (`mock` defaults to true; `false` runs the real function) | Yes, whenever the version has any in-call function |
 | `testLLMModel` | Model that plays the caller. Omit for the platform default; list allowed ones with `list_llm_models` (category `simulation`) or `ck sim models` | Use one model for the whole suite; the platform default is fine |
 
 ## 2.2 MCP tools

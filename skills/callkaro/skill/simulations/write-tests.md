@@ -190,7 +190,8 @@ behaviour came from the safe default, not from the prompt.
 - Do not mock predefined functions (`end_call`, `transfer`, `keep_call_on_hold`). Mock Cal.com
   `check_availability` / `book_a_meeting` and WhatsApp sends only if the platform treats them as mockable in
   your probe; otherwise note them as manual QA.
-- Do not rely on pre-call mocks ([F5](how-simulation-works.md#12-verified-behaviour-you-must-design-around)); use `testVariables`.
+- `mock: false` runs the real function ([F5](how-simulation-works.md#12-verified-behaviour-you-must-design-around)). Never set it on your own: ask the user which functions should run for real, and warn that they have side effects. WhatsApp functions cannot be run for real.
+- Prefer `testVariables` over pre-call mocks for values the agent needs from a pre-call function; verify with a probe before relying on a pre-call mock.
 
 ## 6.7 Simulator model
 
