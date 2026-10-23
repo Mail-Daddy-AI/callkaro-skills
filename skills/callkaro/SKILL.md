@@ -27,6 +27,7 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 
 - [Analytics](skill/analytics.md) — ck analytics overview / performance / version commands, their filters and output fields, and which one answers: agent health, A/B winner, cost, why calls fail.
 - [Audit Strategies (AI Auditor)](skill/audit-strategies.md) — Create and manage AI-auditor strategies that score a sampled share of an agent's calls against free-text instructions; commands, filters, models, and the rule not to invent filter values.
+- [Chat Audit Strategies (WhatsApp AI Auditor)](skill/chat-audit-strategies.md) — Create and manage AI-auditor strategies for WhatsApp chat agents and run manual audit batches; commands, contact filters, daily limits, and the new-messages-only rule.
 - [Auth & Account](skill/auth.md) — Sign-in, register, logout, whoami and config; whoami is the auth gate before any workflow, and it shows the credits balance.
 - [Batch Calls](skill/batches.md) — Create or schedule batch calls from a CSV (format rules, row-count confirmation), monitor status, re-dial unreached rows, download results. Creating a batch starts real calls immediately.
 - [Calls — placing, history, live queues](skill/calls.md) — Place a single call (use --test while iterating), list, get and export call history with filters, read raw call logs, and inspect live call queues.
