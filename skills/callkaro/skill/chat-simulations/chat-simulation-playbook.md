@@ -9,9 +9,11 @@ lists what changes for chat. Read
 
 ## Before anything
 
-1. Confirm the agent is a WhatsApp Basic or Advanced agent
+1. Confirm the agent is a WhatsApp Basic, Advanced or Workflow agent
    (`ck chat-agents get <chatAgentId> --json`: `channel` and `agentMode`). If
-   not, stop: it cannot be simulated.
+   not, stop: it cannot be simulated. For a Workflow, read
+   [Workflow agents](how-chat-simulation-works.md#workflow-agents) first: its
+   code steps are mocked by key.
 2. List existing tests (`ck chat-sim tests <chatAgentId>`) so you extend the
    suite rather than duplicate it.
 

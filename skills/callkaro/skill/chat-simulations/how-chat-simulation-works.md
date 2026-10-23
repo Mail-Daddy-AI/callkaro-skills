@@ -1,5 +1,5 @@
 # How chat simulation works
-<!-- graph-summary: What a chat simulation run does, the verified facts C1–C12 (user speaks first, default mocks, no contact record, nothing sent, 7/10 pass mark, grading failures), the test case fields, ck chat-sim commands and MCP tools. Mandatory first read for chat tests. -->
+<!-- graph-summary: What a chat simulation run does, the verified facts C1–C12 (user speaks first, default mocks, no contact record, nothing sent, 7/10 pass mark, grading failures), the Workflow-agent facts W1–W5 (code steps mocked by key, button taps, counters), the test case fields, ck chat-sim commands and MCP tools. Mandatory first read for chat tests. -->
 
 Read this before writing any chat test. It is the chat counterpart of
 [How simulation actually works](../simulations/how-simulation-works.md); the
@@ -8,8 +8,10 @@ voice facts do not carry over unless they are repeated here.
 ## What a run is
 
 - Chat simulation is available for **WhatsApp chat agents of type Basic
-  (`agentMode: "ai"`) or Advanced (`agentMode: "advanced"`)**. Chat Center
-  Workflows, widget flow agents and Instagram agents are not simulated.
+  (`agentMode: "ai"`), Advanced (`agentMode: "advanced"`) or Workflow
+  (`agentMode: "workflow"`)**. Widget flow agents and Instagram agents are not
+  simulated. Workflows differ in a few ways: see
+  [Workflow agents](#workflow-agents).
 - A run is a **text WhatsApp conversation** between two LLMs:
   - the **agent**: the version's real prompt (or Advanced flow), functions and
     chat models, run in test mode;
@@ -36,6 +38,22 @@ voice facts do not carry over unless they are repeated here.
 | C10 | An **empty `post_simulation`** means the grader produced nothing: the run is neither PASS nor FAIL. | Classify it INVALID and rerun; never count it as a failure of the agent. |
 | C11 | Results arrive one by one, written asynchronously. There is no run-status flag. | A run is complete only when the result count equals `number_of_runs`. A just-finished result can take a few seconds to appear. |
 | C12 | Runs cost credits (agent, simulated user and grader tokens). Limits: 1–100 epochs, at most 500 runs per batch. | Confirm the run size with the user before starting a large batch. |
+
+## Workflow agents
+
+A Workflow agent ([Workflow chat agents](../chat-agents-workflow.md)) is
+simulated the way it runs live: each simulated message walks the workflow, its
+sends go into the transcript, and when it reaches an `assign_agent` step the
+assigned Basic or Advanced agent replies in the same turn, at its published
+version.
+
+| # | Fact | What it means for you |
+|---|---|---|
+| W1 | **Code steps never run their code.** Each returns `function_mocks[]` whose `name` is the step's `key`; unmocked, `{"status":"success","message":"Function executed successfully"}`. A mock with `"status": "error"` takes the failure exit. | Mock every code step the scenario reaches, with the fields later steps read as `{{key.path}}`. Test the failure branch with an error mock. |
+| W2 | The assigned agent's custom functions use the **same `function_mocks`**, by function name. | Put the assigned agent's mocks in the workflow's test case too. |
+| W3 | When the simulated user types a button's title from the last interactive message, it counts as a **tap**: `button_id` is that button's id. | Write user prompts that pick options by their exact title. |
+| W4 | **Counters count the simulated chat** (the whole chat; `windowHours` is ignored). `last_reply` reads it too. | Counter limits such as "after 3 messages hand off" are testable. |
+| W5 | Workflow sends show the **step name** in the transcript; Update contact steps are dry runs. | Criteria can name the step that should have sent a message. |
 
 There is no post-call extraction in chat simulation, and `ended_by` is not
 returned with the result — read the last messages to see who ended the chat.

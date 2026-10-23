@@ -45,7 +45,7 @@ and test it"* — and it will load the skill.
 | `skills/callkaro/skill/voice-agents/AGENT-VERSION-REFERENCE.md` | every agent/version field, its values, and the traps |
 | `skills/callkaro/skill/voice-agents/` | prompts, voice/STT, functions, creation, versions, and regression testing |
 | `skills/callkaro/skill/workflows.md` · `contacts.md` | workflow graphs and CRM contacts |
-| `skills/callkaro/skill/chat-agents.md` · `chat-simulations/` | chat agents, and testing them with chat simulations (`ck chat-sim`) |
+| `skills/callkaro/skill/chat-agents.md` · `chat-agents-advanced.md` · `chat-agents-workflow.md` · `chat-simulations/` | chat agents (Basic, Advanced and Workflow types), and testing them with chat simulations (`ck chat-sim`) |
 | `skills/callkaro/skill/auth.md` · `numbers.md` · `calls.md` · `batches.md` · `simulations/simulation-playbook.md` · `analytics.md` | the rest of the platform |
 
 ## Maintaining the skill graph

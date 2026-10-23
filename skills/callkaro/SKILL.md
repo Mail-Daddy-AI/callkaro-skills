@@ -27,11 +27,13 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 
 - [Analytics](skill/analytics.md) — ck analytics overview / performance / version commands, their filters and output fields, and which one answers: agent health, A/B winner, cost, why calls fail.
 - [Audit Strategies (AI Auditor)](skill/audit-strategies.md) — Create and manage AI-auditor strategies that score a sampled share of an agent's calls against free-text instructions; commands, filters, models, and the rule not to invent filter values.
-- [Chat Audit Strategies (WhatsApp AI Auditor)](skill/chat-audit-strategies.md) — Create and manage AI-auditor strategies for WhatsApp chat agents and run manual audit batches; commands, contact filters, daily limits, and the new-messages-only rule.
 - [Auth & Account](skill/auth.md) — Sign-in, register, logout, whoami and config; whoami is the auth gate before any workflow, and it shows the credits balance.
 - [Batch Calls](skill/batches.md) — Create or schedule batch calls from a CSV (format rules, row-count confirmation), monitor status, re-dial unreached rows, download results. Creating a batch starts real calls immediately.
 - [Calls — placing, history, live queues](skill/calls.md) — Place a single call (use --test while iterating), list, get and export call history with filters, read raw call logs, and inspect live call queues.
-- [Chat agents](skill/chat-agents.md) — Chat agents are a separate entity from voice agents: ck chat-agents commands, WhatsApp number assignment, safe creation, prompt/model setup, functions and versions.
+- [Advanced chat agents](skill/chat-agents-advanced.md) — Advanced WhatsApp chat agents (agentMode advanced): role, goal, instructions, rebuttals and a step flow the model follows; flowGraph shape, every step type, value sources, a full create example, editing and publish checks.
+- [Workflow chat agents](skill/chat-agents-workflow.md) — Workflow WhatsApp chat agents (agentMode workflow): a code-run graph with no prompt or model; flowGraph shape, every step type, code-step runtime, sources and counters, a full create example, editing and publish checks.
+- [Chat agents](skill/chat-agents.md) — Chat agents are a separate entity from voice agents: the three agent types (Basic, Advanced, Workflow), ck chat-agents commands, WhatsApp number assignment, safe creation, prompt/model setup, functions and versions.
+- [Chat Audit Strategies (WhatsApp AI Auditor)](skill/chat-audit-strategies.md) — Create and manage AI-auditor strategies for WhatsApp chat agents and run manual audit batches; commands, contact filters, daily limits, and the new-messages-only rule.
 - [Contacts (CRM)](skill/contacts.md) — CRM contacts and their attributes: define attributes first, import and export CSV, assign contacts to a workflow or an agent, and the protection of hand-set values from workflows.
 - [How to Work — operating instructions for AI agents using CallKaro](skill/INSTRUCTIONS.md) — Start here. The operating loop, session preamble, agent authoring order, decision rules that prevent damage, standard playbooks (build from a doc, build from scratch, debug a bad agent) and when to ask the user.
 - [Phone Numbers](skill/numbers.md) — Phone numbers: list, browse the buyable catalog, buy, release and spam-flag; assigning a number to an agent (outbound caller ID, inbound); the WhatsApp number pool, which has no buy.
@@ -72,6 +74,6 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 ### Chat Simulations
 
 - [Chat Simulations & Test Cases](skill/chat-simulations/chat-simulation-playbook.md) — Entry point for testing a WhatsApp chat agent with simulations: which voice phases to reuse and what changes for chat, the chat test templates, the run-and-read order, and the release gate.
-- [How chat simulation works](skill/chat-simulations/how-chat-simulation-works.md) — What a chat simulation run does, the verified facts C1–C12 (user speaks first, default mocks, no contact record, nothing sent, 7/10 pass mark, grading failures), the test case fields, ck chat-sim commands and MCP tools. Mandatory first read for chat tests.
+- [How chat simulation works](skill/chat-simulations/how-chat-simulation-works.md) — What a chat simulation run does, the verified facts C1–C12 (user speaks first, default mocks, no contact record, nothing sent, 7/10 pass mark, grading failures), the Workflow-agent facts W1–W5 (code steps mocked by key, button taps, counters), the test case fields, ck chat-sim commands and MCP tools. Mandatory first read for chat tests.
 
 <!-- END AUTO-GENERATED SKILL GRAPH -->
