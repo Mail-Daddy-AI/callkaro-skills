@@ -1,8 +1,29 @@
 # Chat agents
-<!-- graph-summary: Chat agents are a separate entity from voice agents: ck chat-agents commands, WhatsApp number assignment, safe creation, prompt/model setup, functions and versions. -->
+<!-- graph-summary: Chat agents are a separate entity from voice agents: the three agent types (Basic, Advanced, Workflow), ck chat-agents commands, WhatsApp number assignment, safe creation, prompt/model setup, functions and versions. -->
 
 Chat agents are separate from voice agents. Use `ck chat-agents`; do not send a
 chat-agent payload to `ck agents`.
+
+## Agent types
+
+`agentMode` is picked at creation and **cannot change afterwards** — to switch
+type, create a new agent. All three run on WhatsApp.
+
+| `agentMode`      | What it is                                                                                                                                                                  | Guide                                                    |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `ai` (default) | **Basic**: a system prompt plus functions; the model answers every message. Everything below on this page.                                                                 | this page                                                |
+| `advanced`     | **Advanced**: role, goal, instructions, objection handling and a step flow (`flowGraph`) the model follows. Code sends exact messages, fills template variables and checks rules. | [Advanced chat agents](chat-agents-advanced.md)          |
+| `workflow`     | **Workflow**: no prompt, no model. Code walks a graph on every inbound message — runs Python, checks rules, sends messages, hands off to a Basic/Advanced agent.             | [Workflow chat agents](chat-agents-workflow.md)          |
+
+Pick by the job: free-form conversation → `ai`; a guided conversation with a
+planned script, buttons and branches → `advanced`; deterministic routing or
+lookups with no LLM (keyword menus, order status, hand-off to the right agent)
+→ `workflow`.
+
+The CLI refuses `role`/`goal`/`instructions`/`rebuttals` unless the agent is
+`advanced`, and a non-empty `flowGraph` unless it is `advanced` or `workflow`.
+On `update` and `create-version` it reads the agent's mode first and checks the
+patch against it.
 
 ## Commands
 
@@ -40,10 +61,11 @@ an active WhatsApp subscription on the account.
 ## Create safely
 
 1. Run `ck whoami`.
-2. Run `ck chat-agents models --json`; copy model IDs exactly.
-3. Run `ck chat-agents list --json` to avoid duplicates.
-4. Create the agent.
-5. Read it back with `ck chat-agents get <id> --versions <versionId> --json`.
+2. Pick the agent type (see [Agent types](#agent-types)); it is fixed once created.
+3. Run `ck chat-agents models --json`; copy model IDs exactly.
+4. Run `ck chat-agents list --json` to avoid duplicates.
+5. Create the agent.
+6. Read it back with `ck chat-agents get <id> --versions <versionId> --json`.
 
 The minimum payload is:
 
