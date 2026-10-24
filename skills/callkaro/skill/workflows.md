@@ -42,7 +42,10 @@ method.
 | Dashboard name | `type` | Must have |
 |---|---|---|
 | (created with the workflow) | `start` | exactly one; never added |
-| End | `end` | at least one reachable from Start |
+| Inbound Call | `inbound` | at most one; the second entry point |
+| End | `end` | an `end` or `cancel` reachable from Start |
+| Cancel Workflow | `cancel` | — |
+| Resume Where They Were | `resume` | — (needs an `inbound` node in the workflow) |
 | Send Call | `send-call` | `agentId` |
 | Send WhatsApp Template | `wa-template` | `templateId` (+ name, language, body, `parameters`, `phoneNumberId`, `displayPhoneNumber`, `provider`) |
 | Send WhatsApp Message | `wa-message` | `message`, `phoneNumberId`, `displayPhoneNumber` |
@@ -56,8 +59,8 @@ method.
 
 - **Ids are unique across the graph.** Node ids like `wait-<timestamp>`, edge ids like `edge-<timestamp>`, exit ids like `o_<random>`.
 - **One edge per (node, handle).** A normal node's handle is `"out"`. A `conditions` node has one handle **per exit**, and the handle is the **exit's `id`**.
-- **Nothing leaves an End; nothing enters Start.** There must be a path Start → End.
-- A **dangling handle is legal** (the run ends there); an unreachable parked node is legal. Neither blocks a save.
+- **Nothing leaves an End, Cancel or Resume; nothing enters Start or Inbound.** There must be a path Start → End or Cancel.
+- A **dangling handle is legal** (the run ends there — except after an Inbound node, where the lead is handed back instead); an unreachable parked node is legal. Neither blocks a save.
 - **Conditions**: the exit with **no** `condition` is the fallback (`label: "otherwise"`). Sources `phone_number`, `connected_call`, `voicemail`, `hangup_reason`, `call_duration`, `conversion_status` take **no** `field`; `contact`, `post_call_variables`, `call_metadata`, `fn_response`, `static_value` **need** one.
 - `conversion_status` is `"true"`/`"false"`. The `hangup_reason` values are printed by `ck workflows schema`.
 - `update-lead` and `contact`-source values use **CRM attribute names** (the `name`, not the display label). They must already exist — see [contacts.md](contacts.md).
@@ -117,12 +120,32 @@ ck workflows remove-node <id> <nodeId> --reconnect --yes
 ```
 
 - After a `conditions` node, `add-node --after` needs `--handle <exitId>` (the error lists them).
-- `add-node` saves immediately, so types with no sensible default need `--set` up front — `send-call` (`agentId`), `wa-template` (`templateId`…), `wa-message` (`message`…), `api-basic` (`url`), `update-lead` (`updates`). The error shows an example. A new `conditions` node starts as a complete "did the call connect?" rule (`connected_call` = true); change it with `set-node --set @exits.json`.
+- `add-node` saves immediately, so types with no sensible default need `--set` up front — `send-call` (`agentId`), `wa-template` (`templateId`…), `wa-message` (`message`…), `api-basic` (`url`), `update-lead` (`updates`). The error shows an example. `inbound`, `cancel` and `resume` need nothing set; add `inbound` without `--after` (nothing may lead into it). A new `conditions` node starts as a complete "did the call connect?" rule (`connected_call` = true); change it with `set-node --set @exits.json`.
 - Replacing a conditions node's `exits` via `set-node` drops the edges of exits you removed.
 - Inline `--set '{…}'` is fragile in shells; for anything non-trivial write a file and use `@file`.
 - The server validates on every save; an edit that would leave **no path to End** is rejected with the reason. Read it, fix, retry.
 - The last save wins — don't edit a workflow someone else may be editing.
 - **Editing a workflow that has leads running** may change what they do next. This pack has not verified how in-flight runs react — confirm with the user first.
+
+### Inbound calls — the second entry point
+
+An `inbound` node is where a live run jumps when the lead calls in on a number this workflow has called them from. It jumps **from wherever the lead had reached** — mid-Wait, suspended on a call — and carries on down the inbound branch. Conditions placed after it read **that** call: `post_call_variables`, `conversion_status`, `hangup_reason`, `call_duration`.
+
+What the branch leads to decides what happens to the journey they were on:
+
+| The inbound branch… | The run |
+|---|---|
+| reaches `cancel` | is cancelled, and any call an earlier `send-call` had scheduled is dropped |
+| reaches `end` | is completed |
+| reaches `resume` | goes back to the step the call interrupted — a `wait` keeps the time it had left, a call it was suspended on still wakes it |
+| leads nowhere | the same as `resume` |
+
+An `inbound` node with **no outgoing edge is a valid, useful configuration**: the call is recorded against the run — its post-call variables merge into the run's variables, so later steps can read them — and the lead is left exactly where they were. Use it when you want the call noted but the journey untouched.
+
+Two things worth knowing before branching on an inbound call:
+
+- `post_call` **accumulates** across every call in a run rather than being replaced, so a `post_call_variables` condition can match a value an **earlier** call set. The inbound call is usually answered by a different agent with a different post-call variable set, which makes this easy to hit. Branch on `conversion_status` for strictly-the-latest-call, or give the inbound agent the same post-call variables.
+- Only the workflow of the lead's **most recent** call learns about an inbound call. A lead live in two workflows at once will not have both notified.
 
 ## Read results
 
