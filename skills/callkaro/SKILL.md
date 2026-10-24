@@ -74,6 +74,6 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 ### Chat Simulations
 
 - [Chat Simulations & Test Cases](skill/chat-simulations/chat-simulation-playbook.md) — Entry point for testing a WhatsApp chat agent with simulations: which voice phases to reuse and what changes for chat, the chat test templates, the run-and-read order, and the release gate.
-- [How chat simulation works](skill/chat-simulations/how-chat-simulation-works.md) — What a chat simulation run does, the verified facts C1–C12 (user speaks first, default mocks, no contact record, nothing sent, 7/10 pass mark, grading failures), the Workflow-agent facts W1–W5 (code steps mocked by key, button taps, counters), the test case fields, ck chat-sim commands and MCP tools. Mandatory first read for chat tests.
+- [How chat simulation works](skill/chat-simulations/how-chat-simulation-works.md) — What a chat simulation run does, the verified facts C1–C12 (user speaks first, the 0000000000 test contact, mocks on by default and switchable off to run real code, nothing sent, 7/10 pass mark, grading failures), the Workflow-agent facts W1–W5 (code steps mocked by key, button taps, counters), the test case fields, ck chat-sim commands and MCP tools. Mandatory first read for chat tests.
 
 <!-- END AUTO-GENERATED SKILL GRAPH -->

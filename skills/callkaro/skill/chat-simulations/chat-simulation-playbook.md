@@ -23,10 +23,10 @@ lists what changes for chat. Read
 |---|---|---|
 | A. Profile | [profile-the-bot.md](../simulations/profile-the-bot.md) | Read `chatAgentSystemPrompt` (Basic) or the persona and flow steps (Advanced), `functions`, `followUpFunctions` and models. There are no pre-call variables, transcriber or voice settings. |
 | B. Lint | [lint-config-and-prompt.md](../simulations/lint-config-and-prompt.md) | Skip voice items (opening line, end-call, transfer, language switch by speech). Check every function description is a clear trigger, every `send_template` variable has a `varDescriptions` entry or is pinned in `varSources`, every media link is pinned or described, and the prompt says what to do when a function fails. |
-| C. Classify | [plan-the-suite.md](../simulations/plan-the-suite.md) | Manual-QA list: agent-first messages (C1), anything depending on a filled CRM contact (C4), real side effects of sends and functions (C3), scheduled follow-ups, media the user sends. |
+| C. Classify | [plan-the-suite.md](../simulations/plan-the-suite.md) | Manual-QA list: agent-first messages (C1), a filled CRM contact other than the shared `0000000000` test contact (C4), real side effects of sends and functions (C3), scheduled follow-ups, media the user sends. |
 | D–E. Derive, prioritise | [plan-the-suite.md](../simulations/plan-the-suite.md) | Same tiers and epoch question. Ask the user about epochs before running — runs cost credits (C12). |
 | F. Write | below | The voice templates apply with the substitutions below. |
-| G. Self-review | [self-review.md](../simulations/self-review.md) | Plus: every custom function the scenario touches is mocked (C6). |
+| G. Self-review | [self-review.md](../simulations/self-review.md) | Plus: every custom function the scenario touches has a mock entry (C6), and any mock switched off is safe to run for real (C5). |
 | H. Run and read | below | Read results in the order below. |
 
 ## Writing a chat test
@@ -51,6 +51,10 @@ lists what changes for chat. Read
 - **function_mocks**: one per custom function the scenario touches, shaped
   like the real response. To test a failure path, mock the failure
   (`{"status":"error","message":"Order not found"}`) in its own test (C7).
+  Leave mocks on. Set `"enabled": false` only to exercise a function's real
+  code end to end, and only when calling it for real is safe (a read-only
+  lookup or a test endpoint): its API calls and side effects really happen
+  (C5). Say so in the test name, e.g. `[P1] Order status - live lookup`.
 
 Example:
 
@@ -74,7 +78,9 @@ ck chat-sim create <chatAgentId> \
    1. **Validity**: GRADING FAILED (empty `post_simulation`) → INVALID, rerun (C10).
       User drifted off its script (`userPerformance`, or read it yourself) → fix the test.
    2. **Mechanics**: the expected functions were called with the right
-      arguments, and none were left unmocked (C6).
+      arguments, and none were left without a mock entry (C6). A function
+      whose mock is off returned its real result (C5) — read it before
+      blaming the agent.
    3. **Verdict**: `successRating` ≥ 7 is PASS; read `successFlaws` on every FAIL.
 5. Triage each failure to one owner (prompt, function, test) as in
    [8.2](../simulations/run-triage-report.md#82-triage-every-failure-to-exactly-one-owner),
