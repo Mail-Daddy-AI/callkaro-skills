@@ -67,6 +67,14 @@ ck chat-sim create <chatAgentId> \
   --mocks '[{"name":"get_order_status","response":{"status":"error","message":"Order not found"}}]'
 ```
 
+To run one function for real instead (C5), switch its mock off — the other
+entries stay mocked:
+
+```bash
+ck chat-sim update <testCaseId> \
+  --mocks '[{"name":"get_order_status","enabled":false},{"name":"send_invoice","response":{"status":"success"}}]'
+```
+
 ## Run and read
 
 1. Smoke-run one P0 test with 1 epoch on the target version; check the
