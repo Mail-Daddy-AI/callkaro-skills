@@ -100,6 +100,49 @@ IVR nodes support `msg_while_switching_type` / `msg_while_switching`, just like 
 
 ---
 
+## Metadata conditions
+
+After the message is spoken, the IVR runner evaluates a list of **conditions** before waiting for a key press. The first condition that matches immediately routes the call to its target node — no DTMF needed.
+
+```json
+"conditions": [
+  { "condition": "(metadata.language == 'english')", "next_capability": "english_agent" },
+  { "condition": "(metadata.opted_out == True)",      "next_capability": "opt_out_node"   }
+]
+```
+
+### Rules
+
+- Conditions are evaluated **in order** — first match wins.
+- If no condition matches, the runner falls through to normal DTMF routing.
+- Only **`metadata.*`** operands are allowed. `extract_variables` are not available during the IVR phase (no STT/LLM runs).
+- Only **expression-type** (`condition_type: 1`) logic is supported — no natural-language / prompt conditions.
+- The grammar is identical to pathway expression conditions (see `AGENT-VERSION-REFERENCE.md`):
+
+```
+Comparison   := '(' operand op operand ')'
+LogicalExpr  := '(' Expression ('AND'|'OR') Expression+ ')'
+operand      := metadata.<key> | 'string' | True | False | number
+op           := == | != | > | < | >= | <=
+```
+
+Examples:
+```
+(metadata.language == 'english')
+(metadata.opted_out == True)
+((metadata.score > 5) AND (metadata.tier == 'gold'))
+```
+
+### When to use conditions vs key options
+
+| Use case | Approach |
+|---|---|
+| Route based on pre-call data (campaign field, CRM attribute) | **Condition** — no user input required |
+| Route based on what the caller presses | **Key option** |
+| Both | Conditions are checked first; if none match, DTMF runs |
+
+---
+
 ## Static post-call variables (`use_ivr_postcall`)
 
 Pure IVR calls (calls that never reach an LLM node) have no transcript for the LLM to analyse. You can configure each IVR node to save **static post-call variable values** instead of running LLM inference.
