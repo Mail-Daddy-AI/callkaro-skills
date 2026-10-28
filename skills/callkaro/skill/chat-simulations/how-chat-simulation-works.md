@@ -46,7 +46,8 @@ A Workflow agent ([Workflow chat agents](../chat-agents-workflow.md)) is
 simulated the way it runs live: each simulated message walks the workflow, its
 sends go into the transcript, and when it reaches an `assign_agent` step the
 assigned Basic or Advanced agent replies in the same turn, at its published
-version.
+version; an `assign_version` step does the same with the chosen version of this
+agent.
 
 | # | Fact | What it means for you |
 |---|---|---|

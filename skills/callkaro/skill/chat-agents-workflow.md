@@ -15,7 +15,7 @@ creation; the commands are the usual `ck chat-agents` ones from
 
 ## How a run works
 
-- A run ends at an `end` step, at an `assign_agent` step, or at an unwired
+- A run ends at an `end` step, at an `assign_agent` or `assign_version` step, or at an unwired
   exit.
 - Sends are collected and delivered when the run ends. A send is **not** the
   end: any step can follow it.
@@ -45,6 +45,7 @@ Every step: `id` (1–64 letters, digits, `_`, `-`; unique), `type`, optional
 | `send_media`     | `mediaType` image/video/audio/document, `link` (fixed must be `https://`), `filename` (document), `caption` (not audio)            | 1                                                                            |
 | `send_interactive` | `message`, `footer`, `buttonText`, `buttons: [{id, title ≤24, description?}]` (1–10)                                                | 1                                                                            |
 | `assign_agent`   | `agentId` (a Basic or Advanced WhatsApp chat agent of this account, with a published version), `note` (context for that agent's turn)  | none — ends the run                                                         |
+| `assign_version` | `versionId` (a Basic or Advanced version of **this same agent**; a workflow version can't be the target), `note` | none — ends the run |
 | `end`            | —                                                                                                                                             | none                                                                         |
 
 A button tap from `send_interactive` arrives as the **next** message. Route on
@@ -157,7 +158,9 @@ attribute, missing keywords/pattern, or a counter missing its agent or steps; a
 `send_interactive` without buttons or with duplicate titles; a template step
 with no template; a non-`https://` media link; an `assign_agent` with no
 agent, or one naming an agent that is not a published Basic or Advanced
-WhatsApp agent of the account. Half-wired decision steps and unreachable steps
+WhatsApp agent of the account; an `assign_version` with no version, or one
+naming a version that is missing, belongs to another agent, or is a workflow
+version. Half-wired decision steps and unreachable steps
 print as warnings.
 
 Test before publishing with [Chat Simulations & Test Cases](chat-simulations/chat-simulation-playbook.md):
