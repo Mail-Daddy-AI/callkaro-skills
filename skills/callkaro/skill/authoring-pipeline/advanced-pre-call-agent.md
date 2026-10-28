@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 6: writes Python source for custom pre-call functions (P0 data loading and prompt rewriting). Use when a pre-call function needs code, not a fixed request. -->
 # Advanced Pre-Call Function Agent
 
 *Production prompt — ai-fde's **Advanced Pre-Call Function Agent** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

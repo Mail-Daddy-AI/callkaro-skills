@@ -1,3 +1,4 @@
+<!-- graph-summary: Workflow graphs via ck: steps (call, wait, WhatsApp, branch, CRM update), validation, import and runs. Use to build, edit or inspect a workflow from the CLI. -->
 # Workflows
 
 A workflow is a **graph of steps run per contact**: call them, wait, WhatsApp

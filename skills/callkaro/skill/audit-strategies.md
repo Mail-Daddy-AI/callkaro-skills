@@ -1,3 +1,4 @@
+<!-- graph-summary: AI Auditor strategies via ck: score sampled calls with an LLM, scoped by call filters. Use to create or update an audit strategy; creating one spends credits on live calls. -->
 # Audit Strategies (AI Auditor)
 
 An audit strategy scores calls with an LLM against free-text instructions

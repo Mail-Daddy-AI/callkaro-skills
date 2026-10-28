@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 6: generates a declarative pre-call API function (fixed request, no code). Use when the plan needs data fetched before the call by a plain API call. -->
 # Pre-Call Basic Function Agent
 
 *Production prompt — ai-fde's **Pre-Call Basic Function Agent** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

@@ -1,3 +1,4 @@
+<!-- graph-summary: Every agent and version field: where it lives, allowed values, traps, minimal payloads. Use to check a field before any create or update; read it by section, it is long. -->
 # CallKaro Agents & Versions — Complete Reference
 
 **Read this before doing ANYTHING with agents or versions** — creating, editing,
@@ -476,7 +477,7 @@ functionLog.response = result.message;
 
 | `type` | Required | Notes |
 | --- | --- | --- |
-| `end` | `name`, `description` | Nothing else. Ends the call. |
+| `end` | `name`, `description` | Nothing else. Ends the call. Not the preferred way to end calls: prefer closing lines in `end_call_msg`. |
 | `transfer` | `name`, `description`, `to_number`, `warm_transfer` | `to_number` is E.164 and is the primary destination. The builder also maintains `to_numbers[]` (ordered list, with `to_number` mirroring `to_numbers[0]`) for multi-destination attempts — write both when using a list. `warm_transfer: true` **requires** a non-empty `warm_transfer_prompt` (how to brief the human before handing over); cold transfer uses `false` + `""`. Also carries `msg_while_executing[]` and `msg_while_executing_type: "static"` for what the caller hears while connecting. |
 | `keep_call_on_hold` | `name`, `description` | `hold_duration` seconds (default 20). Pairs with `hold_call_snippet` and `hold_disconnect_timeout`. |
 | `available` | `name`, `description`, `api`, `event_id` | Check calendar availability (cal.com-style). |
@@ -1038,7 +1039,7 @@ Quality — nothing validates these, and they are what make the agent good:
   "speakfirst": { "value": 1, "message_interruption": false },
   "speakfirst_inbound": { "value": 0, "message_interruption": false },
   "initial_pause_outbound": 1,
-  "functions": [{ "type": "end", "name": "end_call", "description": "End the call when done" }],
+  "functions": [],
   "postcall": [
     { "type": "boolean", "name": "reminder_acknowledged",
       "description": "Did the customer acknowledge the service reminder?",

@@ -1,3 +1,4 @@
+<!-- graph-summary: Branch library and verification checklist that turns a PRD into a test suite. Use when building from a spec, auditing a live agent, or checking a fix did not break another branch. -->
 # Client Regression — branch coverage & verification discipline
 
 Use when **building from a PRD/BRD** (this is the checklist that turns a spec
@@ -62,7 +63,7 @@ Beyond the config sanity checks in [voice-and-transcriber.md](voice-and-transcri
       `Number:DigitByDigit` for account/reference numbers).
 - [ ] Named entities formatted the way the BRD expects.
 - [ ] No conflict between happy-path instructions and terminal branches.
-- [ ] Every terminal branch really ends the call (`end` function present and
-      the closing line is in `end_call_msg`).
+- [ ] Every terminal branch really ends the call: its closing line is in
+      `end_call_msg` (preferred), or an `end` function is present where one is used.
 - [ ] Each fix committed with a reason (`--commit "…"`) so the change is
       auditable.

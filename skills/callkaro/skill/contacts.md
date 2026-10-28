@@ -1,3 +1,4 @@
+<!-- graph-summary: CRM contacts: attribute schema, create, upload, update, delete, assign to an agent or workflow. Use when managing leads or the fields a workflow or agent reads. -->
 # Contacts (CRM)
 
 A contact is a **phone number plus attributes**. Attributes are fields the

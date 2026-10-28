@@ -1,3 +1,4 @@
+<!-- graph-summary: The sections of a complete agent prompt and how to choose the prompt type (0 to 3). Use as background when writing or restructuring a prompt; house rules point to the writing nodes. -->
 # Writing Agent Prompts
 
 > **Writing a script right now?** Use the production writer prompts in
@@ -5,6 +6,16 @@
 > `script-writer-agent.md` (types 0/1) or `multi-prompt-script-writer-agent.md`
 > (types 2/3), then critique with `reflect-agent.md`. This file is the
 > background theory; those are the operating instructions.
+
+House rules for every prompt:
+- Design first: [agent design](../design/agent-design.md) decides the type, the
+  stages and what pre-call functions compute.
+- Plain text, no markdown ([prompt style](../writing/prompt-style.md)).
+- Script vs compose, the prompt skeleton and objections:
+  [conversational agents](../writing/conversational-agents.md); sounding human:
+  [conversational voice](../writing/conversational-voice.md); multilingual:
+  [language switching](../writing/language-switching.md).
+- Closing lines go in `end_call_msg`; prefer that over an `end` function.
 
 The system prompt is the heart of the agent: who it is, its goal, how it
 behaves, what it must never do, the call flow, and objection handling. This

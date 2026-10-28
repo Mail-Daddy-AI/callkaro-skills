@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 7: chooses and configures voice and transcriber for the language and persona. Use when a build or request touches voice or speech recognition. -->
 # Voice & Transcriber Agent
 
 *Production prompt — ai-fde's **Voice & Transcriber Agent** (call-parameters). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

@@ -1,3 +1,5 @@
+<!-- graph-summary: Signing in to the ck CLI (ck login, whoami, logout) and where the token lives. Use when ck reports not logged in or the wrong account. -->
+<!-- audience: ck -->
 # Auth & Account
 
 State lives in `~/.config/callkaro/config.json` (a revocable `ck_…` token). The

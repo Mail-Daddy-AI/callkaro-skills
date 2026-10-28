@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 2 for types 0 and 1: the planner prompt that turns the requirement into an execution plan. Use before writing a basic or advanced agent's script. -->
 # Planner
 
 *Production prompt — ai-fde's **Planner** (core-pipeline). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

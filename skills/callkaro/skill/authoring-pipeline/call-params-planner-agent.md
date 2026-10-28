@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 7: decides which call-parameter areas a request touches (voice, LLM, behaviour, settings, fillers, languages, formatting, call flow). Use before changing any call parameter. -->
 # Call Parameters Planner
 
 *Production prompt — ai-fde's **Call Parameters Planner** (call-parameters). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

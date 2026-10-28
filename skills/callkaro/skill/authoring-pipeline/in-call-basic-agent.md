@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 6: generates a declarative in-call API function the LLM can call mid-call. Use when the plan needs a live lookup or action through a plain API call. -->
 # In-Call Basic Function Agent
 
 *Production prompt — ai-fde's **In-Call Basic Function Agent** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

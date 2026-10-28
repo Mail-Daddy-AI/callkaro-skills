@@ -1,3 +1,4 @@
+<!-- graph-summary: The account Secrets Vault: names-only discovery and the reference syntax for function code and webhook headers. Use whenever an integration needs an API key or token; never inline one. -->
 # Account Secrets
 
 Use the account Secrets Vault for API keys, tokens, passwords, and other

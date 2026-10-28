@@ -1,3 +1,4 @@
+<!-- graph-summary: What a voice agent is (LLM, voice, transcriber, prompt, functions, post-call) and the ck agent commands. Use as the entry point for any voice-agent task. -->
 # Voice Agents — the core entity
 
 A CallKaro **agent** is a phone-calling AI: an LLM + voice (TTS) + transcriber

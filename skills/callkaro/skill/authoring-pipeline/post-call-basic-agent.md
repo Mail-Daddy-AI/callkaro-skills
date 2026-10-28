@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 6: generates a declarative post-call API function (send results after the call). Use when the plan needs a plain webhook or API write after the call. -->
 # Post-Call Basic Function Agent
 
 *Production prompt — ai-fde's **Post-Call Basic Function Agent** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

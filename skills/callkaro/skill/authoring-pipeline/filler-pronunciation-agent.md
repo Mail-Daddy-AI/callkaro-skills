@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 7: filler sounds while the agent thinks and custom pronunciations. Use when a request changes fillers or how a word is spoken. -->
 # Filler & Pronunciation Agent
 
 *Production prompt — ai-fde's **Filler & Pronunciation Agent** (call-parameters). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

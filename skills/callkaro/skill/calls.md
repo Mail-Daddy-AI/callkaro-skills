@@ -1,3 +1,4 @@
+<!-- graph-summary: Placing calls (test by default), call history, a call's transcript and raw log, live queues. Use to make a test call, read what happened on a call, or debug a failed call from its log. -->
 # Calls — placing, history, live queues
 
 ## Place a single call

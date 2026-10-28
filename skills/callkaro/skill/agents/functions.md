@@ -1,13 +1,15 @@
+<!-- graph-summary: Which function type to use (transfer, hold, booking, custom pre/in/post-call), basic or advanced, and where to attach it. Read first when adding a function; then function-authoring. -->
 # Functions — giving the agent abilities
 
 > **Field shapes** for every function type: [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §6 (and §15 for WhatsApp).
-> **Writing `source_code`**: use the production generator prompts —
+> **Writing any function's JSON or `source_code`**: follow
+> [function-authoring.md](../functions/function-authoring.md), the per-variant rules and the
+> review checklist condensed from the production generator prompts —
 > [advanced-pre-call-agent.md](../authoring-pipeline/advanced-pre-call-agent.md),
 > [advanced-in-call-agent.md](../authoring-pipeline/advanced-in-call-agent.md),
 > [advanced-post-call-agent.md](../authoring-pipeline/advanced-post-call-agent.md).
-> They own the exact protocols (signatures, allowed imports, forbidden types,
-> security rules) and are stricter than any summary. Review generated code with
-> [function-critic-agent.md](../authoring-pipeline/function-critic-agent.md).
+> (originals, for the build pipeline). Review every function with the checklist there
+> (from [function-critic-agent.md](../authoring-pipeline/function-critic-agent.md)).
 >
 > This file is the **decision layer**: which function, basic or advanced, where to attach it.
 
@@ -19,7 +21,7 @@ be unique **within a scope** and are the update/delete key. Use `snake_case`.
 
 | Need | Type |
 |---|---|
-| Hang up | `end` — one per agent, almost always wanted (without it the agent can't end gracefully) |
+| Hang up | Preferred: closing lines in `end_call_msg` (the call ends when the agent speaks one). The `end` function also works but is not the preference. |
 | Live transfer to a human | `transfer` — **always this type, never custom code** |
 | Put the caller on hold | `keep_call_on_hold` |
 | Check / book a calendar slot | `available` / `booking` |

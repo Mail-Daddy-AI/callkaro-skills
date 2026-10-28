@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 6: decides which functions to create, update or delete for the agent. Use before generating any function. -->
 # Function Planner Agent
 
 *Production prompt — ai-fde's **Function Planner Agent** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

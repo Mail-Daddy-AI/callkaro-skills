@@ -1,3 +1,4 @@
+<!-- graph-summary: Simulation test cases and runs: an LLM caller talks to a version and a judge grades PASS/FAIL. Use to create test cases, run them, and read results before publishing. -->
 # Simulations & Test Cases
 
 Simulations let you test an agent **without phone calls or credits-per-minute**:

@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 6: writes Python source for custom in-call functions the LLM calls mid-call. Use when an in-call function needs logic or several requests. -->
 # Advanced In-Call Function Agent
 
 *Production prompt — ai-fde's **Advanced In-Call Function Agent** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

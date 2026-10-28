@@ -1,3 +1,4 @@
+<!-- graph-summary: The ai-fde build pipeline: which production prompt runs at each stage (intake, plan, script, reflect, analyze, functions, parameters) and how outputs combine. Use to build an agent end to end. -->
 # The ai-fde Authoring Pipeline — build agents the way our own AI does
 
 These files are the **actual production prompts** of ai-fde, CallKaro's

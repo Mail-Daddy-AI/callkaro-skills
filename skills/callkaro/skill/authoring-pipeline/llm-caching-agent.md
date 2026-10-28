@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 7: sets the LLM, fallback model, temperature and caching. Use when a request changes the model or response caching. -->
 # LLM & Caching Agent
 
 *Production prompt — ai-fde's **LLM & Caching Agent** (call-parameters). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

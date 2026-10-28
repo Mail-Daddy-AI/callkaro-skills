@@ -1,3 +1,4 @@
+<!-- graph-summary: WhatsApp and Instagram chat agents via ck chat-agents: create, version, publish, templates, predefined functions. Use for any chat-agent task; never send chat payloads to voice agents. -->
 # Chat agents
 
 Chat agents are separate from voice agents. Use `ck chat-agents`; do not send a

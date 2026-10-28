@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 1, intake: the orchestrator prompt that turns a user request into the requirement and calls stages in order. Use when starting a build or update from a conversation. -->
 # Chatbot Supervisor
 
 *Production prompt — ai-fde's **Chatbot Supervisor** (core-pipeline). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

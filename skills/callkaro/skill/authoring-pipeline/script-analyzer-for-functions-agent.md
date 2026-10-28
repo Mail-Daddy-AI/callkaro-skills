@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 5: designs post-call variables, conversion reason and dispositions from the finished script. Use after the script is final, before functions. -->
 # Script Analyzer for Functions
 
 *Production prompt — ai-fde's **Script Analyzer for Functions** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

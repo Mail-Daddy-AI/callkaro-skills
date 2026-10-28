@@ -1,3 +1,4 @@
+<!-- graph-summary: How contacts and workflows connect: enrolment, the data a workflow reads from the CRM, and writing results back. Use when a workflow must act on contact attributes or update them. -->
 # Workflows + Contacts together
 
 Contacts are **who**; a workflow is **what happens to them**. They meet in

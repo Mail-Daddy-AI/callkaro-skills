@@ -1,3 +1,4 @@
+<!-- graph-summary: Choosing the voice (TTS) and transcriber (STT) for a language and persona, and fixing mishearing. Use when setting or changing voice or transcriber; field tables are in the reference. -->
 # Voice (TTS) & Transcriber (STT) — choosing them
 
 > **Field tables live in [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md)

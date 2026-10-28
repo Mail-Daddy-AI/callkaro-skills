@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 2 for types 2 and 3: the planner prompt for multi-prompt capabilities and pathway nodes. Use before writing a multi-prompt or pathway agent. -->
 # Planner (Multi-Prompt)
 
 *Production prompt — ai-fde's **Planner (Multi-Prompt)** (core-pipeline). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

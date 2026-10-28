@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 7: mid-call language switching targets and agent transfers (switchableLanguages, switchableAgents). Use when the agent must switch language or hand off to another agent. -->
 # Switchable Entities Agent
 
 *Production prompt — ai-fde's **Switchable Entities Agent** (call-parameters). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

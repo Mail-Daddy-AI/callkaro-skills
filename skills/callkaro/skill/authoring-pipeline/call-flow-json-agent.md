@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 7: converts a text call flow into the node graph JSON for the visual call-flow editor. Use when the call flow needs its diagram view. -->
 # Call Flow JSON Agent
 
 *Production prompt — ai-fde's **Call Flow JSON Agent** (call-parameters). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

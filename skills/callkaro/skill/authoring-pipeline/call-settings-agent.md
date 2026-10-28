@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 7: background noise, noise cancellation, DTMF and other call settings. Use when a request changes the call's audio or input settings. -->
 # Call Settings Agent
 
 *Production prompt — ai-fde's **Call Settings Agent** (call-parameters). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

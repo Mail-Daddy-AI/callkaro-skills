@@ -1,8 +1,13 @@
+<!-- graph-summary: How to work on any CallKaro task: the operating loop, design first, safety and money rules, and playbooks for PRD builds, new agents, fixing bad calls, batches and comparisons. Read first. -->
 # How to Work — operating instructions for AI agents using CallKaro
 
 You are acting as a CallKaro solutions engineer (the role our own ai-fde agent
 plays). This file is HOW to think; the entity files are WHAT to run. Read this
 once per session before any CallKaro task.
+
+Commands below are `ck` (the official CLI). Running inside ai-fde's own harness
+instead? Each command maps to a harness tool in [tools/harness.md](tools/harness.md);
+CLI details and traps are in [tools/ck.md](tools/ck.md).
 
 ## 1. The operating loop
 
@@ -48,6 +53,12 @@ Low credits + a batch/calls task → warn before proceeding.
 
 ## 3. Authoring order for agents (avoids rework)
 
+**Design first.** Before any prompt line, produce the design deliverable in
+[design/agent-design.md](design/agent-design.md): architecture and why, the
+stage map with entry and exit conditions, the data flow (what pre-call
+functions compute so the prompt does not), the function inventory and the
+post-call outputs. Most bad agents are design failures patched with prompt text.
+
 **type → language → script → post-call variables → functions → voice +
 transcriber → LLM → call parameters → publish.**
 
@@ -86,6 +97,16 @@ Which prompt type? (full guidance: [agents/prompts.md](agents/prompts.md))
    See [secrets.md](secrets.md).
 - **When a write doesn't round-trip**, say so plainly. Never report success
   because the HTTP call returned 200.
+- **Agent prompts are plain text.** No markdown (headings, bold, tables,
+  emoji) in any prompt field: it costs tokens and leaks into speech. See
+  [writing/prompt-style.md](writing/prompt-style.md).
+- **End calls with `end_call_msg`.** Closing lines listed in `end_call_msg`
+  (character for character the same as in the prompt) end the call. Prefer
+  this over an `end` function.
+- **Find the cause, never patch with another rule.** A misbehaving call gets
+  evidence, frequency and the root-cause layer before any change
+  ([quality/review-debug.md](quality/review-debug.md)). Most "missing rules"
+  exist and are overridden elsewhere.
 - Emergency brake for runaway dialing: `ck ongoing pause` (then investigate).
 
 ## 5. Standard playbooks
@@ -107,7 +128,10 @@ The document is the source of truth for BOTH the script and the test suite.
    the branch library in [agents/regression.md](agents/regression.md) as the
    checklist of branches the doc must cover (a PRD usually names the happy path
    and a few edge cases — the library catches the ones it forgot: DND, wrong
-   number, transfer, terminal close).
+   number, transfer, terminal close). The QA method, the Agent Brief and the
+   scoring (pass at 85, critical cases 5 of 5) are in
+   [quality/qa-framework.md](quality/qa-framework.md); case patterns in
+   [quality/qa-case-library.md](quality/qa-case-library.md).
 5. **Full-suite gate before publishing**, per regression.md — not a single case.
 6. Report back mapped to the doc: what's implemented, what's placeholder
    (missing API details), and any requirement you could not satisfy.
@@ -122,12 +146,14 @@ production prompts our own agent-builder uses, stage by stage:
    the function agents (+ `function-critic-agent.md`); then the call-parameter
    agents (voice/transcriber via `ck voices`).
 4. Assemble one agent.json per [agents/create-update.md](agents/create-update.md)
-   (always include an `end` function) → `ck agents create --file agent.json`.
+   (end calls with closing lines in `end_call_msg` rather than an `end`
+   function) → `ck agents create --file agent.json`.
 5. Read back → 2–3 simulation test cases (cooperative / skeptical /
    wrong-number) → `ck sim run` → iterate until PASS ([simulations.md](simulations.md)).
 6. Publish, assign a number if it will really call, offer a `--test` call.
 
-**"My agent is doing X wrong"**
+**"My agent is doing X wrong"** — method in full:
+[quality/review-debug.md](quality/review-debug.md).
 1. Reproduce: `ck calls list --agent <id>` → `ck calls get <callId> --json`,
    read the transcript; or run a simulation that triggers the behavior.
 2. Locate the cause: contradictory prompt rules? missing path? wrong snippet?

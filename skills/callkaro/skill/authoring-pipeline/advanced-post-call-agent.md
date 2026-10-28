@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 6: writes JavaScript source for custom post-call functions. Use when results need transforming or routing to several systems after the call. -->
 # Advanced Post-Call Function Agent
 
 *Production prompt — ai-fde's **Advanced Post-Call Function Agent** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

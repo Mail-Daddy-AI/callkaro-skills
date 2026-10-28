@@ -1,3 +1,4 @@
+<!-- graph-summary: Creating an agent in one JSON (agent and version fields together) and updating it with --versions. Use when assembling agent.json or patching an existing version. -->
 # Creating & Updating Agents
 
 ## Create
@@ -119,7 +120,7 @@ production export.
   "silence_prompts": [],
   "silence_instructions": null,
   "silence_language": "en",
-  "end_call_msg": [],
+  "end_call_msg": ["Thank you for your time, have a good day."],
   "bgNoise": true,
   "bgNoiseVolume": 0.2,
   "voicemail_msg": true,
@@ -128,9 +129,7 @@ production export.
   "noise_cancellation": true,
   "noise_cancellation_strategy": "aicoustics",
   "noise_cancellation_strength": 1,
-  "functions": [
-    { "type": "end", "name": "end_call", "description": "End the call when the conversation is complete or the user asks to stop." }
-  ],
+  "functions": [],
   "postcall": [
     {
       "type": "boolean",
@@ -160,6 +159,8 @@ production export.
   "webhook_headers": []
 }
 ```
+
+The call ends when the agent speaks a line listed in `end_call_msg`, so the example has no `end` function. Prefer `end_call_msg` over the `end` function; the prompt's closing lines must match these entries exactly.
 
 Workflow:
 

@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 6: generates no-code functions (transfer, hold, availability, booking, end). Prefer end_call_msg over an end function. Use when the plan calls for a predefined function. -->
 # Predefined Functions Agent
 
 *Production prompt — ai-fde's **Predefined Functions Agent** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*
@@ -17,7 +18,8 @@ You will be given either a CREATE or an UPDATE task. Your only job is to return 
   "description": "End the call when you are done"
 }
 ```
-No extra fields. Use when the user wants to hang up / terminate / disconnect.
+No extra fields. Not the preferred way to end calls: prefer closing lines in `end_call_msg`, which end the call
+when the agent speaks one. Create this function only when the user asks for it or a flow cannot end any other way.
 
 ─────────────────────────────────────────────────────────────────
 2. TRANSFER CALL

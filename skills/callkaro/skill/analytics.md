@@ -1,3 +1,4 @@
+<!-- graph-summary: Account, agent and version performance (calls, connect and conversion rates, minutes, credits). Use to answer how an agent is doing or compare versions after an A/B test. -->
 # Analytics
 
 Three views, mirroring the dashboard. Default window when no dates are given:

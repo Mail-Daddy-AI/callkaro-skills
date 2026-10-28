@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 7: how raw {{variables}} are formatted before the prompt (dates, numbers, currency). Use when metadata values must be spoken in a specific format. -->
 # Pre-Format Variables Agent
 
 *Production prompt — ai-fde's **Pre-Format Variables Agent** (call-parameters). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 7: silence handling, language switching, gender detection and turn-taking (VAD). Use when a request changes how the agent behaves between turns. -->
 # Agent Behavior Agent
 
 *Production prompt — ai-fde's **Agent Behavior Agent** (call-parameters). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

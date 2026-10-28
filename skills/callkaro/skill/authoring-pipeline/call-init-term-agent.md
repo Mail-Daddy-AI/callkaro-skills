@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 7: who speaks first, opening pauses, voicemail and how the call ends (end_call_msg, time limit). Use when a request changes how calls start or end. -->
 # Call Initiation & Termination Agent
 
 *Production prompt — ai-fde's **Call Initiation & Termination Agent** (call-parameters). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

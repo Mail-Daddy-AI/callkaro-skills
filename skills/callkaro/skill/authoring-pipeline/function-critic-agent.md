@@ -1,3 +1,4 @@
+<!-- graph-summary: Pipeline stage 6 check: verifies every planned function operation was carried out correctly and returns a verdict. Run after each function change. -->
 # Function Critic Agent
 
 *Production prompt — ai-fde's **Function Critic Agent** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

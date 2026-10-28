@@ -1,3 +1,4 @@
+<!-- graph-summary: Batch call campaigns from a CSV of leads: validate, create, schedule, monitor, retry. Creating one dials real people at once, so confirm row count and spend first. -->
 # Batch Calls
 
 A batch = a CSV of leads dialed by an agent. Creating one **starts real calls

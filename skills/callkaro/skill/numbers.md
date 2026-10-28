@@ -1,3 +1,4 @@
+<!-- graph-summary: Phone numbers: list, buy, release, spam flags, inbound vs outbound assignment rules (inbound is one agent per number). Use before assigning a number; buying one spends credits. -->
 # Phone Numbers
 
 Numbers come from CallKaro's own pool (no bring-your-own). A number can be:
