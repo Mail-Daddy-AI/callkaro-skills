@@ -137,6 +137,38 @@ agent (`assign_version`) or to another agent (`assign_agent`); see
 message keeps the same `agentId` and only `versionId` differs, so agent-keyed
 lookups and audit strategies still cover them.
 
+### Delete, import and commit history
+
+```bash
+ck chat-agents delete-version <agentId> --versions <versionId>
+ck chat-agents import-versions <agentId> --file versions.json   # add versions to this agent
+ck chat-agents import --file v1.json --file v2.json             # create a new agent
+ck chat-agents commits <agentId> [--versions <versionId>] [--page 2]
+ck chat-agents commit <commitId> --json                         # the commit's full saved state
+ck chat-agents revert <agentId> <commitId>
+```
+
+- **Delete is permanent.** It removes the version and its commit history, so it
+  cannot be restored. It is refused for the published version and for a version
+  another version's `assign_version` step routes to — publish another version or
+  remove that step first.
+- **Import files** are exported JSON: one object per version, as an array or a
+  single object; repeat `--file` for several files. Every entry is validated
+  before any is written, so one bad entry means nothing is imported.
+- **`import-versions`** adds versions to an existing agent. Agent-level fields in
+  the file (name, phone numbers, published version) are ignored.
+- **`import`** creates a new agent. Several entries become **one agent with that
+  many versions**, not several agents; the first entry is published. Agent-level
+  fields (`chatAgentName`, `channel`, `agentStatus`, `instagramAgentType`) must be
+  identical across entries, or it fails listing the mismatches. On WhatsApp the
+  version type (`agentMode`) may differ per entry. WhatsApp numbers and the
+  exported `publishedVersionId` are never carried over.
+- **Commits** record every create, save, duplicate and import of a version, each
+  holding the version's full state. `commits` lists them newest first.
+- **`revert`** sets a version back to a commit's state. The revert is itself
+  recorded as a new commit, so it can be undone the same way; the version keeps
+  its own type.
+
 ## Testing
 
 Use chat simulations before publishing: an AI plays the user, the agent replies
