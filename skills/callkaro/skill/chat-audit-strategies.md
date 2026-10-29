@@ -18,6 +18,15 @@ conversation's last audit, clear, or handover.
 | `delete <strategyId>` | Permanent. |
 | `batch <agentId> <strategyId> --max <n> [--phone <n>] [--model <name>] [--set <json>]` | Audit up to n conversations now (1-500, uses credits). `--set` takes `filters`, `minUserMessages`, `minMessages`. |
 
+**Chatflow summary.** The auditor does not read the agent's prompt or published
+version. It judges each conversation against the strategy's `--strategy` text and
+its `--chatflow-summary`: how the conversation should go (stages in order,
+actions the agent must take, follow-up and hand-off rules, the intended outcome).
+Write it for the flow being audited; without one the auditor has no agent
+context, so set it on every strategy. It is optional (max 40,000 chars), is kept
+when an update omits it, and is cleared with `--set '{"chatflow_summary":""}'`.
+MCP: `chatflow_summary` on `create_or_update_chat_audit_strategy`.
+
 `audit_filters` are contact filters: `contact_created_from/_to`,
 `contact_updated_from/_to` (YYYY-MM-DD, inclusive) and
 `attributes: {name: value | [values]}`. Get the attribute names and their allowed
