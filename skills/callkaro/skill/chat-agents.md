@@ -76,6 +76,11 @@ types: `send_template`, `send_contact`, `send_call`, `send_image`,
 - A media send's `link` (and a document's `filename`, and the `caption`) come
   from the model unless pinned in `sources` (below).
 - Never put secrets in a payload; use `x_secrets.NAME` in headers.
+- Function code can read, without taking them as parameters: `x_message`
+  (`text`, `type`, `button_id`, `media_link`, `msg_id`), `x_history` (the chat
+  oldest first, ending with this message: `role`, `text`, `type`, `time`,
+  `msg_id`, `media_link`, `agent_id`, `workflow_node`, `flow_step`),
+  `x_context`, `x_contact` and `x_secrets`.
 
 ```json
 {"name":"send_booking_confirmation","type":"send_template","provider":"whatsapp",
