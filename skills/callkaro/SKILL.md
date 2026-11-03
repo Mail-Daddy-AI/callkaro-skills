@@ -39,7 +39,7 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 - [Phone Numbers](skill/numbers.md) — Phone numbers: list, browse the buyable catalog, buy, release and spam-flag; assigning a number to an agent (outbound caller ID, inbound); the WhatsApp number pool, which has no buy.
 - [Account Secrets](skill/secrets.md) — The account secrets vault: list names, set, rename and remove secrets, and the xsecrets reference syntax used in function headers and code. Never put a credential in an agent payload.
 - [Workflows + Contacts together](skill/workflows-and-contacts.md) — End-to-end recipe for using workflows with contacts: define attributes, gather ids, build the graph, load contacts, test on one number, verify, then scale.
-- [Workflows](skill/workflows.md) — Build and run workflow graphs per contact: node types, the rules that bite, commands, generating a graph from a request using real ids, editing, and reading results.
+- [Workflows](skill/workflows.md) — Build and run workflow graphs per contact: every node type (Send Call, Wait, Conditions, WhatsApp, API, Update Contact, and the Inbound Call, Cancel Workflow and Resume Where They Were nodes for call-backs), the rules that bite, commands, generating a graph from a request using real ids, editing, and reading results.
 
 ### Voice Agents
 
