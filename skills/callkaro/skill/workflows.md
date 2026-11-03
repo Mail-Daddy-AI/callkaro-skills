@@ -46,7 +46,7 @@ method.
 | End | `end` | an `end` or `cancel` reachable from Start |
 | Cancel Workflow | `cancel` | — |
 | Resume Where They Were | `resume` | — (needs an `inbound` node in the workflow) |
-| Send Call | `send-call` | `agentId` |
+| Send Call | `send-call` | `agentId` (timing and other options: next section) |
 | Send WhatsApp Template | `wa-template` | `templateId` (+ name, language, body, `parameters`, `phoneNumberId`, `displayPhoneNumber`, `provider`) |
 | Send WhatsApp Message | `wa-message` | `message`, `phoneNumberId`, `displayPhoneNumber` |
 | Wait | `wait` | `minutes` ≥ 1 |
@@ -54,6 +54,20 @@ method.
 | API Call — Basic | `api-basic` | `url` |
 | API Call — Advanced | `api-advanced` | `code` (`async function handler(context) {…}`) |
 | Update Contact | `update-lead` | `updates: [{attribute, source, value}]` |
+
+### Send Call options (all optional)
+
+| Field | Meaning |
+|---|---|
+| `scheduleMode` | `"datetime"` (default) or `"time"`. Picks which of the next two applies. |
+| `scheduleAt` | `datetime` mode: hold the call until this IST date-time, `"YYYY-MM-DDTHH:mm:ss"`. A time already past calls straight away. |
+| `scheduleTime` | `time` mode: a daily IST time, `"HH:mm:ss"`. A lead reaching the step before it is called at it that day; up to 5 minutes after, straight away; any later, at that time the next day. This is how to do "call at 10 am". |
+| `minTriggerTime` / `maxTriggerTime` | `"HH:mm"` IST window for this step's calls **and its retries**. Empty = the workflow's own calling window (else `00:00`–`23:59`). |
+| `carryOver` | Default `true`: a call that lands outside the window waits for the window to reopen. `false` drops it. |
+| `language` | Language code the agent speaks, default `"en"`; `""` = the agent's own default language. |
+| `metadata` | `[{key, source, value}]` rows sent to the agent as `{{metadata.<key>}}`, on top of what the lead was enrolled with. Sources as in Conditions. |
+
+A scheduled time outside the window moves to the next window opening when `carryOver` is on; with it off, the call is not placed and the step moves on with `placed: false` and the reason in its result.
 
 ### Rules that bite
 
