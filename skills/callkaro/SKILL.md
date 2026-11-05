@@ -15,7 +15,8 @@ relevant.
 Keep these invariants: check authentication first, prefer JSON read commands,
 discover IDs instead of inventing them, use `--versions` for version selection,
 and obtain explicit confirmation before a command spends credits or starts real
-calls/messages.
+calls/messages. If a command prints a notice that a newer CLI is available,
+tell the user and offer to run `ck update`; do not upgrade without their OK.
 
 ## Nodes
 
