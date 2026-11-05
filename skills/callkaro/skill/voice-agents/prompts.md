@@ -114,5 +114,20 @@ platform default; set `""` to suppress it entirely.
   language you actually wrote the script in.
 - Placeholders: `{{name}}` is filled before the call from metadata, and `{name}` is captured or
   resolved during the call (full rules in [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §3).
+- **Keep variables at the end (prompt caching).** The LLM caches the prompt only up to the first
+  `{{name}}` / `{name}`, because everything after it differs per call. In the body write `<name>`
+  (never substituted), and list every variable once as the last thing in the script:
+  ```
+  Greet the customer as <customer_name> and mention their loan of <loan_amount>.
+  ...
+  # Call variables
+  Values for the <placeholders> used above:
+  - <customer_name> = {{customer_name}}
+  - <loan_amount> = {{loan_amount}}
+  ```
+  Type 0: end of `systemprompt`. Type 1: the last item of `rebuttals`. Types 2/3: end of each
+  capability's `system_prompt` that uses variables. Pre-call/in-call `.replace("{name}", …)` code
+  still works, since `{{name}}` in the list contains `{name}`. The dashboard shows a
+  "% cacheable" badge and a "Make cacheable" button that does this rewrite.
 - Updating an existing script: change only what was asked and keep its style, agent name and brand,
   and any custom placeholders. See [verify-and-review.md](verify-and-review.md).
