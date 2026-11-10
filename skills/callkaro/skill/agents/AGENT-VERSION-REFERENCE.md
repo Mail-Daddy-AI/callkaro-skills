@@ -644,7 +644,10 @@ Guidance:
 - Copy `transcriber_language` from the resolved catalogue value **verbatim** — do not reformat
   `["en-IN"]` → `"en"`, or `"hi"` → `"hi-IN"`, and never wrap a string provider's value in an array.
 - `keywords[]` boosts recognition of brand/product/domain words and lives **inside** the transcriber
-  object, not at version level.
+  object, not at version level. The backend accepts **at most 20** keywords: pick the 20 the
+  calls most need (brand, product and place names) rather than every term in a brief.
+- Every `transcriber` and `secondary_transcriber` object needs its `transcriber_provider`; the
+  backend rejects a save without it, even when only the language or keywords changed.
 - Some accounts have the transcriber language **locked** — leave it unchanged there.
 - `useMultiTranscribers` (agent doc) makes the secondary run alongside the primary rather than only
   on failure.
@@ -690,7 +693,8 @@ Guidance:
 
 **`vad_configuration`** — voice-activity / barge-in / endpointing tuning. Treat it as
 **system-owned**: leave it out unless the user explicitly asks to tune interruption behaviour, and
-change one field at a time. Fields, ranges and platform defaults:
+change one field at a time. A requirements document (BRD) that specifies these values counts as the
+user asking: set exactly the values it gives. Fields, ranges and platform defaults:
 
 | Field | Range | Default | Effect |
 | --- | --- | --- | --- |
