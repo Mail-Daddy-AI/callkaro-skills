@@ -73,7 +73,7 @@ Playbook and commands: [call-memory-and-rotation.md](../call-memory-and-rotation
 | `voice_rotation_config.enabled` | bool, `false` | Switch for voice rotation on retry. |
 | `voice_rotation_config.trigger` | `{mode, previous_call_status, conditions}`, `{mode:"instant_hangup"}` | When the previous call (same contact, same version) means "use the next voice". `mode`: `instant_hangup` (previous call connected and the contact never spoke) or `custom`. For `custom`: `previous_call_status` `connected` (default) / `not_connected`, and up to 20 `conditions` that must all match. |
 | `trigger.conditions[]` | `{source, field?, operator, value?}` | `source`: `post_call_variable` (needs `field`), `hangup_reason`, `call_duration`, `conversion_status`. `operator`: `equals`, `not_equals`, `empty`, `not_empty`, `eq`, `gt`, `gte`, `lt`, `lte`. `value` is not used with `empty` / `not_empty`. |
-| `voice_rotation_config.voices` | object[], `[]` (max 5) | Retry voices, each a complete voice configuration (same shape and validation as `voice_configuration`, [§9](voice-and-transcriber-fields.md)). Step 1 = `voices[0]`. |
+| `voice_rotation_config.voices` | object[], `[]` (max 5) | Retry voices, each a complete voice configuration (same shape as `voice_configuration`, [§9](voice-and-transcriber-fields.md); copy it unchanged from `ck voices` - the backend does not check the model against the provider). Step 1 = `voices[0]`. |
 | `voice_rotation_config.on_exhausted` | `last` \| `primary` \| `cycle`, `last` | After the last voice: stay on it, go back to the primary voice, or restart from `voices[0]`. |
 
 Default value of the whole object in a new agent:

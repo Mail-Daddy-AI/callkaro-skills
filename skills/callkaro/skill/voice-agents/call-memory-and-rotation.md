@@ -63,8 +63,10 @@ ck agents voice-rotation <agentId> --versions <vid> --trigger custom --status no
 
 `voices.json` is a JSON array of up to **5** complete voice configurations, built the same way as
 the primary voice ([voice-and-transcriber.md](voice-and-transcriber.md): resolve real voices with
-`ck voices`, never invent ids). Each is validated like the primary voice, so a wrong provider or
-model fails at once. A retry voice is used as is, not merged over the primary; only the call
+`ck voices`, never invent ids). Copy each voice's `configuration` object from `ck voices --json`
+unchanged. The CLI checks provider and model against the live voice catalogue before saving; the backend
+does **not**, so through other paths (raw `--set` on `agentMemory`, MCP) a made-up model is saved silently and
+only fails on the retry call. A retry voice is used as is, not merged over the primary; only the call
 language carries over when the voice does not set its own.
 
 | Flag | Field | Notes |
