@@ -11,9 +11,10 @@ functions/tools, post-call analysis). Configuration is split across two levels:
   transcriber, functions, post-call config. You iterate by editing/creating
   versions and publishing the good one. See [versions.md](versions.md).
 
-Read next: **[AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) — the complete field reference (every
-field, its values, per-provider voice/transcriber sets, functions, pathways,
-traps). Load it before writing any agent/version payload.** Then
+Read next: **[AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) — the field reference router (which
+document a field lives on, then the topic node for its values, per-provider voice/transcriber sets,
+functions, pathways, traps). Read it before writing any agent/version payload, then open only the
+node you need.** Then
 [prompts.md](prompts.md) (how to write the script), [create-update.md](create-update.md)
 (CLI workflows + starter JSON), [versions.md](versions.md) (publish/A/B),
 [voice-and-transcriber.md](voice-and-transcriber.md) (voice + STT choices),

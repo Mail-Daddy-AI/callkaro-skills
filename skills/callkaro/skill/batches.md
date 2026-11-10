@@ -55,3 +55,5 @@ ck ongoing status            # live queue; `ck ongoing pause` is the brake
 ck batches download <batchId> --type not-connected
 ck batches send-next-try <batchId>        # retry the misses (confirm first — more real calls)
 ```
+
+Retries can use a different voice (voice rotation) and functions can read the contact's earlier calls (call memory): [call-memory-and-rotation.md](voice-agents/call-memory-and-rotation.md).

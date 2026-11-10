@@ -98,7 +98,7 @@ Server-enforced rules (violations return a precise 400):
 - Exactly ONE `if`, and it must be **first**; at most one `else`, and it must be
   **last**; middles are `elseif`.
 - `condition` uses the pathway expression grammar
-  (AGENT-VERSION-REFERENCE §"Expression grammar"): fully parenthesised,
+  ([expression grammar](reference/capabilities-and-pathways.md)): fully parenthesised,
   `metadata.<key>` operands, `== != >= <= > <`, UPPERCASE `AND`/`OR`.
   `else` has an empty condition.
 - `returnType: "version"` → each target needs a `versionId` **belonging to this

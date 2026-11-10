@@ -1,7 +1,7 @@
 # Voice (TTS) & Transcriber (STT) — choosing them
 <!-- graph-summary: How to choose a voice and transcriber: find real voices with ck voices, pick by language and gender, the two traps, and verifying after writing. -->
 
-> **Field tables live in [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md)
+> **Field tables live in [voice-and-transcriber-fields.md](reference/voice-and-transcriber-fields.md)
 > §9 (voice) and §10 (transcriber)** — every provider's exact keys, models,
 > ranges and defaults. Don't restate them; look them up there.
 > This file is *how to choose*.
@@ -65,7 +65,7 @@ Azure lacks the locale). Always a different provider from the primary.
    language in `switchableLanguages` — use an array provider.
 
 Realtime LLM models (`*realtime*`) force `voice_provider: "Open AI"`; see
-reference §7.
+[llm-and-postcall.md](reference/llm-and-postcall.md) §7.
 
 ## Verify after writing
 

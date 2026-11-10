@@ -3,7 +3,7 @@
 
 Rules for the `source_code` of advanced `custom_in_call` (Python) and `custom_post_call`
 (JavaScript) functions. Advanced pre-call and email helpers are in
-[AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §6; choosing the function type and
+[functions-advanced-code.md](reference/functions-advanced-code.md) and [functions-reference.md](reference/functions-reference.md) §6; choosing the function type and
 where to attach it is in [functions.md](functions.md).
 
 ## In-call (Python)
@@ -105,6 +105,28 @@ async function updateCrmRecord(context) {
   `x_secrets`.
 - Optional `conditions` field only when the user asks for conditional execution.
 - Names are `snake_case`, at most 4 words, specific to the side effect (`update_crm_record`).
+
+## Earlier calls — `x_call_history`
+
+A read-only global in in-call, pre-call and post-call code (like `x_secrets`; no import needed). It
+lists earlier calls with this contact, newest first, and is empty unless Call Memory is enabled on
+the version ([call-memory-and-rotation.md](call-memory-and-rotation.md)). Items are dicts/objects with
+`call_sid, time, created_at, call_duration, connected, hangup_reason, conversion_status,
+disposition_reason, post_call, call_metadata, functions_called, language` (and `transcript` only if
+enabled). Always handle an empty list, and send only the fields an API needs, never the whole list.
+
+```python
+# in-call or pre-call (Python)
+last = x_call_history[0] if x_call_history else None
+if last and last["disposition_reason"] == "callback_requested":
+    return {"status": "success", "note": "Contact asked for a callback last time"}
+```
+
+```javascript
+// post-call (JavaScript)
+const last = x_call_history[0];            // undefined on a first call
+const previousInterest = last?.post_call?.interested ?? null;
+```
 
 ## Updating existing function code
 

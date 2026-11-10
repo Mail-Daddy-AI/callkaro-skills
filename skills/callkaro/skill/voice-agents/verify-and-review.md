@@ -2,7 +2,7 @@
 <!-- graph-summary: Check a built or updated agent before publishing: does it deliver the request, update-without-damage rules, and function review (duplicates, scope, credentials, transfer fields, fix in place or redo). -->
 
 Run this after every create or update, before you publish. The field-level pre-flight checklist is
-[AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §19. This file checks the other half: did
+[versioning-and-preflight.md](reference/versioning-and-preflight.md) §19. This file checks the other half: did
 the version do what the user asked, and are the functions right. Behaviour is then tested with
 [simulations](../simulations/simulation-playbook.md).
 
@@ -46,6 +46,16 @@ provider's format (for example `en-IN` for Azure) instead of against the old ver
   convert them to `{{variable}}` syntax.
 - If a language-bearing field no longer matches the target language (a Hindi script with
   `default_language: "en"`), correct it.
+
+### Call memory and voice rotation
+
+If the request mentions memory of earlier calls, or any function reads `x_call_history`:
+`agentMemory.enabled_for_call` is `true` (read it back with `ck agents memory <agentId> --versions <vid>`),
+and the function handles an empty list. For voice rotation (`ck agents voice-rotation …`): `voices` holds
+1–5 valid voices in the agent's language and persona gender, `enabled` is true, a `custom` trigger has the
+intended `previous_call_status` and conditions, and `call_filters` / `voice_rotation_config` were both
+preserved after the edit (`agentMemory` is replaced whole). See
+[call-memory-and-rotation.md](call-memory-and-rotation.md).
 
 ## 3. Reviewing functions
 

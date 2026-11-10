@@ -1,7 +1,7 @@
 # Behaviour Snippets — default texts
 <!-- graph-summary: The verbatim default text of the five behaviour snippets (response style, security, function calling, language switch, hold). Open when you need to edit one. -->
 
-The five snippets are described in [prompts.md](prompts.md) and [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md)
+The five snippets are described in [prompts.md](prompts.md) and [script-and-types.md](reference/script-and-types.md)
 §3. Omit a field to get the platform default; set `""` to suppress it. Write the texts below only when
 you want to edit one: start from the default, change what you need, keep the rest.
 

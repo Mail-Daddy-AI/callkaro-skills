@@ -1,9 +1,9 @@
 # Functions — giving the agent abilities
 <!-- graph-summary: Choosing function types (end, transfer, hold, booking, in-call, pre/post-call, WhatsApp), basic versus advanced, secrets in functions, where to attach a function, and writing its description as a trigger. -->
 
-> **Field shapes** for every function type: [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §6 (and §15 for WhatsApp).
+> **Field shapes** for every function type: [functions-reference.md](reference/functions-reference.md) §6 (and §15 in [variables-memory-whatsapp.md](reference/variables-memory-whatsapp.md) for WhatsApp).
 > **Writing `source_code`**: [function-code.md](function-code.md) (in-call Python, post-call JavaScript),
-> and the advanced pre-call protocols in reference §6. Review generated functions with
+> and the advanced pre-call protocols in [functions-advanced-code.md](reference/functions-advanced-code.md). Review generated functions with
 > [verify-and-review.md](verify-and-review.md).
 >
 > This file is the **decision layer**: which function, basic or advanced, where to attach it.
@@ -24,11 +24,19 @@ be unique **within a scope** and are the update/delete key. Use `snake_case`.
 | Enrich metadata or rewrite the prompt before dialing | `custom_pre_call` |
 | Run a side effect automatically when the call connects or enters a capability/node | `on_connected` |
 | CRM push, notification, custom disposition after the call | `custom_post_call` |
-| WhatsApp message during/after the call | `whatsapp_in_call` / `whatsapp_post_call` (§15) |
+| WhatsApp message during/after the call | `whatsapp_in_call` / `whatsapp_post_call` ([§15](reference/variables-memory-whatsapp.md)) |
 | Hand the contact to a chat agent | `assign_chat_agent` |
 
 `transfer/end/keep_call_on_hold/available/booking` may each be added **once**.
 The name `send_text_message_on_whatsapp` is reserved.
+
+### Remembering earlier calls
+
+Functions (in-call, pre-call, post-call) can read earlier calls with the same contact through the
+read-only global `x_call_history`, but only after Call Memory is switched on for the version
+(`agentMemory.enabled_for_call`, off by default). If a function should react to a previous call, enable
+it first; otherwise the list is always empty. Setup, filters and the item fields:
+[call-memory-and-rotation.md](call-memory-and-rotation.md).
 
 ## Basic or advanced?
 
@@ -70,7 +78,7 @@ successful save, report every missing name and tell the user to run `ck secrets
 set <name>`, add it at https://callkaro.ai/dashboard/settings/secrets, or ask
 their admin to update the secrets registry. See [../secrets.md](../secrets.md).
 
-Constraints that bite either way (details in reference §6): parameter rows are
+Constraints that bite either way (details in [functions-reference.md](reference/functions-reference.md)): parameter rows are
 only `{key_name, type:"string"|"number", description}` — no boolean/object/enum,
 so pass `"true"`/`"false"` strings and normalise inside; methods are
 `GET POST PUT DELETE` only (no PATCH).
@@ -87,7 +95,7 @@ so pass `"true"`/`"false"` strings and normalise inside; methods are
   same side effect globally and locally unless it must run at both lifecycle points.
 - Warm transfer (`warm_transfer: true`) **requires** a non-empty
   `warm_transfer_prompt`. On pathway agents (type 3) both are lifted to version
-  level at save time (reference §6).
+  level at save time ([functions-reference.md](reference/functions-reference.md)).
 
 ## `description` is the trigger
 

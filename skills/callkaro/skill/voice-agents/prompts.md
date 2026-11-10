@@ -4,7 +4,7 @@
 The system prompt is the heart of the agent: who it is, its goal, how it
 behaves, what it must never do, the call flow, and objection handling. This
 file is HOW to write it well; field mechanics live in
-[AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §2–§5.
+[script-and-types.md](reference/script-and-types.md) §2–§5 and [capabilities-and-pathways.md](reference/capabilities-and-pathways.md) §4.
 
 ## The 8 sections of a complete prompt
 
@@ -105,6 +105,14 @@ platform default; set `""` to suppress it entirely.
 - Every `{{metadata}}` reference needs a fallback so an empty value is never
   spoken.
 
+## Using memory of earlier calls
+
+Call Memory ([call-memory-and-rotation.md](call-memory-and-rotation.md)) feeds functions, not the
+prompt. To let the agent speak about a previous call, have a pre-call function put the facts into
+metadata (for example `last_disposition`) and reference them with a fallback:
+`If {{last_disposition}} is present, acknowledge it once ("Last time you asked for a callback") and
+don't repeat questions already answered.` Never quote a transcript back at the caller.
+
 ## Closing lines, variables, updates
 
 - `end_call_msg`: 2–3 natural closing lines in the agent's persona and language, for example
@@ -113,7 +121,7 @@ platform default; set `""` to suppress it entirely.
 - Language codes: `en hi kn ta te mr gu bn ml`. Set `default_language` and `silence_language` to the
   language you actually wrote the script in.
 - Placeholders: `{{name}}` is filled before the call from metadata, and `{name}` is captured or
-  resolved during the call (full rules in [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §3).
+  resolved during the call (full rules in [script-and-types.md](reference/script-and-types.md) §3).
 - **Keep variables at the end (prompt caching).** The LLM caches the prompt only up to the first
   `{{name}}` / `{name}`, because everything after it differs per call. In the body write `<name>`
   (never substituted), and list every variable once as the last thing in the script:

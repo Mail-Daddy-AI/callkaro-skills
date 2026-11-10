@@ -37,7 +37,7 @@ Backend-enforced creation rules:
   names must be supported; Callkaro voice `temperature` is `0`–`2`. Transcriber
   provider/model/language/mode/format and whether language is a string or array
   must match the provider catalogue. Realtime LLMs require an Open AI voice.
-  Use [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §7 or an existing
+  Use [llm-and-postcall.md](reference/llm-and-postcall.md) §7 or an existing
   account-approved agent for model IDs; discover media values with
   `ck voices --json` and `ck transcribers`. Never invent catalogue values.
 - **Core shapes and ranges:** `versionName` must be non-empty; language is one of
@@ -60,7 +60,7 @@ Backend-enforced creation rules:
 
 These are save-time validity rules, not the complete authoring schema. Before
 constructing non-trivial nested fields, use
-[AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) for exact enums and
+[AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) to find the topic node for exact enums and
 provider-specific shapes.
 
 ### Recommended production-safe starter template (type 0)
@@ -227,7 +227,7 @@ Rules:
   these itself — the CLI rejects them with an explanation. JSON from
   `ck agents get --json` contains them: strip before reuse, or use
   `ck agents export` (already sanitized).
-- Which level a field is on: [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §1/§17. Version fields without
+- Which level a field is on: [AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) §1 and [field-index.md](reference/field-index.md). Version fields without
   `--versions` → 400. The CLI pre-validates enums and tells you which fields
   need a version.
 - **`--set` patches (merges) — it does not replace the version.** But object

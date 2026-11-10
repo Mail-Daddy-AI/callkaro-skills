@@ -117,7 +117,7 @@ After the message is spoken, the IVR runner evaluates a list of **conditions** b
 - If no condition matches, the runner falls through to normal DTMF routing.
 - Only **`metadata.*`** operands are allowed. `extract_variables` are not available during the IVR phase (no STT/LLM runs).
 - Only **expression-type** (`condition_type: 1`) logic is supported — no natural-language / prompt conditions.
-- The grammar is identical to pathway expression conditions (see `AGENT-VERSION-REFERENCE.md`):
+- The grammar is identical to pathway expression conditions (see [capabilities-and-pathways.md](reference/capabilities-and-pathways.md)):
 
 ```
 Comparison   := '(' operand op operand ')'

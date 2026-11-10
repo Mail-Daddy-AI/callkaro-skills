@@ -42,8 +42,8 @@ and test it"* — and it will load the skill.
 | `skills/callkaro/SKILL.md` | the single entry point and generated graph router |
 | `skills/callkaro/skill/INSTRUCTIONS.md` | how to think: operating loop, playbooks, safety rules |
 | `skills/callkaro/skill/secrets.md` | account secret commands, names-only discovery, and safe reference syntax |
-| `skills/callkaro/skill/voice-agents/AGENT-VERSION-REFERENCE.md` | every agent/version field, its values, and the traps |
-| `skills/callkaro/skill/voice-agents/` | prompts, voice/STT, functions, creation, versions, and regression testing |
+| `skills/callkaro/skill/voice-agents/AGENT-VERSION-REFERENCE.md` + `reference/` | router for every agent/version field (which document it lives on), then one topic node per area (script, capabilities, functions, LLM and post-call, voice, call settings, variables and memory, versioning, payloads, field index) |
+| `skills/callkaro/skill/voice-agents/` | prompts, voice/STT, functions, creation, versions, call memory and voice rotation (`ck agents memory`, `ck agents voice-rotation`), and regression testing |
 | `skills/callkaro/skill/workflows.md` · `contacts.md` | workflow graphs and CRM contacts |
 | `skills/callkaro/skill/chat-agents.md` · `chat-agents-advanced.md` · `chat-agents-workflow.md` · `chat-simulations/` | chat agents (Basic, Advanced and Workflow types), and testing them with chat simulations (`ck chat-sim`) |
 | `skills/callkaro/skill/auth.md` · `numbers.md` · `calls.md` · `batches.md` · `simulations/simulation-playbook.md` · `analytics.md` | the rest of the platform |
@@ -52,7 +52,7 @@ and test it"* — and it will load the skill.
 
 There is only one discoverable `SKILL.md`. Every `.md` file below
 `skills/callkaro/skill/` is a graph node, and relative Markdown links between
-files are directed edges. Add a new node anywhere below that directory, give it
+files are directed edges. Keep each node under about 12 KB (long reference material is split into topic nodes under `voice-agents/reference/` so an agent loads only what the task needs). Add a new node anywhere below that directory, give it
 an H1 title and a short first paragraph, then run:
 
 ```bash
