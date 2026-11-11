@@ -66,7 +66,8 @@ provider-specific shapes.
 ### Recommended production-safe starter template (type 0)
 
 This is intentionally explicit even though create-time defaults fill many of
-these fields. It gives a new agent predictable call behavior and makes later
+these fields. Its values are the ones in [recommended-settings.md](recommended-settings.md); take
+any field it doesn't set from there, and keep the two in step. It gives a new agent predictable call behavior and makes later
 reviews and updates easier. Replace the example prompt, post-call field, and
 catalogue-backed voice values for the use case. Do not copy phone assignments,
 A/B rules, IDs, customer-specific prompts/functions, or credentials from a
@@ -108,27 +109,42 @@ production export.
     "transcriber_language_detection": false
   },
 
-  "speakfirst": { "value": 1, "message_interruption": false },
+  "speakfirst": { "value": 1, "message_interruption": true },
   "speakfirst_inbound": { "value": 1, "message_interruption": false },
   "initial_pause_outbound": 1,
   "initial_pause_inbound": 1,
   "time_limit": 300,
   "hold_disconnect_timeout": 30,
   "silence_count": 2,
-  "silence_wait": 6,
-  "silence_mode": "default",
+  "silence_wait": 8,
+  "silence_mode": "dynamic",
   "silence_prompts": [],
-  "silence_instructions": null,
+  "silence_instructions": "The user has been silent after your last response. Generate a brief reply to check if the user is still there on the call.",
   "silence_language": "en",
   "end_call_msg": [],
   "bgNoise": true,
   "bgNoiseVolume": 0.2,
-  "voicemail_msg": true,
+  "voicemail_msg": false,
   "voicemail_custom_msg": "",
   "punctuations_to_remove": [],
   "noise_cancellation": true,
   "noise_cancellation_strategy": "aicoustics",
-  "noise_cancellation_strength": 1,
+  "noise_cancellation_strength": 0.8,
+  "vad_configuration": {
+    "silence": 555,
+    "threshold": 4,
+    "prefix_padding_ms": 206,
+    "min_speech_duration": 0.05,
+    "interrupt_speech_duration": 0.4,
+    "interrupt_min_words": 3,
+    "manual_interruption": true,
+    "manual_interruption_duration": 1.1,
+    "clear_buffer_if_not_interrupted": false,
+    "max_buffered_speech": 10,
+    "min_endpointing_delay": 0.3,
+    "max_endpointing_delay": 5,
+    "preemptive_synthesis": true
+  },
   "functions": [
     { "type": "end", "name": "end_call", "description": "End the call when the conversation is complete or the user asks to stop." }
   ],
@@ -144,17 +160,17 @@ production export.
   "conversion_reason": "Customer agreed to a demo or asked for a follow-up",
   "postcallmodel": "callkaro/krishna-2.5",
   "post_call_strategy": {
-    "1-10": "callkaro/krishna-2.5",
+    "1-10": "DEFAULT_VALUES",
     "11-30": "callkaro/krishna-2.5",
     "31-60": "callkaro/krishna-2.5",
     ">60": "callkaro/krishna-2.5",
     "only_agent_turns": "DEFAULT_VALUES"
   },
   "secondary_post_call_strategy": {
-    "1-10": "gpt-5.4-nano",
-    "11-30": "gpt-5.4-nano",
-    "31-60": "gpt-5.4-nano",
-    ">60": "gpt-5.4-nano",
+    "1-10": "DEFAULT_VALUES",
+    "11-30": "gpt-6-luna",
+    "31-60": "gpt-6-luna",
+    ">60": "gpt-6-luna",
     "only_agent_turns": "DEFAULT_VALUES"
   },
   "webhook": "",
@@ -219,6 +235,31 @@ Noise cancellation and transcription cleanup are also version-level fields:
 `punctuations_to_remove` is an array of exact strings removed from caller
 transcriptions before processing. Noise-cancellation strength is `0.05`–`1`;
 the strategy is `aicoustics`, `dtln`, `deepfilternet`, or `noisereduce`.
+
+### Update only what was asked (minimal patches)
+
+An update must contain **only the fields the user asked to change**. Every extra field is a chance to
+overwrite a value that was chosen on purpose, and a live agent's quality depends on them.
+
+- **Never send back the output of `ck agents get`** (or a whole export) as the patch. Build the patch
+  from scratch with just the requested keys.
+- **Never reset other fields to the recommended values** in [recommended-settings.md](recommended-settings.md)
+  while making an unrelated change. That page is for creating agents, filling the missing keys of a
+  whole object, and reviewing. Mention differences to the user instead.
+- **Whole-replace objects** (`voice_configuration`, `secondary_voice_configuration`, `transcriber`,
+  `secondary_transcriber`, `agentMemory`, `preFormatVariables`, `customPronunciations`, `variableSource`,
+  `callPropertyMapping`, `callFlow_json`): the backend replaces the whole object. The CLI now merges a
+  partial object onto the saved one before sending, but still send only the keys you are changing and
+  never delete siblings. Prefer `ck agents memory` / `ck agents voice-rotation` for `agentMemory`.
+- **One concern per update and per `--commit`** (for example "tighten the prompt" or "raise silence
+  wait", not both).
+- **Preview first:** run the same command with `--dry-run`. It lists the fields that would change and
+  those already set (skipped) and saves nothing. Check the list matches the request, then run it for
+  real.
+- **The CLI stops big patches.** Fields that already hold the requested value are dropped automatically.
+  If more than 8 fields would still change, it refuses unless you add `--yes`. Treat that refusal as a
+  sign the patch is too big: trim it, and add `--yes` only when the user really asked for that many
+  changes.
 
 Rules:
 
