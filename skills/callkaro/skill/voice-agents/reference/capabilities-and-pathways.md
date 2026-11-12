@@ -13,6 +13,7 @@ Shared fields (both types):
 | `is_starting` | bool | Entry point. **Exactly one** in the final set — save-time normalisation keeps the first `true` (or index 0) and clears the rest. |
 | `system_prompt` | string | What the agent does and says **while this capability is active**. |
 | `overwrite` | bool, `false` | `false` → the version `systemprompt` is **merged** with this prompt, so write only the phase-specific part. `true` → the base is **excluded** and this prompt must be fully self-contained (persona, tone, rules), or the agent changes character mid-call. |
+| `description` | string | Short description of what this capability/node handles. Read by the decision model when version `decision_model` is set (type 2/3 only); otherwise unused. |
 | `msg_while_switching_type` | `silent` \| `static` \| `dynamic` | What the caller hears while switching **into** this capability. `silent` (default) = nothing; `static` = speak `msg_while_switching` verbatim; `dynamic` = `msg_while_switching` is a *prompt* for generating a bridging line. |
 | `msg_while_switching` | string | The literal line, or the generation prompt. `""` for `silent`. |
 | `endpointing` | `{mode, min_delay, max_delay}` | Controls when the caller's turn is complete while this capability/node is active. `mode` is `fixed` or `dynamic`; `min_delay` is 0–1 seconds and `max_delay` is 0–6 seconds. Defaults: `{ "mode": "fixed", "min_delay": 0.5, "max_delay": 3 }`. See below. |
@@ -109,3 +110,21 @@ filled), `functions` (`[]`), `postcall` (`[]`) — plus the four node fields whe
 like a node (`node_type` `normal`, `transitions` `[]`, `extract_variables` `[]`, `when_to_jump` `""`).
 Any per-capability `metadata` key is stripped. Don't rely on other ad-hoc keys surviving a save
 through that path.
+
+## Switch Nodes Using (`decision_model`)
+
+**`decision_model`** (types 2 and 3 only) — "Switch Nodes Using":
+
+| Value | Meaning |
+| --- | --- |
+| `null` (default) | **Default.** The primary LLM switches capabilities with its `switch_capability` tool. |
+| `{provider, model, min_confidence, max_history_turns}` | **Advanced.** A decision model picks "stay" or "switch to X" after every user turn, before the primary LLM runs, and `switch_capability` is withheld from the primary LLM. |
+
+- `provider` / `model`: `typesafe` / `jev-latest` (Jev) or `openai_decisions` / `gpt-6-luna` (Luna).
+- `min_confidence`: 0–1, default `0.5`. A switch decided below it is treated as staying.
+- `max_history_turns`: integer 1–50, default `20`. Recent messages sent to the decision model.
+- No other keys are accepted. Send the complete object; replacing it whole is how it is saved.
+- Give **every capability a `description`** — the decision model reads it to decide when to switch to that node. A missing one only produces a UI warning, not an error.
+- **Do not** combine it with `extract_variables` entries that set `is_required: true`; the version is rejected.
+- Type 0/1 versions must leave it `null`/omitted.
+
