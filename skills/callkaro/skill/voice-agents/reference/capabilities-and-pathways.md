@@ -125,6 +125,6 @@ through that path.
 - `max_history_turns`: integer 1–50, default `20`. Recent messages sent to the decision model.
 - No other keys are accepted. Send the complete object; replacing it whole is how it is saved.
 - Give **every capability a `description`** — the decision model reads it to decide when to switch to that node. A missing one only produces a UI warning, not an error.
-- **Do not** combine it with `extract_variables` entries that set `is_required: true`; the version is rejected.
+- Avoid `extract_variables` entries that set `is_required: true`: the agent cannot leave a node until they are collected, so a decision-model switch is held back. The editor warns but does not block.
 - Type 0/1 versions must leave it `null`/omitted.
 
