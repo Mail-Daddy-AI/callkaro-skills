@@ -3,7 +3,8 @@ name: callkaro
 description: >
   Operate CallKaro voice and chat AI agents with the ck CLI. Use for creating,
   testing, calling with, or analyzing agents; managing versions, numbers,
-  batches, workflows, contacts, secrets, simulations, and analytics.
+  batches, workflows, contacts, secrets, simulations, analytics, embed
+  widgets, and KPI Manager (KPI metrics, RCA, scheduled KPI reports).
 ---
 # CallKaro skill graph
 
@@ -37,8 +38,10 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 - [Chat Audit Strategies (WhatsApp AI Auditor)](skill/chat-audit-strategies.md) — Create and manage AI-auditor strategies for WhatsApp chat agents and run manual audit batches; commands, contact filters, daily limits, and the new-messages-only rule.
 - [Contacts (CRM)](skill/contacts.md) — CRM contacts and their attributes: define attributes first, import and export CSV, assign contacts to a workflow or an agent, and the protection of hand-set values from workflows.
 - [How to Work — operating instructions for AI agents using CallKaro](skill/INSTRUCTIONS.md) — Start here. The operating loop, session preamble, agent authoring order, decision rules that prevent damage, standard playbooks (build from a doc, build from scratch, debug a bad agent) and when to ask the user.
+- [KPI Manager](skill/kpi-manager.md) — KPI Manager per voice agent: data sources, KPI metrics with targets, the RCA prompt and model, Auto RCA, the scheduled KPI report (recipients, IST window, gap), RCA preview and on-demand runs, metric history, report preview, PDF export and delivery log; the ck kpi commands and the rules for safe edits.
 - [Phone Numbers](skill/numbers.md) — Phone numbers: list, browse the buyable catalog, buy, release and spam-flag; assigning a number to an agent (outbound caller ID, inbound); the WhatsApp number pool, which has no buy.
 - [Account Secrets](skill/secrets.md) — The account secrets vault: list names, set, rename and remove secrets, and the xsecrets reference syntax used in function headers and code. Never put a credential in an agent payload.
+- [Embed Widgets](skill/widgets.md) — Embed widgets put an agent on a website or app: the chat, omni and voice types and which agent each needs, ck widgets commands, omni settings (chips, pre-chat, history, voice agent, Call us teams, launcher), install code, and the rule that edits go live on every embed.
 - [WhatsApp Campaign & Template Stats](skill/whatsapp-stats.md) — Read-only WhatsApp stats: list campaigns and their status/send counts, one campaign's delivery/read/reply/click totals and daily series, and template link-click stats. Sending, cancelling and template changes are not available here.
 - [Workflows + Contacts together](skill/workflows-and-contacts.md) — End-to-end recipe for using workflows with contacts: define attributes, gather ids, build the graph, load contacts, test on one number, verify, then scale.
 - [Workflows](skill/workflows.md) — Build and run workflow graphs per contact: every node type (Send Call, Wait, Conditions, WhatsApp, API, Update Contact, and the Inbound Call, Cancel Workflow and Resume Where They Were nodes for call-backs), the rules that bite, commands, generating a graph from a request using real ids, editing, and reading results.
