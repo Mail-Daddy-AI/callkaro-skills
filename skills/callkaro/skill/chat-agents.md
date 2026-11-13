@@ -151,6 +151,8 @@ ck chat-agents import --file v1.json --file v2.json             # create a new a
 ck chat-agents commits <agentId> [--versions <versionId>] [--page 2]
 ck chat-agents commit <commitId> --json                         # the commit's full saved state
 ck chat-agents revert <agentId> <commitId>
+ck chat-agents compare <agentId> --a <versionA> --b <versionB>        # diff two live versions
+ck chat-agents compare <agentId> --commits --a <commitA> --b <commitB>  # diff two commits
 ```
 
 - **Delete is permanent.** It removes the version and its commit history, so it
@@ -172,7 +174,14 @@ ck chat-agents revert <agentId> <commitId>
   holding the version's full state. `commits` lists them newest first.
 - **`revert`** sets a version back to a commit's state. The revert is itself
   recorded as a new commit, so it can be undone the same way; the version keeps
-  its own type.
+  its own type. Run `compare` first to show the user what will change.
+- **`compare`** lists changed fields (text fields show line counts; functions and
+  flow-graph nodes show `+added -removed ~changed`). `--field <name>` prints one
+  field A then B; `--json` returns everything, including per-node and per-function
+  diffs. Without `--commits`, `--a/--b` are version ids of the **same agent**; with
+  it, commit ids. If the two sides are different agent types, only fields both
+  use are compared and the rest are listed as not comparable. Over MCP this is
+  `compare_chat_agent_versions` (read-only).
 
 ## Testing
 
