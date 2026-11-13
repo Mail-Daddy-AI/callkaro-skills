@@ -146,6 +146,15 @@ with the user, create, monitor `ck batches status`, retry misses.
 `ck batches status` for a specific campaign; drill into failures via
 `ck calls list --hangup`.
 
+**"Track a KPI / why did conversion drop? / email me a daily report"** →
+[kpi-manager.md](kpi-manager.md): `ck kpi get`, set metrics and data sources,
+`ck kpi rca-preview` before saving an RCA prompt, `ck kpi history` for misses,
+and confirm before `ck kpi rca-run` (credits) or turning Auto Report on.
+
+**"Put my agent on my website / app"** → [widgets.md](widgets.md): pick the
+type from the agent (chat, omni or voice), `ck widgets create`, hand over the
+install code, and confirm before changing a widget that is already live.
+
 **"Compare two prompts / which is better?"** → two versions + `ck agents ab`
 + `ck analytics version` ([voice-agents/versions.md](voice-agents/versions.md)); or
 offline: same sim tests against both versions and compare PASS rates.
