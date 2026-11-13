@@ -9,8 +9,9 @@
   version per language. Publishing a `hi` version replaces the previous `hi`
   entry and leaves `en` untouched. Calls use the published version for the
   call's language (agents `get` with no `--versions` also falls back to it).
-- Every version save with `--commit` writes a snapshot (commit history is
-  browsable/revertable in the dashboard).
+- Every version save with `--commit` writes a snapshot. Browse, diff and revert
+  them with `ck agents commits | commit | compare | revert` (see
+  [History, compare and revert](#history-compare-and-revert)).
 - `isVersionActive` soft-disables a version. A version must be **active** to be
   published or A/B'd; a **published or A/B version cannot be deactivated or
   deleted** (the server rejects it).
@@ -25,7 +26,28 @@ ck agents publish <agentId> --versions <vid>        # per-language publish
 ck agents toggle-active <agentId> --versions <vid>  # activate/deactivate
 ck agents ab <agentId> --versions "<vid1>=60,<vid2>=40"   # start A/B
 ck agents ab <agentId> --disable                    # stop A/B
+ck agents commits <agentId> [--versions <vid>]      # saved snapshots, newest first
+ck agents commit <commitId> --json                  # one snapshot, full saved state
+ck agents compare <agentId> --a <vidA> --b <vidB>   # diff two live versions
+ck agents compare <agentId> --commits --a <cA> --b <cB>   # diff two commits
+ck agents revert <agentId> <commitId>               # restore a snapshot (asks first)
 ```
+
+### History, compare and revert
+
+- `commits` lists snapshots (id, version, message, author, time); filter to one
+  version with `--versions`. `commit <id> --json` returns the full saved state.
+- `compare` prints the changed fields; `--field <name>` shows one field A then B
+  (prompts, instructions and similar text fields diff as text), `--json` gives
+  everything. Without `--commits`, `--a/--b` are **version** ids and must belong
+  to the same agent; with `--commits` they are **commit** ids.
+- `revert` **overwrites the version's current settings** with the snapshot and
+  records the revert as a new commit (so it can be undone the same way). It
+  asks for confirmation; pass `--yes` only when the user has already approved.
+  Never revert a **published or A/B** version without telling the user — calls
+  use it immediately; use `compare` first to show what will change.
+- Over MCP, history and compare are read-only tools (`list_agent_commits`,
+  `get_agent_commit`, `compare_agent_versions`); there is no revert tool.
 
 ### Clone a sibling version
 

@@ -23,6 +23,7 @@ same attributes — see [workflows-and-contacts.md](workflows-and-contacts.md).
 |---|---|
 | `ck contacts list [filters] [--page n] [--page-size ≤50] [--columns a,b] [--json]` | Browse. Filters: `--search`, `--channel`, `--attr name=value` (repeatable), `--last-message-state read\|delivered\|sent\|failed\|clicked\|not_clicked`, `--created-from/--created-to/--updated-from/--updated-to YYYY-MM-DD` (IST), `--assigned-to-me` |
 | `ck contacts get <phone> [--json]` | One contact with its attributes |
+| `ck contacts messages <phone> [--channel c] [--agent-phone-number n] [--thread-id id] [--page n] [--page-size ≤50] [--json]` | The contact's chat messages (WhatsApp, Instagram, widget, test chat), **newest first**: time, direction (`inbound`/`outbound`), channel, body or media link, status. The contact must already exist in the CRM. Page with `--page` while `hasNext` is true. MCP: `get_contact_messages` |
 | `ck contacts create <phone> [--attr name=value …] [--channel c …]` | Create, or merge into an existing contact |
 | `ck contacts update <phone> [--attr name=value …] [--clear name …]` | Set or clear attributes (validated against the definitions) |
 | `ck contacts delete <phone> [--yes]` | Delete |

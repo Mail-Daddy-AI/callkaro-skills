@@ -24,6 +24,30 @@ Scalar flags on `create`/`update`: `--name`, `--active`, `--model
 
 There is no `delete` command — intentionally out of scope.
 
+## Reading results (read-only)
+
+Nothing here starts an audit; it only reads what strategies already produced.
+Voice audit batches are started from the dashboard, not the CLI. `<id>` is a
+**batch id** by default; add `--by-strategy` when it is a **strategy id** (all of
+that strategy's batches, optionally narrowed with `--from/--to YYYY-MM-DD`).
+
+| Command | What it shows |
+|---|---|
+| `ck audit batches [--agent id] [--from d --to d] [--page n]` | Batch results, newest first: strategy, agent, status (`running completed partial_failed failed`), calls audited, average score. **Start here to get a batch id.** |
+| `ck audit strategy-reports [--agent id] [--from d --to d]` | Results rolled up per strategy: batches, audited/failed calls, cost, average scores. |
+| `ck audit report <id> [--by-strategy]` | One batch's report: metric tiles (accuracy per area, issue counts, cost) and a page of its audited calls. |
+| `ck audit summary <id> [--by-strategy] [--severity s] [--dimension d]` | Total calls, average score, score per dimension, issues by severity, **issue categories** and the top issue calls. |
+| `ck audit calls <id> [--by-strategy] <filter>` | The calls behind a summary number. Pick **exactly one** filter: `--severity critical\|high\|medium\|low`, `--below-80` (`--sort recent\|score\|issues`), `--category <dimension:category>` (as listed by `summary`), or `--var <name=value>` (an extra audit variable). |
+| `ck audit call <id> <callId> [--by-strategy]` | One audited call in full; `--json` has every issue. |
+
+Typical path: `audit batches` → `audit summary <batch>` → `audit calls <batch> --severity critical`
+→ `audit call <batch> <callId>`. Add `--json` / `--file` to any of them. The day-wise
+(KPI) reports are not available here. MCP equivalents: `list_audit_batches`,
+`list_audit_strategy_reports`, `get_audit_report`, `get_audit_summary`,
+`list_audited_calls`, `get_audited_call`.
+
+Reading summaries needs the **analytics** permission as well as AI Auditor, as on the dashboard.
+
 ## `--set` carries the structured fields
 
 `audit_filters`, `postcall_filters`, `extra_variables`, and `llms` (if not

@@ -36,6 +36,23 @@ and ask the user which attribute and value to filter on — never guess them.
 `batch` answering "No new conversations to audit for these filters" is normal:
 every matching conversation was already audited up to its latest message.
 
+## Reading results (read-only)
+
+`<id>` is a **batch id** by default; add `--by-strategy` for a **strategy id**.
+`--from/--to` are `YYYY-MM-DD` (India days).
+
+| Command | What it shows |
+|---|---|
+| `batches [--agent id] [--from d --to d] [--page n]` | Audit batches, newest first: strategy, agent, status, trigger, chats audited, average score, cost. **Start here for a batch id**, including the one `batch` just created. |
+| `strategy-reports [--agent id] [--from d --to d]` | The same rolled up per strategy. |
+| `report <id> [--by-strategy]` | Scores, chats below 80, credits per chat, issues by severity and by dimension. |
+| `audits <id> [--by-strategy] [--status s] [--sort s] [--page n]` | The conversations audited: contact number, status, overall / chatflow / function / system scores, issue count, top problem. |
+| `audit <auditId>` | One conversation audit in full; `--json` has the issues and the audited messages. |
+
+All take `--json` / `--file`. MCP: `list_chat_audit_batches`,
+`list_chat_audit_strategy_reports`, `get_chat_audit_report`, `list_chat_audits`,
+`get_chat_audit`.
+
 MCP equivalents: `get_chat_audit_strategy_setup_info`,
 `create_or_update_chat_audit_strategy`, `delete_chat_audit_strategy`,
 `create_chat_audit_batch`.
