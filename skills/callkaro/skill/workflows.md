@@ -44,14 +44,14 @@ method.
 | (created with the workflow) | `start` | exactly one; never added |
 | Inbound Call | `inbound` | at most one; the second entry point |
 | End | `end` | an `end` or `cancel` reachable from Start |
-| Cancel Workflow | `cancel` | — |
+| Cancel Workflow | `cancel` | — (optional `reason`, shown in the run log) |
 | Resume Where They Were | `resume` | — (needs an `inbound` node in the workflow) |
 | Send Call | `send-call` | `agentId` (timing and other options: next section) |
-| Send WhatsApp Template | `wa-template` | `templateId` (+ name, language, body, `parameters`, `phoneNumberId`, `displayPhoneNumber`, `provider`) |
-| Send WhatsApp Message | `wa-message` | `message`, `phoneNumberId`, `displayPhoneNumber` |
+| Send WhatsApp Template | `wa-template` | `templateId` (+ name, language, body, `parameters`, `provider`: `whatsapp` (default), `heltar` or `aisensy`; `phoneNumberId` and `displayPhoneNumber` for `whatsapp`) |
+| Send WhatsApp Message | `wa-message` | `message`, `phoneNumberId`, `displayPhoneNumber`. `provider` is `whatsapp` (default) or `heltar`; free text is not sent on `aisensy`. Each `{{name}}` in the message is bound by a `parameters` row `{key: "{{name}}", source, value}` |
 | Wait | `wait` | `minutes` ≥ 1 |
 | Conditions | `conditions` | `exits` (≥ 1) |
-| API Call — Basic | `api-basic` | `url` |
+| API Call — Basic | `api-basic` | `url` (+ `method`, default `POST`; `parameters`, `headers`, `body`, `bodyParameters`: see below) |
 | API Call — Advanced | `api-advanced` | `code` (`async function handler(context) {…}`) |
 | Update Contact | `update-lead` | `updates: [{attribute, source, value}]` |
 
@@ -64,7 +64,10 @@ method.
 | `scheduleTime` | `time` mode: a daily IST time, `"HH:mm:ss"`. A lead reaching the step before it is called at it that day; up to 5 minutes after, straight away; any later, at that time the next day. This is how to do "call at 10 am". |
 | `minTriggerTime` / `maxTriggerTime` | `"HH:mm"` IST window for this step's calls **and its retries**. Empty = the workflow's own calling window (else `00:00`–`23:59`). |
 | `carryOver` | Default `true`: a call that lands outside the window waits for the window to reopen. `false` drops it. |
-| `language` | Language code the agent speaks, default `"en"`; `""` = the agent's own default language. |
+| `retries` / `retryGapMinutes` / `retryGaps[]` | How many retries, and one gap in minutes per retry. A blank gap reuses the one before it (default 30). |
+| `fromNumber` | The number to call from, digits without `+` (from `ck numbers list`). `""` = the agent's own number. A spammed or released number falls back to the agent's number. |
+| `language` | Language code the agent speaks (`hi en kn mr ta te bn gu ml`). Left out = the workflow's language, else `"en"`; `""` = the agent's own default language. |
+| `languageSource` / `languageValue` | Take the language from the lead: `languageSource` is `contact`, `call_metadata` or `fn_response`, `languageValue` the field (e.g. `contact` + `language`). `"hi"`, `"Hindi"` and `"hi-IN"` all work; a value it can't read falls back to `language`. `static_value` (the default) just uses `language`. |
 | `metadata` | `[{key, source, value}]` rows sent to the agent as `{{metadata.<key>}}`, on top of what the lead was enrolled with. Sources as in Conditions. |
 
 A scheduled time outside the window moves to the next window opening when `carryOver` is on; with it off, the call is not placed and the step moves on with `placed: false` and the reason in its result.
@@ -79,7 +82,8 @@ A scheduled time outside the window moves to the next window opening when `carry
 - `conversion_status` is `"true"`/`"false"`. The `hangup_reason` values are printed by `ck workflows schema`.
 - `update-lead` and `contact`-source values use **CRM attribute names** (the `name`, not the display label). They must already exist — see [contacts.md](contacts.md).
 - **`wa-template` `parameters`**: one row per template variable, `{key, source, value}`, with `key` = `ORIGIN::token` (`BODY::{{1}}`, `HEADER::MEDIA`, `BUTTON_URL[0]::{{1}}`). `context` prints the exact keys per template — copy them, don't compose them.
-- `fn_response` fields are `<apiNodeId>.returned.<key>`.
+- `fn_response` fields are `<nodeId>.<path into its result>`. An `api-basic` result is `{ok, status, body}` → `<nodeId>.body.data.id`, `<nodeId>.ok`. An `api-advanced` result is `{success, returned}` → `<nodeId>.returned.<key>`, `<nodeId>.success`.
+- **`api-basic`**: `url` and `body` take `{{name}}` placeholders; `parameters` binds the URL's and `bodyParameters` the body's, each row `{key: "{{name}}", source, value}`. `body` is a JSON string: a placeholder inside quotes becomes text, a bare one a JSON value. `headers` rows are `{key, source, value}` with source `secret` (value = a name from `ck secrets list`) or `static_value`. Never put an API key in a `static_value` header.
 
 ## Commands
 
@@ -108,6 +112,8 @@ ck whatsapp list --json                    # phoneNumberId + display number for 
 ck chat-agents templates --json            # template id / name / language / status (use APPROVED)
 ck chat-agents template <templateId> --json   # its variables[].id = the exact parameters[].key values
 ck contacts attributes list --json         # CRM attribute names for update-lead / contact conditions
+ck numbers list --json                     # fromNumber for Send Call (only if the user names a number)
+ck secrets list                            # secret names for api-basic headers
 ck agents get <agentId> --json             # publishedVersionId
 ck agents get <agentId> --versions <publishedVersionId> --json   # postcall[].name = post_call_variables fields (skip type call_drop_off_reason)
 # 3. write graph.json using ONLY ids/names from those listings
