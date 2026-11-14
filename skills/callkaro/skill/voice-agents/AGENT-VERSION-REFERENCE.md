@@ -39,6 +39,7 @@ folderId · name · systempromptType · phoneNumber · inboundPhoneNumbers ·
 outboundPhoneNumber · secondaryOutboundPhoneNumber · whatsappPhoneNumber ·
 whatsappInboundPhoneNumber · publishedVersionId · lastpublisedDate ·
 abTestVersions · abTestEnabled · advancedAbTestEnabled · advancedAbTestRules ·
+advancedAbTestMode · advancedAbTestJsCode ·
 _id · default_agent_language ·
 useMultiTranscribers · publishedVersionsByLanguage · agentStatus
 ```
@@ -64,6 +65,7 @@ useMultiTranscribers · publishedVersionsByLanguage · agentStatus
 | `agentStatus` | `live` \| `in-progress` | `in-progress` = still being built. |
 | `abTestEnabled` / `abTestVersions` | bool / `[{versionId, ratio 0–100}]` | Traffic split across versions. **Never modify as a side effect** of another change. |
 | `advancedAbTestEnabled` / `advancedAbTestRules` | bool / rule array | **Rule-based A/B**: ordered if/elseif/else chain over call `metadata.*`, evaluated BEFORE the ratio A/B (only when no version is pinned). Each rule: `{kind: if\|elseif\|else, condition, returnType: version\|language, targets:[{versionId\|language, ratio}]}`. `version` short-circuits (that version runs); `language` only overrides language and resolution continues. Conditions use the [§4](reference/capabilities-and-pathways.md) expression grammar with `metadata.*` operands; ratios are integers summing to 100 per rule. Manage via `ck agents ab-advanced`. |
+| `advancedAbTestMode` / `advancedAbTestJsCode` | `rules` \| `js` / string | **JavaScript routing** instead of the rule chain: `async function route(context)` with `context = {metadata, versions, languages}` returns a version id, a language, or nothing (ratio A/B decides). Errors, invalid returns and runs over 5 s fall back to the ratio A/B. Default mode `rules`. Manage via `ck agents ab-advanced --js / --test / --mode` (MCP `test_ab_routing_js`); see [versions.md](versions.md). |
 | `useMultiTranscribers` | bool | Run the primary and secondary transcriber simultaneously instead of primary-with-fallback. |
 | `systempromptType` | int 0–3 | Routed here, but **not stored** — see the trap below. |
 
