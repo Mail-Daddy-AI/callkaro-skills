@@ -1,5 +1,5 @@
 # Versions, Publishing & A/B Testing
-<!-- graph-summary: Versions, commits and publishing, cloning a sibling version, ratio and rule-based A/B tests, and the safe iteration recipe that avoids editing production in place. -->
+<!-- graph-summary: Versions, commits and publishing, cloning a sibling version, ratio, rule-based and JavaScript-routed A/B tests, and the safe iteration recipe that avoids editing production in place. -->
 
 ## How versions work
 
@@ -134,7 +134,9 @@ Server-enforced rules (violations return a precise 400):
   to exactly **100**. A single target is auto-set to 100.
 
 The fields live on the AGENT document (`advancedAbTestEnabled`,
-`advancedAbTestRules`) — no `--versions` flag involved.
+`advancedAbTestRules`, and for JavaScript routing `advancedAbTestMode`,
+`advancedAbTestJsCode`) — no `--versions` flag involved. `--rules` also sets
+`advancedAbTestMode: "rules"`.
 
 ### Editing an existing rule chain (read → modify → write)
 
@@ -154,6 +156,54 @@ ck agents ab-advanced <agentId> --show
 To add/remove/reorder a rule: edit the array (order = evaluation order; keep
 `if` first, `else` last). To change only one target ratio: edit that rule's
 `targets` and keep the rule's ratios summing to 100.
+
+## Advanced A/B with JavaScript routing
+
+Instead of a rule chain, advanced A/B can run code: `advancedAbTestMode: "js"`
+with `advancedAbTestJsCode`. Same place in resolution as the rules (before the
+ratio A/B, only when the call does not pin a version); rules and code are
+alternatives, and the other one stays saved.
+
+```bash
+ck agents ab-advanced <agentId> --test --js @route.js --metadata '{"city":"Mumbai"}'  # dry run, saves nothing
+ck agents ab-advanced <agentId> --js @route.js     # save + enable JS routing
+ck agents ab-advanced <agentId> --test --metadata @sample.json   # dry-run the SAVED code
+ck agents ab-advanced <agentId> --mode rules       # back to the saved rule chain (--mode js to return)
+ck agents ab-advanced <agentId> --show [--json]    # mode + rules or code
+```
+
+MCP: `update_agent` with `advancedAbTestEnabled: true, advancedAbTestMode: "js",
+advancedAbTestJsCode`, and `test_ab_routing_js` (agentId, code, metadata) for the
+dry run.
+
+`route.js`:
+
+```js
+async function route(context) {
+  if (context.metadata.city === 'Mumbai') return 'hi';      // a language
+  if (Number(context.metadata.age) > 40) return context.versions[0];  // a version id
+  // returning nothing → the ratio A/B / published version decides
+}
+```
+
+- **Signature:** `async function route(context)` at the top level (helpers may sit
+  beside it). The server refuses code without it, and `eval`, `Function(...)`,
+  `process.env`, `require('fs' | 'child_process')`.
+- **context:** `metadata` (the call's metadata; keys can be missing and numbers
+  can arrive as text, so use `Number()`), `versions` (the agent's ACTIVE version
+  ids), `languages` (languages with a published version or a ratio-A/B version).
+  Inbound calls get the metadata of the caller's last call, or `{}`.
+- **Return:** a version id from `context.versions` (that version runs the call),
+  a language from `context.languages` (language override; resolution continues),
+  or nothing (ratio A/B decides). Anything else is "invalid".
+- **Available:** `axios`, `moment`, `_` (lodash), `console`, `x_secrets['name']`
+  for saved secrets (never paste keys). No `require`, `process` or file access.
+- **Never fails a call:** a throw, a return outside the lists, or more than **5 s**
+  logs the error and falls back to the ratio A/B. The caller waits while it runs:
+  give API calls `timeout: 3000`. Returning callers run it again, so their version
+  can change between calls.
+- `--test` prints `version` / `language` / `none` / `invalid` / `error` with the
+  time taken. Test before saving.
 
 ## Safe iteration recipe (don't edit prod in place)
 
