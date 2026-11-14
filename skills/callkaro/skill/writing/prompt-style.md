@@ -46,6 +46,19 @@ Why, with numbers from the real conversion: stripping markdown, dead heading wei
 
 Keep the docs' prompt rules while you are in there: one rule said once, literal instructions ("ask for the 6 digit pincode" not "handle location"), no maths in prompt (precompute and pass facts), and state when to do nothing.
 
+## Language of the prompt
+
+For a bot in any language other than English, the prompt's instructions, section labels, conditions and guidance are always in English; only the lines the bot speaks (dialogue, opening and closing lines, end_call_msg) are in the target language, in its native script (Hindi in Devanagari). This overrides any older guidance that says to write the whole prompt in the target language.
+
+```
+STEP 2: CONFIRM IDENTITY
+=========================================
+Ask whether you are speaking to {{customer_name}}:
+"क्या मेरी बात {{customer_name}} जी से हो रही है?"
+- If yes -> go to STEP 3.
+- If no -> ask for a better time to call and end the call.
+```
+
 ## Principles behind the style
 
 - As short as possible without losing performance: too long and the model gets lost, too short and it misses the context.
@@ -134,4 +147,5 @@ Order matters; run it per prompt file, then verify idempotent (converting twice 
 
 - Token count before vs after (tiktoken or any tokenizer site; cl100k and o200k both interesting — Devanagari-heavy prompts differ a lot between encodings).
 - Placeholder audit exit code 0.
+- Non-English bot: every instruction, label and condition is in English; only spoken lines are in the target language.
 - One live or sim call: no spoken `{{`, no spoken `Step N:` system text, no emoji/SSML tag read aloud, opening fires without the customer speaking first.

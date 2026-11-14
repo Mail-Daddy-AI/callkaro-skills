@@ -151,7 +151,9 @@ Rules:
     LANGUAGE CONFIGURATION.
   • Valid language codes: en, hi, kn, ta, te, mr, gu, bn, ml
   • Capability identifiers (snake_case names) are code identifiers — NEVER translate them.
-    Only the system_prompt CONTENT of each capability is written in the target language.
+    Only the spoken lines inside each capability's system_prompt are written in the target
+    language; its instructions, labels and conditions stay in English
+    ([prompt style](../writing/prompt-style.md)).
   • In update mode, if the existing silence_language and default_language already match
     the target language, carry them through verbatim. If they do not match (e.g. a Hindi
     version that incorrectly has default_language: "en"), correct them to the target

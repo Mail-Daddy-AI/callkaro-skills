@@ -186,7 +186,8 @@ named ## STEP N section with actual dialogue and numbered IF/THEN branches.
 Never romanize regional language words."
 
 Additional language rules:
-- The base systemprompt persona must be written in native script.
+- The base systemprompt persona is described in English; the persona's name and spoken lines are in native script.
+- All instructions, labels and conditions stay in English; only spoken lines are in the target language ([prompt style](../writing/prompt-style.md)).
 - If the user provided a persona name, include it.
 - If the user specified female persona, include: "Female persona."
 - For Hinglish, use Devanagari for Hindi words and Latin script for common English technical/process words.
