@@ -3,8 +3,9 @@ name: callkaro
 description: >
   Operate CallKaro voice and chat AI agents with the ck CLI. Use for creating,
   testing, calling with, or analyzing agents; managing versions, numbers,
-  batches, workflows, contacts, secrets, simulations, analytics, embed
-  widgets, and KPI Manager (KPI metrics, RCA, scheduled KPI reports).
+  outbound phone number strategies (rolling caller IDs), batches, workflows,
+  contacts, secrets, simulations, analytics, embed widgets, and KPI Manager
+  (KPI metrics, RCA, scheduled KPI reports).
 ---
 # CallKaro skill graph
 
@@ -40,6 +41,7 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 - [How to Work — operating instructions for AI agents using CallKaro](skill/INSTRUCTIONS.md) — Start here. The operating loop, session preamble, agent authoring order, decision rules that prevent damage, standard playbooks (build from a doc, build from scratch, debug a bad agent) and when to ask the user.
 - [KPI Manager](skill/kpi-manager.md) — KPI Manager per voice agent: data sources, KPI metrics with targets, the RCA prompt and model, Auto RCA, the scheduled KPI report (recipients, IST window, gap), RCA preview and on-demand runs, metric history, report preview, PDF export and delivery log; the ck kpi commands and the rules for safe edits.
 - [Phone Numbers](skill/numbers.md) — Phone numbers: list, browse the buyable catalog, buy, release and spam-flag; assigning a number to an agent (outbound caller ID, inbound); the WhatsApp number pool, which has no buy.
+- [Outbound Phone Number Strategies](skill/outbound-strategies.md) — Outbound phone number strategies (Rolling Strategy in the dashboard): an ordered list of up to 10 numbers with working hours, days and daily limits that an agent dials from instead of one outbound number; how each call picks its number, the fallback to the outbound number, ck outbound-strategies commands, assigning to agents, and the rule that edits apply to every agent on the strategy.
 - [Account Secrets](skill/secrets.md) — The account secrets vault: list names, set, rename and remove secrets, and the xsecrets reference syntax used in function headers and code. Never put a credential in an agent payload.
 - [WhatsApp Campaign & Template Stats](skill/whatsapp-stats.md) — Read-only WhatsApp stats: list campaigns and their status/send counts, one campaign's delivery/read/reply/click totals and daily series, and template link-click stats. Sending, cancelling and template changes are not available here.
 - [Embed Widgets](skill/widgets.md) — Embed widgets put an agent on a website or app: the chat, omni and voice types and which agent each needs, ck widgets commands, omni settings (chips, pre-chat, history, voice agent, Call us teams, launcher), install code, and the rule that edits go live on every embed.

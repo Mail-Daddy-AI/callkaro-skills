@@ -151,6 +151,12 @@ with the user, create, monitor `ck batches status`, retry misses.
 `ck kpi rca-preview` before saving an RCA prompt, `ck kpi history` for misses,
 and confirm before `ck kpi rca-run` (credits) or turning Auto Report on.
 
+**"Rotate numbers / call from a different number on each retry / stop my number getting flagged"** →
+[outbound-strategies.md](outbound-strategies.md): pick owned numbers from
+`ck numbers list`, create the strategy, make sure the agent also has an
+outbound number as the fallback, then assign it; confirm before editing a
+strategy other agents use.
+
 **"Put my agent on my website / app"** → [widgets.md](widgets.md): pick the
 type from the agent (chat, omni or voice), `ck widgets create`, hand over the
 install code, and confirm before changing a widget that is already live.
