@@ -29,6 +29,10 @@ All commands accept **either the number's id or the phone number itself**
 | `ck agents set-inbound <agentId> --number <numberId>` | Route this number's incoming calls to the agent. Fails with 409 if another agent already has it inbound. |
 | `ck agents set-inbound <agentId> --number <numberId> --remove` | Unassign. |
 
+To rotate an agent's caller ID across several numbers, with working hours and
+daily limits per number, use an [outbound phone number strategy](outbound-strategies.md)
+instead of a single outbound number.
+
 ## Typical flow: give an agent a number
 
 ```bash
