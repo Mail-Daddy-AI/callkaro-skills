@@ -43,7 +43,7 @@ Output format when not producing the workbook:
 
 ## Debugging: root cause, never a patch
 
-1. **Evidence.** Get real call ids. Read the transcript (`read_call`) and the raw log's ERROR and WARNING lines (the raw log is not readable from the harness; ask the user for it from the CallKaro dashboard). Note the exact turn where behaviour went wrong and which capability or node was active. Check `chat_history[].metrics.llm_metadata.model_name` first: a `FallbackAdapter` turn means the platform's degraded model ran, so behavioural faults in it are infrastructure, not prompt.
+1. **Evidence.** Get real call ids. Read the transcript (`read_call`) and the raw log's ERROR and WARNING lines (`read_call_log`); from the main conversation both run inside `analyze_calls`, so ask it. Note the exact turn where behaviour went wrong and which capability or node was active. Check `chat_history[].metrics.llm_metadata.model_name` first: a `FallbackAdapter` turn means the platform's degraded model ran, so behavioural faults in it are infrastructure, not prompt.
 2. **Frequency.** How often? Look across calls (`list_calls`, post-call flags, `analyze_calls`) and reproduce in simulation (several runs, `start_simulation_batch` with `epoch`). A one-off and a 40 percent failure are different problems.
 3. **Root-cause layer.**
 

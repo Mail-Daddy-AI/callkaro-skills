@@ -23,4 +23,4 @@ batch) are on the CallKaro dashboard.
   ran inside a batch, the batch's status is on the dashboard.
 - *"What are calls costing?"* → the overview → credits totals/averages.
 - *"Why are calls failing?"* → the overview → `hangup_reason_distribution`;
-  drill in with `list_calls` → `read_call`, or `analyze_calls`.
+  drill in with `list_calls` → `analyze_calls` with the call ids.

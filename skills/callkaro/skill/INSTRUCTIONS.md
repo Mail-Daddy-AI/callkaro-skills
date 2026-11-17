@@ -165,8 +165,8 @@ The document is the source of truth for BOTH the script and the test suite.
 
 **"My agent is doing X wrong"** — method in full:
 [quality/review-debug.md](quality/review-debug.md).
-1. Reproduce: `list_calls` (for the agent) → `read_call`, read the transcript
-   (`analyze_calls` for many calls; see [harness/call-debugging.md](harness/call-debugging.md));
+1. Reproduce: `list_calls` (for the agent) → `analyze_calls` with the call ids,
+   which reads the transcripts and logs (see [harness/call-debugging.md](harness/call-debugging.md));
    or run a simulation that triggers the behavior.
 2. Locate the cause: contradictory prompt rules? missing path? wrong snippet?
    function description not triggering? transcriber mishearing (check the
@@ -183,7 +183,7 @@ and retry misses on the dashboard.
 
 **"How is my agent performing?"** → [analytics.md](analytics.md) (`call_analytics`);
 a specific campaign's status is on the dashboard; drill into failures with
-`list_calls` → `read_call` or `analyze_calls`.
+`list_calls` → `analyze_calls`.
 
 **"Compare two prompts / which is better?"** → two versions + an A/B split
 (`manage_ab_testing`) + per-version `call_analytics` ([agents/versions.md](agents/versions.md)); or

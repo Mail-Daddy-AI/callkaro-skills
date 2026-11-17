@@ -3,11 +3,11 @@
 
 # CallKaro QA Grader
 
-Grade tester calls from Call History JSON, not from vibes. For planning a full QA (branch matrix, simulations, scoring, workbook) see [qa framework](qa-framework.md); for fixing what you find, [review debug](review-debug.md). Pull with `list_calls` and `read_call` (`analyze_calls` for many calls), then score each call on the four fault layers below.
+Grade tester calls from Call History JSON, not from vibes. For planning a full QA (branch matrix, simulations, scoring, workbook) see [qa framework](qa-framework.md); for fixing what you find, [review debug](review-debug.md). Pull with `list_calls` and `analyze_calls` (it reads each call with `read_call`), then score each call on the four fault layers below.
 
 ## 1. Pull the batch
 
-`list_calls` for the agent and the test dates (load the `calls` tool group first), then `read_call` per call; for a large batch see [large results](../harness/large-results.md).
+`list_calls` for the agent and the test dates (load the `calls` tool group first), then `analyze_calls` with the call ids (it reads each with `read_call`); for a large batch see [large results](../harness/large-results.md).
 
 Filter to the tester number and agent. Keep `transcription`, `functions_called`, `call_metadata`, `disposition_reason`, `hangup_reason`, `call_duration` per call.
 

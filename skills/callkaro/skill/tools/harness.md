@@ -64,7 +64,7 @@ user.
 | Test cases | `list_simulation_test_cases`, `create_simulation_test_case`, `update_simulation_test_case` (simulation group) |
 | Run and follow a batch | `start_simulation_batch` (spends credits), `list_simulation_batches`, `get_simulation_batch_status` |
 | Why runs failed | `analyze_simulation_batch` (evidence), `analyze_simulations` (causes and fixes) |
-| Real calls | `list_calls`, `read_call`, `call_analytics`, `analyze_calls` (calls group): [call debugging](../harness/call-debugging.md) |
+| Real calls | `list_calls`, `call_analytics`, `analyze_calls` (calls group); `analyze_calls` reads each call (`read_call`) and its log (`read_call_log`) in its own context: [call debugging](../harness/call-debugging.md) |
 
 ## Chat agents (WhatsApp bots)
 
