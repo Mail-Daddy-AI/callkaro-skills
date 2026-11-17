@@ -113,8 +113,13 @@ platform default; set `""` to suppress it entirely.
 - Spoken lines in the target language; **all operational text (headings, step
   labels, conditions, tool guidance) in English**.
 - Native script, never romanised. Mix in the English words real speakers use
-  (`booking`, `slot`, `confirm`, `payment`). Everyday spoken register, not
-  literary.
+  (`booking`, `slot`, `confirm`, `payment`), in English letters: "Hello, आप कैसे
+  हैं?", never "Hello, aap kaise hain?" or "हेलो, आप कैसे हैं?". Everyday spoken
+  register, not literary.
+- The language section tells the bot, in English, to reply the same way: "When
+  you reply, write Hindi words in Devanagari and English words in English
+  letters. Never write Hindi in English letters." Rules:
+  [prompt style](../writing/prompt-style.md).
 - ONE persona gender across every field and the voice: Hindi `बोल रही हूँ … कर
   सकती हूँ` **or** `बोल रहा हूँ … कर सकता हूँ`, never mixed.
 - Never translate capability names, function names, or `{{placeholder}}` names.

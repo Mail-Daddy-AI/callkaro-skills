@@ -1,6 +1,5 @@
 <!-- graph-summary: Run WhatsApp on CallKaro. Use when connecting numbers, managing templates, sending via API, building campaign CSVs, reading inbox history, handling delivery status. -->
 <!-- source: TejasLamba2006/callkaro-skills skills/callkaro-whatsapp/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
-<!-- audience: ck -->
 
 # CallKaro WhatsApp
 

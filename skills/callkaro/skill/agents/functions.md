@@ -68,12 +68,12 @@ value in code. For example, JavaScript can use
 stored secret is the token only. Never add `Bearer ` both in code and in the
 stored secret.
 
-Never put a real or dummy credential in a function. Run `ck secrets list
---json` first and reuse a matching name. If no matching registered secret
-exists, use a descriptive pending name such as `CRM_API_TOKEN`. After a
-successful save, report every missing name and tell the user to run `ck secrets
-set <name>`, add it at https://callkaro.ai/dashboard/settings/secrets, or ask
-their admin to update the secrets registry. See [../secrets.md](../secrets.md).
+Never put a real or dummy credential in a function. Reuse a matching registered
+name when one is known (secrets are listed and set on the CallKaro dashboard). If
+no matching registered secret exists, use a descriptive pending name such as
+`CRM_API_TOKEN`. After a successful save, report every missing name and tell the
+user to add it at https://callkaro.ai/dashboard/settings/secrets, or ask their
+admin to update the secrets registry. See [../secrets.md](../secrets.md).
 
 Constraints that bite either way (details in reference §6): parameter rows are
 only `{key_name, type:"string"|"number", description}` — no boolean/object/enum,

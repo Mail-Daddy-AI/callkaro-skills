@@ -1,15 +1,13 @@
 <!-- graph-summary: Grade CallKaro QA test calls from history. Use when reviewing tester transcripts, scoring prompt vs function vs config faults, checking dispositions, or writing QA findings back to the team. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-qa-grader/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-qa-grader/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # CallKaro QA Grader
 
-Grade tester calls from Call History JSON, not from vibes. For planning a full QA (branch matrix, simulations, scoring, workbook) see [qa framework](qa-framework.md); for fixing what you find, [review debug](review-debug.md). Pull with `ck calls list --limit N --json`, then score each call on the four fault layers below.
+Grade tester calls from Call History JSON, not from vibes. For planning a full QA (branch matrix, simulations, scoring, workbook) see [qa framework](qa-framework.md); for fixing what you find, [review debug](review-debug.md). Pull with `list_calls` and `read_call` (`analyze_calls` for many calls), then score each call on the four fault layers below.
 
 ## 1. Pull the batch
 
-```bash
-ck calls list --limit 100 --json > qa-calls.json
-```
+`list_calls` for the agent and the test dates (load the `calls` tool group first), then `read_call` per call; for a large batch see [large results](../harness/large-results.md).
 
 Filter to the tester number and agent. Keep `transcription`, `functions_called`, `call_metadata`, `disposition_reason`, `hangup_reason`, `call_duration` per call.
 

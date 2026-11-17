@@ -1,11 +1,11 @@
 <!-- graph-summary: 7-layer agent review and root-cause debugging: evidence, frequency, layer, smallest fix, verify, never another NEVER line. Use to audit a version or when a call went wrong. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-agent-review-debug/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-agent-review-debug/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Reviewing and Debugging an Agent
 
 Two jobs, one discipline: find the cause before touching the prompt. The failure to avoid: someone pastes an issue into an LLM, it appends another rule, the rule ships, and nobody knows why the issue happened or whether it is fixed. Each patch adds duplication and contradiction until the prompt cannot be maintained.
 
-Companions: [agent design](../design/agent-design.md) (what a good design looks like), [conversational agents](../writing/conversational-agents.md) (prompt body), [function rules](../functions/function-rules.md), [post call](../agents/post-call.md), [qa framework](qa-framework.md) (scored review plus simulations), [qa grader](qa-grader.md) (grading tester calls), [ck](../tools/ck.md) (commands).
+Companions: [agent design](../design/agent-design.md) (what a good design looks like), [conversational agents](../writing/conversational-agents.md) (prompt body), [function rules](../functions/function-rules.md), [post call](../agents/post-call.md), [qa framework](qa-framework.md) (scored review plus simulations), [qa grader](qa-grader.md) (grading tester calls), [harness](../tools/harness.md) (tools), [call debugging](../harness/call-debugging.md).
 
 ## Review order
 
@@ -21,7 +21,7 @@ Each layer depends on the one before it.
 
 Out of scope for review: LLM, STT and TTS selection (except flag 7) and hardcoded API keys in older functions.
 
-Inspect completely before scoring: full prompt text, full capability prompts, function source. Previews are for discovery only. `ck agents get <id>` and `ck agents export` give the full version; `ck agents versions <id>` lists versions.
+Inspect completely before scoring: full prompt text, full capability prompts, function source. Previews are for discovery only. `read_version` gives the full version (`fullText`, `includeSourceCode`); `list_versions` lists versions.
 
 Score each check 0 to 10 with what is good, what is bad, the smallest fix and a precise reference (section, capability, function, field). Scoring bands and workbook: [qa framework](qa-framework.md).
 
@@ -43,8 +43,8 @@ Output format when not producing the workbook:
 
 ## Debugging: root cause, never a patch
 
-1. **Evidence.** Get real call ids. Read the transcript (`ck calls get <id>`) and the raw log (`ck calls logs <id> "grep -E ' - (ERROR|WARNING) - ' /call.log"`). Note the exact turn where behaviour went wrong and which capability or node was active. Check `chat_history[].metrics.llm_metadata.model_name` first: a `FallbackAdapter` turn means the platform's degraded model ran, so behavioural faults in it are infrastructure, not prompt.
-2. **Frequency.** How often? Look across calls (`ck calls list`, post-call flags) and reproduce in simulation (several runs, `ck sim run ...`). A one-off and a 40 percent failure are different problems.
+1. **Evidence.** Get real call ids. Read the transcript (`read_call`) and the raw log's ERROR and WARNING lines (the raw log is not readable from the harness; ask the user for it from the CallKaro dashboard). Note the exact turn where behaviour went wrong and which capability or node was active. Check `chat_history[].metrics.llm_metadata.model_name` first: a `FallbackAdapter` turn means the platform's degraded model ran, so behavioural faults in it are infrastructure, not prompt.
+2. **Frequency.** How often? Look across calls (`list_calls`, post-call flags, `analyze_calls`) and reproduce in simulation (several runs, `start_simulation_batch` with `epoch`). A one-off and a 40 percent failure are different problems.
 3. **Root-cause layer.**
 
 | Layer | Typical symptoms |
@@ -57,7 +57,7 @@ Output format when not producing the workbook:
 
 4. **Check existing text first.** Search the prompt and snippets for anything that already covers or contradicts the behaviour. Most "missing rules" are present but overridden elsewhere. Quote what you find.
 5. **Fix at the root, smallest change.** Prefer, in order: fix data or a pre-call function; fix design; remove or merge conflicting text; fix the function; add a rule only when one is genuinely missing. For a rule the agent keeps missing, deliberate double placement in prompt and snippet is allowed; contradictions between the two never are.
-6. **Verify.** Apply in a NEW version (`ck agents clone-version`, then `ck agents update --versions <new>`). Rerun the failing case 5 times plus related regression cases; compare with the old version.
+6. **Verify.** Apply in a NEW version (edit the loaded draft, `review_draft`, then `save_version_to_db`: a published base is saved as a new version). Rerun the failing case 5 times plus related regression cases; compare with the old version.
 7. **Report**: symptom, evidence, frequency, root cause, fix, verification result.
 
 ### Do not
@@ -69,4 +69,4 @@ Output format when not producing the workbook:
 
 ## Using an LLM for this well
 
-An assistant with the CLI amplifies whatever method you give it. Ask it for the root cause with evidence and frequency, to check existing prompt text for conflicts, and to show the smallest fix; then verify with simulations. Never ship a suggested patch without that loop.
+An assistant with the platform tools amplifies whatever method you give it. Ask it for the root cause with evidence and frequency, to check existing prompt text for conflicts, and to show the smallest fix; then verify with simulations. Never ship a suggested patch without that loop.

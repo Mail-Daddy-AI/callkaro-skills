@@ -1,6 +1,5 @@
 <!-- graph-summary: Trigger CallKaro calls and campaigns over REST. Use when placing outbound calls, scheduling, retries, creating v1 or v2 campaigns, deleting scheduled calls, reading call history, handling errors. -->
 <!-- source: TejasLamba2006/callkaro-skills skills/callkaro-calls-api/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
-<!-- audience: ck -->
 
 # CallKaro Calls API
 

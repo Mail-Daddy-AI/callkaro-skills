@@ -1,11 +1,11 @@
 <!-- graph-summary: Design an agent before any prompt: intake, type 0-3 choice, stage map, what pre-call functions compute, function inventory. Use for a new agent, a big change, or a prompt full of if/else. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-agent-design/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-agent-design/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Designing a CallKaro Agent
 
 An agent is designed, then written. Most bad agents are design failures that people try to fix with more prompt text. Know the business problem, the outputs the client needs, the data that arrives, the architecture, the stages and where every function sits before the first prompt line exists.
 
-Next steps after design: [conversational agents](../writing/conversational-agents.md) (write the prompt), [function rules](../functions/function-rules.md) (pre/in/post-call code), [post call](../agents/post-call.md) (variables and outcomes), [qa framework](../quality/qa-framework.md) (test it), [review debug](../quality/review-debug.md) (review and root-cause fixes). Field reference: [field notes](../agents/field-notes.md). Commands: [ck](../tools/ck.md).
+Next steps after design: [conversational agents](../writing/conversational-agents.md) (write the prompt), [function rules](../functions/function-rules.md) (pre/in/post-call code), [post call](../agents/post-call.md) (variables and outcomes), [qa framework](../quality/qa-framework.md) (test it), [review debug](../quality/review-debug.md) (review and root-cause fixes). Field reference: [field notes](../agents/field-notes.md). Tools: [harness](../tools/harness.md).
 
 ## Intake: collect before designing
 
@@ -20,7 +20,7 @@ If something essential is missing, ask once, in one batch.
 7. Integrations and APIs (pre-call data, in-call lookups, post-call writes).
 8. Constraints: latency, cost, call length.
 
-Never invent model, voice or transcriber configs, IDs, metadata keys, endpoints or business facts. Discover them (`ck voices`, `ck transcribers`, and the model list in the dashboard) or ask.
+Never invent model, voice or transcriber configs, IDs, metadata keys, endpoints or business facts. Discover them (`list_voices`; the transcriber and model lists are on the CallKaro dashboard) or ask.
 
 ## Choose the architecture
 
@@ -107,7 +107,7 @@ Values that must be exact (prices, approvals, closing amounts) are written by fu
 11. Configure the rest ([field notes](../agents/field-notes.md)).
 12. Review ([review debug](../quality/review-debug.md)), then QA ([qa framework](../quality/qa-framework.md)).
 
-Write to the platform only as a new agent or a new version (`ck agents create`, or `ck agents clone-version` then `ck agents update --versions <new>`). Never edit a live version in place; do not publish, change routing, phone numbers or A/B rules unless asked.
+Write to the platform only as a new agent or a new version (`create_agent_in_db`, or load the base with `read_agent_state`, edit, `review_draft`, then `save_version_to_db`: a published base is always saved as a new version; see [editing drafts](../harness/editing-drafts.md)). Never edit a live version in place; do not publish, change routing, phone numbers or A/B rules unless asked.
 
 ## The design deliverable
 

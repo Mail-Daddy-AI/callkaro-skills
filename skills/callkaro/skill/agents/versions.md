@@ -1,4 +1,4 @@
-<!-- graph-summary: Versions, cloning, publishing per language and A/B testing (normal and advanced rules). Use when making a new version, publishing, or splitting traffic between versions. -->
+<!-- graph-summary: Versions, new versions from an existing one, publishing per language and A/B testing (normal and advanced rules). Use when making a new version, publishing, or splitting traffic between versions. -->
 # Versions, Publishing & A/B Testing
 
 ## How versions work
@@ -8,66 +8,45 @@
 - **Publishing is per-language**: `publishedVersionsByLanguage` holds one live
   version per language. Publishing a `hi` version replaces the previous `hi`
   entry and leaves `en` untouched. Calls use the published version for the
-  call's language (agents `get` with no `--versions` also falls back to it).
-- Every version save with `--commit` writes a snapshot (commit history is
+  call's language (`read_agent_state` without a `versionId` also loads it).
+- Every version save writes a commit snapshot (commit history is
   browsable/revertable in the dashboard).
-- `isVersionActive` soft-disables a version. A version must be **active** to be
+- `isVersionActive` soft-disables a version (activating/deactivating is done on
+  the CallKaro dashboard). A version must be **active** to be
   published or A/B'd; a **published or A/B version cannot be deactivated or
   deleted** (the server rejects it).
 
-## Commands
+## Tools
 
-```bash
-ck agents versions <agentId> --json                 # name, id, language, type, active
-ck agents clone-version <agentId> --versions <sourceVid> --name <name> \
-  --prompt-type <0-3> --language <code>
-ck agents publish <agentId> --versions <vid>        # per-language publish
-ck agents toggle-active <agentId> --versions <vid>  # activate/deactivate
-ck agents ab <agentId> --versions "<vid1>=60,<vid2>=40"   # start A/B
-ck agents ab <agentId> --disable                    # stop A/B
-```
+- `list_versions`: name, id, language, prompt type, active/published state, A/B use.
+- `save_version_to_db` (`versionName`): saves the working draft; a published base
+  is always saved as a new version.
+- `manage_version_publishing` with `publish_version`: per-language publish.
+- `manage_ab_testing` with `configure_normal` (`abTestVersions`) starts A/B,
+  `disable_normal` stops it (load the ab_testing tools first).
 
-### Clone a sibling version
+### New version from an existing one
 
-`clone-version` copies an existing version under the **same agent**. All four
-inputs are mandatory: source `--versions`, target `--name`, target
-`--prompt-type`, and target `--language`.
+A new version is a copy of an existing version under the **same agent**: load
+the source with `read_agent_state`, change what is needed in the draft
+(`trigger_single_pipeline` or `edit_draft_script`), run `review_draft`, then
+`save_version_to_db` with the new name (e.g. "Hindi v1"). A published base is
+never overwritten; it is always saved as a new version. Prompts, functions,
+models, capabilities, and other version settings are inherited from the source.
 
-```bash
-ck agents clone-version <agentId> \
-  --versions <sourceVid> \
-  --name "Hindi v1" \
-  --prompt-type 1 \
-  --language hi \
-  --set '{"silence_language":"hi"}' \
-  --json
-```
+Prompt types are `0` Basic, `1` Advanced, `2` Multi-prompt, and `3` Pathways; to
+change it, pass `systempromptType` to `trigger_single_pipeline`. Languages are
+`en hi kn ta te mr gu bn ml`; for another language change `default_language`
+together with `silence_language`, `voice_configuration` and `transcriber`.
 
-Prompt types are `0` Basic, `1` Advanced, `2` Multi-prompt, and `3` Pathways.
-Languages are `en hi kn ta te mr gu bn ml`. A changed prompt type is migrated
-by the backend. Prompts, functions, models, capabilities, and other version
-settings are inherited from the source.
+A new version is not published automatically. Check with `list_versions` which
+version is live for each language, and publish with `manage_version_publishing`
+only when the user asks.
 
-`--set` is optional and accepts only `transcriber`, `secondary_transcriber`,
-`voice_configuration`, `secondary_voice_configuration`, and
-`silence_language`. It does not accept prompts, models, capabilities, or
-`default_language`; use the mandatory `--language` option for the latter.
-
-With `--json`, read the new id from `newVersion._id`. If the target language
-already has a published version, the clone is not published automatically. If
-none exists, the backend adds the clone to that language's published mapping.
-Edit the clone afterward with:
-
-```bash
-ck agents update <agentId> --versions <newVid> --set @changes.json
-ck agents get <agentId> --versions <newVid> --json
-ck agents versions <agentId> --json
-```
-
-A/B rules (CLI validates before sending): **at least 2 versions**, ratios are
-integers that **sum to exactly 100**, and each version must be active. Traffic
-splits by ratio; score with `ck analytics version <agentId> --json`
-(compare `overall_connected_to_conversion_pct`).
+A/B rules (`manage_ab_testing` `configure_normal`): **at least 2 versions**,
+ratios are integers that **sum to exactly 100** per configured language, and each
+version must be active. Traffic splits by ratio; score with `call_analytics`
+with the `agentId` (per-version; compare `overall_connected_to_conversion_pct`).
 
 ## Advanced (rule-based) A/B testing
 
@@ -75,13 +54,12 @@ Routes calls by **metadata conditions** instead of pure ratios: an ordered
 if / elseif / else chain evaluated before the ratio A/B (and only when the call
 does not pin an explicit version).
 
-```bash
-ck agents ab-advanced <agentId> --rules @rules.json   # enable / replace the chain
-ck agents ab-advanced <agentId> --show [--json]       # inspect the current chain
-ck agents ab-advanced <agentId> --disable             # turn it off
-```
+`manage_ab_testing` with `configure_advanced` (`advancedAbTestRules`) enables or
+replaces the chain; `read_ab_test_configuration` shows the current chain;
+`disable_advanced` turns it off. Never invent metadata keys: take them from the
+user or `discover_ab_test_metadata`.
 
-`rules.json` — an ARRAY of rule objects:
+`advancedAbTestRules` — an ARRAY of rule objects:
 
 ```json
 [
@@ -112,22 +90,14 @@ Server-enforced rules (violations return a precise 400):
   to exactly **100**. A single target is auto-set to 100.
 
 The fields live on the AGENT document (`advancedAbTestEnabled`,
-`advancedAbTestRules`) — no `--versions` flag involved.
+`advancedAbTestRules`) — no version is involved.
 
 ### Editing an existing rule chain (read → modify → write)
 
-`--rules` REPLACES the whole chain — there is no per-rule patch. So:
-
-```bash
-# 1. dump the current chain to a file (the wrapper object is fine —
-#    --rules accepts it as-is, no reshaping needed)
-ck agents ab-advanced <agentId> --show --json > rules.json
-# 2. edit rules.json: change a condition, add an elseif, adjust ratios…
-# 3. apply the whole chain back
-ck agents ab-advanced <agentId> --rules @rules.json
-# 4. verify
-ck agents ab-advanced <agentId> --show
-```
+`configure_advanced` REPLACES the whole chain — there is no per-rule patch. So:
+read the current chain with `read_ab_test_configuration`, edit it (change a
+condition, add an elseif, adjust ratios…), send the whole chain back with
+`configure_advanced`, then verify with `read_ab_test_configuration`.
 
 To add/remove/reorder a rule: edit the array (order = evaluation order; keep
 `if` first, `else` last). To change only one target ratio: edit that rule's
@@ -135,25 +105,17 @@ To add/remove/reorder a rule: edit the array (order = evaluation order; keep
 
 ## Safe iteration recipe (don't edit prod in place)
 
-```bash
-# 1. capture the current published version
-ck agents get <agentId> --versions <publishedVid> --json > current.json
-# 2. clone it into a sibling version under the same agent
-ck agents clone-version <agentId> --versions <publishedVid> \
-  --name "v2-discount-fix" --prompt-type <0-3> --language <code> --json
-# 3. read newVid from newVersion._id, then edit only the clone as needed
-ck agents update <agentId> --versions <newVid> --set @changes.json
-# 4. test it with simulations (see ../simulations.md) until PASS
-ck sim run <agentId> --tests <t1,t2> --versions <newVid>
-# 5. either flip over…
-ck agents publish <agentId> --versions <newVid>
-# …or A/B it against the incumbent:
-ck agents ab <agentId> --versions "<oldVid>=50,<newVid>=50"
-# 6. after enough calls, read the scorecard and settle:
-ck analytics version <agentId> --json
-ck agents ab <agentId> --disable
-ck agents publish <agentId> --versions <winnerVid>
-```
+1. Load the current published version with `read_agent_state`.
+2. Edit only what is needed in the draft, run `review_draft`, and save it with
+   `save_version_to_db` under a new name (e.g. "v2-discount-fix"); the published
+   base stays untouched.
+3. Test the new version with simulations (see [../simulations.md](../simulations.md);
+   load the simulation tools: `start_simulation_batch`, then
+   `get_simulation_batch_status` and `analyze_simulation_batch`) until PASS.
+4. Either flip over with `manage_version_publishing` (`publish_version`), or A/B
+   it against the incumbent with `manage_ab_testing` (`configure_normal`, 50/50).
+5. After enough calls, read the scorecard with `call_analytics`, stop the A/B
+   (`disable_normal`) and publish the winner.
 
 ## Multi-language agents
 

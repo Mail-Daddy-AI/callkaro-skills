@@ -1,5 +1,5 @@
 <!-- graph-summary: Production traps: default snippet texts, the systempromptType trap, endpointing, fields that silently drop, speech hygiene, A/B rule chains. Use with the field reference before a write. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-voice-agents/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-voice-agents/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # CallKaro Voice Agents
 
@@ -22,7 +22,7 @@ Pick Basic for short, single-purpose calls; Advanced for complex but linear flow
 
 **Per-capability `endpointing` (types 2 and 3):** each capability/node accepts `"endpointing": { "mode": "fixed" | "dynamic", "min_delay": 0.5, "max_delay": 3 }` (`min_delay` 0–1s reduces premature cutoffs; `max_delay` 0–6s caps wait; `dynamic` adapts within those bounds). Send the whole `endpointing` object when updating.
 
-**UI fields that may not persist:** `dtmf_collection_enabled` and `callPropertyMapping` return HTTP 200 on write but are not declared on the version schema in some deployments and silently drop. Always read the version back (`ck agents get <id> --versions <vid> --json`) to verify they round-tripped before promising them.
+**UI fields that may not persist:** `dtmf_collection_enabled` and `callPropertyMapping` return HTTP 200 on write but are not declared on the version schema in some deployments and silently drop. Always read the version back (`read_version`) to verify they round-tripped before promising them.
 
 ### Default behaviour snippets
 
@@ -93,19 +93,11 @@ Context says what kind of call this is and which forms matter; keywords are only
 
 ### Never invent catalogue values — discover them
 
-This matters: a remembered voice id goes stale or belongs to a different provider. Discover from the CLI:
+This matters: a remembered voice id goes stale or belongs to a different provider. Discover voices with `list_voices` (load the voices tools): no provider lists the providers and models the account may use; a provider with model, language and gender searches its voices. Transcriber providers, models and languages are in [the reference](AGENT-VERSION-REFERENCE.md) §10.
 
-```bash
-ck voices --providers                          # every provider + models
-ck voices --provider cartesia --fields         # only the keys that provider takes
-ck voices --provider sarvam --model bulbul:v3 --language hi-IN --gender female
-ck transcribers                                # every provider/model + languages
-ck transcribers --provider gnani --fields
-```
+The reference's provider tables list only the keys each provider actually uses, so you never write one it ignores.
 
-`--fields` is the fastest way to write a correct config: it prints only the keys that provider actually uses, so you never write one it ignores.
-
-Providers that exist but rarely show up in exports: **Gnani** (`en-IN,hi-IN`), **Speechify** (locale-scoped — requires `--language`), **Murf**, Deepgram, OpenAI. Don't conclude a provider doesn't exist because no sampled agent uses it.
+Providers that exist but rarely show up in exports: **Gnani** (`en-IN,hi-IN`), **Speechify** (locale-scoped — requires a language), **Murf**, Deepgram, OpenAI. Don't conclude a provider doesn't exist because no sampled agent uses it.
 
 ### The three-language consistency rule
 
@@ -180,7 +172,7 @@ Starting points from the team that builds these agents. Where they differ from t
   - Pair it with one line in `model_response_snippet`: "Never write function names such as end_call in your reply: call the function, do not say it." The settings hide the symptom; the snippet line stops the model producing it.
   - Before pushing, read the target version's current list and merge; never overwrite a list someone added to on the dashboard.
 - **Silence**: for multilingual agents silence messages follow the language of the conversation at that moment.
-- **Publishing**: the first version in a language is published automatically; later ones only when asked. Work in a new version (`ck agents clone-version`, then `ck agents update --versions <new>`); never edit a live version; do not change routing, phone numbers or A/B rules unless asked.
+- **Publishing**: the first version in a language is published automatically; later ones only when asked. Work in a new version (load the base with `read_agent_state`, edit the draft, `save_version_to_db` saves a published base as a new version); never edit a live version; do not change routing, phone numbers or A/B rules unless asked.
 
 Design, prompt, function, post-call, review and QA guidance for these agents: [agent design](../design/agent-design.md), [conversational agents](../writing/conversational-agents.md), [function rules](../functions/function-rules.md), [post call](post-call.md), [review debug](../quality/review-debug.md), [qa framework](../quality/qa-framework.md).
 

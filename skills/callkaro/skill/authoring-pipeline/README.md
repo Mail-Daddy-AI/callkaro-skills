@@ -27,8 +27,8 @@ difference between "an agent that works" and an ai-fde-grade agent.
                agent-behavior-agent.md · call-settings-agent.md ·
                filler-pronunciation-agent.md · switchable-entities-agent.md ·
                pre-format-agent.md · call-flow-json-agent.md
-8. ASSEMBLE    merge every stage's JSON into one agent.json → ck agents create
-9. VERIFY      read back (ck agents get --versions … --json) + simulate (../simulations.md)
+8. ASSEMBLE    merge every stage's JSON into one agent.json → `create_agent_in_db`, then `save_version_to_db`
+9. VERIFY      read back (`read_version`) + simulate (../simulations.md)
 ```
 
 For an UPDATE, run only the stages the change touches — but ALWAYS re-run
@@ -41,9 +41,9 @@ Each file is a verbatim production system prompt. When you run that stage,
 
 | It says | You do |
 |---|---|
-| "draft" / "save to draft" / sub-tools that persist fields | edit your working `agent.json` (or the `--set` patch you're building) |
-| `get-*-voices` / `get-*-transcriber` tools | `ck voices --json` + [../agents/voice-and-transcriber.md](../agents/voice-and-transcriber.md) |
-| read-version / "existing script/config" context | `ck agents get <agentId> --versions <vid> --json` |
+| "draft" / "save to draft" / sub-tools that persist fields | edit your working `agent.json` (the `draftPatch` you pass to `trigger_single_pipeline`) |
+| `get-*-voices` / `get-*-transcriber` tools | `list_voices` + [../agents/voice-and-transcriber.md](../agents/voice-and-transcriber.md) |
+| read-version / "existing script/config" context | `read_agent_state` / `read_version` |
 | "return JSON with exactly these keys" | produce that JSON object as the fields you write into the payload |
 
 ## What these files own (and don't)
@@ -66,7 +66,7 @@ wins** (it tracks the live schema).
   [../agents/AGENT-VERSION-REFERENCE.md](../agents/AGENT-VERSION-REFERENCE.md) —
   the pipeline tells you *what to write*, the reference tells you *where it goes*.
 - Voice/transcriber tool calls in these prompts (`get-cartesia-voices`,
-  `get-soniox-transcriber`, …) map to `ck voices --json` + the provider tables
+  `get-soniox-transcriber`, …) map to `list_voices` + the provider tables
   in [../agents/voice-and-transcriber.md](../agents/voice-and-transcriber.md) and
   [../agents/voice-and-transcriber.md](../agents/voice-and-transcriber.md).
 - The reflect loop is not optional. ai-fde never ships a first draft; neither

@@ -1,5 +1,5 @@
 <!-- graph-summary: Build CallKaro chat agents for WhatsApp and Instagram. Use when creating chat agents, writing system prompts, configuring follow-ups, functions, channels, testing and monitoring. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-chat-agents/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-chat-agents/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # CallKaro Chat Agents
 
@@ -19,6 +19,7 @@ The prompt decides what the agent says and when it acts. Cover five things:
 
 - Identity and scope: who it is, what topics are allowed, where the boundary is.
 - Tone and length: chat is short, two or three sentences, reply in customer language, bullets only for steps.
+- Language: the prompt is written in English; scripted replies are in the bot's language. For Hindi, the prompt says: "When you reply, write Hindi words in Devanagari and English words in English letters. Never write Hindi in English letters." ("Hello, आप कैसे हैं?", never "Hello, aap kaise hain?").
 - When to call each function: name every trigger ("when customer asks for price list, call send_price_list"). Unmentioned functions never run.
 - What not to do: no competitor talk, no unauthorised discounts, no legal or medical advice, no delivery promises.
 - What ends it: order placed, question answered, not interested. Follow-ups refer back to this.
@@ -29,6 +30,7 @@ Skeleton:
 You are Riya, support for Acme Appliances on WhatsApp.
 SCOPE: orders, delivery, warranty, service visits only.
 STYLE: customer language, two short sentences max.
+LANGUAGE (a Hindi bot): When you reply, write Hindi words in Devanagari and English words in English letters. Never write Hindi in English letters.
 ACTIONS: order status calls get_order_status (ask for order id first), warranty PDF calls send_warranty_pdf, angry or wants human calls schedule_callback.
 DONE: question answered and customer confirms, or says not interested.
 ```

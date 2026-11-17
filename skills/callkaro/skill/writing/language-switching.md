@@ -1,5 +1,5 @@
 <!-- graph-summary: Implicit language switching for multilingual agents: Section 0A, matching config (min words, allowed languages, transcriber), a 12-utterance test. Use when the agent must follow the caller's language. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-language-switching/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-language-switching/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Language Switching: Implicit, Silent, Testable
 
@@ -15,7 +15,7 @@ Paste-in block: [template a language](template-a-language.md) (Section 0A, at th
 - **Judge by how the sentence is built** (verbs, grammar, word order), not by its loan words. A Hindi sentence with English nouns is Hindi.
 - **Explicit request** ("speak Hindi") switches at once; the test keeps running afterwards. "I don't understand": ask once, in very simple words, which supported language. Unsupported language: say once which ones you speak.
 - **Silent**: never announce, ask permission, or apologise. Same step, other language.
-- **Reply shape**: one language per reply, own script, never romanised, everyday spoken register, composed natively (never translated from English). Mix back what the customer mixes. Loan words stay in Latin letters inside non-English sentences. Names are written in the reply's script.
+- **Reply shape**: one language per reply, own script, never romanised, everyday spoken register, composed natively (never translated from English). Mix back what the customer mixes. Loan words stay in Latin letters inside non-English sentences: "Hello, आप कैसे हैं?", never "Hello, aap kaise hain?" or "हेलो, आप कैसे हैं?". Names are written in the reply's script.
 - **Lines in the prompt**: a row-per-language line means say the row for this turn (the English row has no priority; saying it on a non-English turn is the most common way a call slips out of the caller's language). A single-language line means say the same meaning natively. A verbatim line (closing, disclosure) is copied exactly, in the language of the turn it ends; never switch language just to reach one.
 
 ## Config must agree with the prompt
@@ -37,7 +37,7 @@ The prompt writes the words; these fields carry the mechanical half.
 
 Pairs with [conversational voice](conversational-voice.md) section 6: never list a language in the transcriber whose script Hindi speech can land in (a `pa` entry turned Hindi into Gurmukhi); the platform note "Conversation language changed, so reply in X" means the test has already passed; an explicit request outranks that note.
 
-Mismatches found auditing live agents: prompt says N=4 while `language_switch_min_words` is 3; `allowed_languages` empty while the prompt speaks six languages; a language in the prompt missing from the transcriber list; a voice id for one language labelled with another language's code; `language_switch_snippet` empty while the rules live only in the body. Export the agent ([ck](../tools/ck.md)) and audit these before touching wording.
+Mismatches found auditing live agents: prompt says N=4 while `language_switch_min_words` is 3; `allowed_languages` empty while the prompt speaks six languages; a language in the prompt missing from the transcriber list; a voice id for one language labelled with another language's code; `language_switch_snippet` empty while the rules live only in the body. Read the agent's version (`read_version`) and audit these before touching wording.
 
 Team rules for the flags: keep `language_switching: true` (platform docs call it legacy, but the backend runs the current implementation behind it), leave `language_lockin_time` unset and `language_switching_v1` false, and leave `language_switching_instructions` null unless you need custom behaviour. `switchableLanguages` is a different feature: it hands the call to another published version.
 

@@ -1,9 +1,11 @@
-<!-- graph-summary: Workflow graphs via ck: steps (call, wait, WhatsApp, branch, CRM update), validation, import and runs. Use to build, edit or inspect a workflow from the CLI. -->
+<!-- graph-summary: Workflow graphs: steps (call, wait, WhatsApp, branch, CRM update), the JSON spec, validation rules and reading runs. Use to design a workflow the user builds on the dashboard. -->
 # Workflows
 
 A workflow is a **graph of steps run per contact**: call them, wait, WhatsApp
 them, branch on what happened, update their CRM record. The dashboard draws it
-on a canvas; the CLI reads and writes the same JSON (`{ nodes, edges }`).
+on a canvas and imports/exports the same JSON (`{ nodes, edges }`). The user
+creates, edits and runs workflows on the CallKaro dashboard; there is no
+harness tool for workflows.
 Enrolling contacts is in [contacts.md](contacts.md); the two together are in
 [workflows-and-contacts.md](workflows-and-contacts.md).
 
@@ -33,9 +35,8 @@ are not covered here.
 }
 ```
 
-Run `ck workflows schema` for a sample of **every** node type, the edge rules,
-and the condition ops/sources. That output is the authority; this file is the
-method.
+The full spec — a sample of **every** node type, the edge rules, and the
+condition ops/sources — is [platform/workflows-official-spec.md](platform/workflows-official-spec.md).
 
 ### Node types (exactly these — the dashboard's Add Node menu)
 
@@ -59,45 +60,34 @@ method.
 - **Nothing leaves an End; nothing enters Start.** There must be a path Start → End.
 - A **dangling handle is legal** (the run ends there); an unreachable parked node is legal. Neither blocks a save.
 - **Conditions**: the exit with **no** `condition` is the fallback (`label: "otherwise"`). Sources `phone_number`, `connected_call`, `voicemail`, `hangup_reason`, `call_duration`, `conversion_status` take **no** `field`; `contact`, `post_call_variables`, `call_metadata`, `fn_response`, `static_value` **need** one.
-- `conversion_status` is `"true"`/`"false"`. The `hangup_reason` values are printed by `ck workflows schema`.
+- `conversion_status` is `"true"`/`"false"`. The `hangup_reason` values are in the spec.
 - `update-lead` and `contact`-source values use **CRM attribute names** (the `name`, not the display label). They must already exist — see [contacts.md](contacts.md).
-- **`wa-template` `parameters`**: one row per template variable, `{key, source, value}`, with `key` = `ORIGIN::token` (`BODY::{{1}}`, `HEADER::MEDIA`, `BUTTON_URL[0]::{{1}}`). `context` prints the exact keys per template — copy them, don't compose them.
+- **`wa-template` `parameters`**: one row per template variable, `{key, source, value}`, with `key` = `ORIGIN::token` (`BODY::{{1}}`, `HEADER::MEDIA`, `BUTTON_URL[0]::{{1}}`). The exact keys come from the template's variables (`check_whatsapp_readiness` `get_template`) — copy them, don't compose them.
 - `fn_response` fields are `<apiNodeId>.returned.<key>`.
 
-## Commands
+## On the dashboard
 
-| Command | What it does |
-|---|---|
-| `ck workflows schema` | The graph reference: every node type with a sample, edges, condition ops/sources |
-| `ck workflows list [--search] [--json]` / `get <id> [--json]` | Browse. `get --json` is the full graph |
-| `ck workflows create <name> [--file graph.json]` | Create (no graph = just Start and End) |
-| `ck workflows import --file x.json [--name]` | Create from a dashboard export or a bare graph |
-| `ck workflows update <id> [--name] [--file graph.json]` | **Replaces the whole graph** (and/or renames) |
-| `ck workflows validate [<id>] [--file graph.json]` | Dry-run: every problem, each with its `nodeId`. Nothing is saved |
-| `ck workflows export <id> [--file]` / `duplicate <id> [--name]` / `delete <id> [--yes]` | As the dashboard |
-| `ck workflows add-node <id> --type T [--after <nodeId> [--handle h]] [--name] [--set <json\|@file>]` | Add one node. With `--after` it is **spliced into the chain** |
-| `ck workflows set-node <id> <nodeId> [--set <json\|@file>] [--name]` | Merge fields into a node (id and type are fixed) |
-| `ck workflows remove-node <id> <nodeId> [--reconnect] [--yes]` | Remove a node and its edges; `--reconnect` bridges its neighbours |
-| `ck workflows connect <id> --from A --to B [--handle h]` / `disconnect <id> --from A [--handle h]` | Edit a link |
-| `ck workflows leads <id>` / `lead <id> <phone>` / `run <id> <phone>` / `journey <id> <phone>` | Results — see below |
+The user creates (no graph = just Start and End), imports (a dashboard export
+or a bare graph), duplicates, exports, deletes and edits workflows there.
+Replacing a graph **replaces the whole graph**. Every save is validated: each
+problem is reported with its `nodeId`, and nothing is saved until it is clean.
 
 ## Generate a workflow from a request
 
-```bash
-ck workflows schema                        # 1. learn the shapes
-# 2. gather real ids — never invent them:
-ck agents list --json                      # agentId for Send Call (prefer agentStatus "live")
-ck whatsapp list --json                    # phoneNumberId + display number for WhatsApp nodes
-ck chat-agents templates --json            # template id / name / language / status (use APPROVED)
-ck chat-agents template <templateId> --json   # its variables[].id = the exact parameters[].key values
-ck contacts attributes list --json         # CRM attribute names for update-lead / contact conditions
-ck agents get <agentId> --json             # publishedVersionId
-ck agents get <agentId> --versions <publishedVersionId> --json   # postcall[].name = post_call_variables fields (skip type call_drop_off_reason)
-# 3. write graph.json using ONLY ids/names from those listings
-ck workflows validate --file graph.json    # 4. fix every reported problem, repeat
-ck workflows create "Name" --file graph.json
-ck workflows get <id> --json               # 5. read back what was saved
-```
+1. Learn the shapes from the spec.
+2. Gather real ids — never invent them:
+   - `list_agents` → `agentId` for Send Call (prefer a live, published agent).
+   - `list_phone_numbers` (WhatsApp) → `phoneNumberId` + display number for WhatsApp nodes.
+   - `check_whatsapp_readiness` → approved templates (id / name / language), and
+     `get_template` for one template's variables = the exact `parameters[].key` values.
+   - CRM attribute names for `update-lead` / contact conditions: ask the user
+     (the dashboard lists them).
+   - `read_version` on the agent's published version → `postcall[].name` =
+     `post_call_variables` fields (skip type `call_drop_off_reason`).
+3. Write the graph JSON using ONLY ids/names from those listings.
+4. The user imports or creates it on the dashboard, which validates on save;
+   fix every reported problem and repeat.
+5. Have the user check the saved graph; walk each branch to an End.
 
 If a listing is empty (no WhatsApp number linked, no APPROVED template, no live agent), do
 not build a node that needs it — tell the user.
@@ -107,33 +97,21 @@ don't guess.
 
 ## Edit an existing workflow
 
-Prefer the small edits; they touch only what you name and re-validate on save:
+The user edits on the dashboard canvas: adding, changing, removing and
+connecting nodes.
 
-```bash
-ck workflows add-node <id> --type wait --after <callNodeId> --set '{"minutes":120}'
-ck workflows set-node <id> <nodeId> --set @patch.json
-ck workflows connect <id> --from <condId> --handle <exitId> --to <nodeId>
-ck workflows remove-node <id> <nodeId> --reconnect --yes
-```
-
-- After a `conditions` node, `add-node --after` needs `--handle <exitId>` (the error lists them).
-- `add-node` saves immediately, so types with no sensible default need `--set` up front — `send-call` (`agentId`), `wa-template` (`templateId`…), `wa-message` (`message`…), `api-basic` (`url`), `update-lead` (`updates`). The error shows an example. A new `conditions` node starts as a complete "did the call connect?" rule (`connected_call` = true); change it with `set-node --set @exits.json`.
-- Replacing a conditions node's `exits` via `set-node` drops the edges of exits you removed.
-- Inline `--set '{…}'` is fragile in shells; for anything non-trivial write a file and use `@file`.
+- After a `conditions` node, a new node goes on one exit's handle.
+- Types with no sensible default need their required fields set up front — `send-call` (`agentId`), `wa-template` (`templateId`…), `wa-message` (`message`…), `api-basic` (`url`), `update-lead` (`updates`). A new `conditions` node starts as a complete "did the call connect?" rule (`connected_call` = true).
+- Replacing a conditions node's `exits` drops the edges of exits you removed.
 - The server validates on every save; an edit that would leave **no path to End** is rejected with the reason. Read it, fix, retry.
 - The last save wins — don't edit a workflow someone else may be editing.
 - **Editing a workflow that has leads running** may change what they do next. This pack has not verified how in-flight runs react — confirm with the user first.
 
 ## Read results
 
-```bash
-ck workflows leads <id> --json             # who is enrolled, status, current step, call count
-ck workflows lead <id> <phone>             # one lead's call totals + enrolment time
-ck workflows run <id> <phone>              # that lead's latest run, step by step (why it branched)
-ck workflows run <id> <phone> --json       # + each step's results and the run variables
-ck workflows journey <id> <phone>          # every call to/from that number in this workflow
-```
+On the dashboard the user sees who is enrolled (status, current step, call
+count), one lead's call totals and enrolment time, that lead's latest run step
+by step, and every call to/from that number in this workflow (its journey).
 
-`run` is the debugging tool: the step table shows each node, its status, the
-handle taken, and any error; `--json` adds the variables a Conditions node was
-testing against.
+The run view is the debugging tool: each node, its status, the handle taken,
+and any error, plus the variables a Conditions node was testing against.

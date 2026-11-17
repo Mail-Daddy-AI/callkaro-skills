@@ -1,5 +1,5 @@
 <!-- graph-summary: Write the prompt body: SAY vs composed lines, the prompt skeleton, call-flow steps, objections, endings, lines in each Indian language. Use when writing or fixing a semi-scripted prompt. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-conversational-agents/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-conversational-agents/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Conversational Agents: Writing the Call Flow
 

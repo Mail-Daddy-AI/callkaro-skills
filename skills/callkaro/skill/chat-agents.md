@@ -1,49 +1,41 @@
-<!-- graph-summary: WhatsApp and Instagram chat agents via ck chat-agents: create, version, publish, templates, predefined functions. Use for any chat-agent task; never send chat payloads to voice agents. -->
+<!-- graph-summary: WhatsApp and Instagram chat agents via the chat-agent tools: create, version, publish, templates, predefined functions. Use for any chat-agent task; never send chat payloads to voice agents. -->
 # Chat agents
 
-Chat agents are separate from voice agents. Use `ck chat-agents`; do not send a
-chat-agent payload to `ck agents`.
+Chat agents are separate from voice agents. Use the chat-agent tools (load the
+`chat_agents` tool group first); never send a chat-agent payload to the voice
+agent tools.
 
-## Commands
+## Tools
 
-| Command                                                                            | What it does                                                               |
-| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `ck chat-agents models [--json]`                                                 | List account-supported chat model IDs.                                     |
-| `ck chat-agents templates --provider whatsapp [--json]`                          | List available WhatsApp template names and IDs.                            |
-| `ck chat-agents template <templateId> --provider whatsapp [--json]`              | Fetch one complete WhatsApp template by ID.                                |
-| `ck chat-agents list [--json]`                                                   | List chat agents.                                                          |
-| `ck chat-agents get <agentId> [--versions <versionId>] [--json]`                 | Read the published or selected version.                                    |
-| `ck chat-agents versions <agentId> [--json]`                                     | List versions and the published version ID.                                |
-| `ck chat-agents create [json\|--file file.json]`                                  | Validate locally, fill defaults, then create an agent and initial version. |
-| `ck chat-agents update <agentId> --set '{...}' [--versions <versionId>]`         | Patch agent or version fields.                                             |
-| `ck chat-agents create-version <agentId> [json\|--file file.json]`                | Create a version, optionally with`cloneFrom`.                            |
-| `ck chat-agents publish <agentId> --versions <versionId>`                        | Publish one version.                                                       |
-
-Read commands support `--file output.json`. Create accepts inline JSON, `@file`,
-`--file`, or stdin with the same parsing and validation. Prefer `--file` for
-prompts and function source code.
+| Tool | What it does |
+| --- | --- |
+| `list_chat_agent_models` | List account-supported chat model IDs. |
+| `check_whatsapp_readiness` (`list_templates` / `get_template`, `provider`, `templateId`) | List approved WhatsApp templates, or fetch one complete template by ID. |
+| `list_chat_agents` | List chat agents. |
+| `get_chat_agent` (`agentId`, `versionId`) | Read the published or selected version. |
+| `list_chat_agent_versions` (`agentId`) | List versions and the published version ID. |
+| `create_chat_agent` (`payload`) | Create an agent and publish its first version. Waits for the user's approval; the backend validates the payload — fix what it reports and call again. |
+| `update_chat_agent` (`agentId`, `versionId`, `updates`) | Patch agent or version fields. Waits for the user's approval. |
+| `create_chat_agent_version` (`agentId`, `versionName`, `cloneFrom`) | Create a version, empty or with `cloneFrom`. |
+| `publish_chat_agent_version` (`agentId`, `versionId`) | Publish one version. Waits for the user's approval. |
 
 ## Assigning a WhatsApp number
 
-There's no dedicated `assign-whatsapp` command — set it via `ck chat-agents
-update`:
-
-```bash
-ck chat-agents update <agentId> --set '{"whatsappPhoneNumber":"<phoneNumberId>","whatsappDisplayPhN":"<display name>"}'
-```
+There's no dedicated assign step — set it with `update_chat_agent`, `updates`
+`{"whatsappPhoneNumber":"<phoneNumberId>","whatsappDisplayPhN":"<display name>"}`
+(`whatsappDisplayPhN` is a version field: without `versionId` it changes the live version).
 
 The number itself comes from Meta via the WhatsApp Business Account linked on
-the **CallKaro dashboard** — not the CLI, and not buyable. Run `ck whatsapp
-list` to see what's available (see `numbers.md` § WhatsApp numbers). Requires
-an active WhatsApp subscription on the account.
+the **CallKaro dashboard** — not buyable. `list_phone_numbers` (`whatsapp`)
+shows what's available (see [numbers.md](numbers.md) § WhatsApp numbers).
+Requires an active WhatsApp subscription on the account.
 
 ## Create safely
 
-1. Run `ck whoami`.
-2. Run `ck chat-agents models --json`; copy model IDs exactly.
-3. Run `ck chat-agents list --json` to avoid duplicates.
-4. Create the agent.
-5. Read it back with `ck chat-agents get <id> --versions <versionId> --json`.
+1. `list_chat_agent_models`; copy model IDs exactly.
+2. `list_chat_agents` to avoid duplicates.
+3. Create the agent (`create_chat_agent`).
+4. Read it back with `get_chat_agent`.
 
 The minimum payload is:
 
@@ -53,11 +45,7 @@ The minimum payload is:
 }
 ```
 
-```bash
-ck chat-agents create '{"chatAgentName":"Support Chat"}'
-```
-
-Omitted fields receive these important defaults:
+The CLI filled these defaults for omitted fields; the harness sends the payload as written, so set the fields you need (the backend's own defaults may differ):
 
 | Field                                          | Default                                      |
 | ---------------------------------------------- | -------------------------------------------- |
@@ -71,9 +59,8 @@ Omitted fields receive these important defaults:
 | `functions` / `followUpFunctions`          | empty arrays                                 |
 | `webhook` / `webhookEvents`                | empty / empty array                          |
 
-The CLI checks shape, ranges, conditional requirements, function names, and
-webhook settings before contacting the API. The backend is still authoritative
-for account-dependent model availability.
+The backend validates the payload and is authoritative, including for
+account-dependent model availability: fix what it reports and call again.
 
 ## Prompt and model example
 
@@ -92,35 +79,34 @@ for account-dependent model availability.
 ## Functions
 
 Custom functions omit `type` and require `source_code` plus `description`. The
-function `name` must match the Python `async def` name. The CLI defaults
-`timeout` to 30 seconds and `directSend` to false.
+function `name` must match the Python `async def` name. Set `timeout`
+(30 seconds is usual) and `directSend` (usually false) explicitly.
 
 Predefined function types are `send_template`, `send_contact`, `send_call`,
 `send_image`, `send_document`, `send_video`, and `send_audio`.
 
-- `send_template` requires `templateId`. Never construct or provide the
-  `template` object yourself; the CLI fetches the approved provider template,
-  replaces `templateId` with that object, and sends the authoritative data.
+- `send_template` requires `templateId`. Never construct the `template` object
+  yourself. The CLI resolved the approved template from `templateId` before
+  saving; the harness does not, so after saving read the function back with
+  `get_chat_agent`. If its template is not resolved, the user sets the
+  template function up on the dashboard.
 - `send_contact` requires a phone number or email in `contactData`.
 - `send_call` requires `callAgentId`; its call window must end after it starts.
 - Function names must be unique within each function list.
 
 Before creating or updating a template function, list the available WhatsApp
-templates and copy the template ID exactly. Chat-agent authoring currently
-supports only `provider: "whatsapp"`.
-
-```bash
-ck chat-agents templates --provider whatsapp
-ck chat-agents template <templateId> --provider whatsapp --json
-```
+templates (`check_whatsapp_readiness` `list_templates`, then `get_template`)
+and copy the template ID exactly; plan a template function only when it
+returns `canPlanTemplateFunction: true`, otherwise tell the user its guidance.
+Chat-agent authoring currently supports only `provider: "whatsapp"`.
 
 The template detail response includes `variables`. Use every `variables[].id`
 as an exact `varDescriptions` key. Infer its meaning from `context` and
 `example`, but describe where the agent obtains the real runtime value rather
-than copying the example. Ask the user when the meaning is ambiguous. The CLI
-rejects missing descriptions before creating or updating the agent.
+than copying the example. Ask the user when the meaning is ambiguous. Give every
+variable a description; the CLI refused a template function without them.
 
-Variable IDs are derived by the CLI from the provider template:
+Variable IDs follow the provider template:
 
 - Body placeholder: `BODY::{{1}}`
 - Text-header placeholder: `HEADER::{{1}}`
@@ -155,22 +141,17 @@ Never place secret values in a payload. Use supported `x_secrets.NAME`
 references in headers.
 
 Use `provider: "whatsapp"` in both the template lookup and function payload.
-The CLI resolves it through the authoritative Meta WhatsApp template API before
-saving the runtime configuration.
 
 ## Versions
 
 Create a clone before substantial changes:
 
-```bash
-ck chat-agents create-version <agentId> \
-  '{"versionName":"support-v2","cloneFrom":"<publishedVersionId>"}'
-ck chat-agents update <agentId> --versions <newVersionId> \
-  --set @chat-agent-patch.json
-ck chat-agents get <agentId> --versions <newVersionId> --json
-ck chat-agents publish <agentId> --versions <newVersionId>
-```
+1. `create_chat_agent_version` (`versionName` e.g. `support-v2`, `cloneFrom`
+   the published version ID).
+2. `update_chat_agent` with the new `versionId`.
+3. `get_chat_agent` with that `versionId` to read it back.
+4. `publish_chat_agent_version`.
 
 `cloneFrom` must identify a version belonging to the same chat agent. Creating
-or updating a version does not publish it. Omitting `--versions` from get or
-update targets the currently published version.
+or updating a version does not publish it. Omitting `versionId` from
+`get_chat_agent` or `update_chat_agent` targets the currently published version.

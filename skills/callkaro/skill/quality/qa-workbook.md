@@ -1,5 +1,5 @@
 <!-- graph-summary: Layout of the QA workbook (Agent Brief, review scores, simulation and manual cases, summary) as JSON. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-qa-framework/WORKBOOK.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-qa-framework/WORKBOOK.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Workbook spec
 

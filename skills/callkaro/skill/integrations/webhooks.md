@@ -1,6 +1,5 @@
 <!-- graph-summary: Receive CallKaro realtime events. Use when setting up webhook destinations, handling call_ended, message_received, message_sent, template_sent, message_status_updated payloads. -->
 <!-- source: TejasLamba2006/callkaro-skills skills/callkaro-webhooks/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
-<!-- audience: ck -->
 
 # CallKaro Webhooks
 

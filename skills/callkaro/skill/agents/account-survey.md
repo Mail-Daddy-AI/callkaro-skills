@@ -1,9 +1,9 @@
 <!-- graph-summary: What 301 production agents actually configure (types, voices, transcribers, models, time limits, silence). Use to sanity-check a config against real practice, not as rules. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-voice-agents/REFERENCE-account-survey.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-voice-agents/REFERENCE-account-survey.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Account survey reference (301 agents, Sept 2026)
 
-Mined read-only from one CallKaro account via `ck agents list --json` plus deep `ck agents export` of 27 agents across 14 business families (OTP, auction/negotiation, matrimony, auto, health, finance, real estate, education, support, sales, notification, ecommerce, other). No agent was modified. Numbers are what production agents in this account actually use — useful as a sanity check, not as gospel.
+Mined read-only from one CallKaro account from its agent list plus full exports of 27 agents across 14 business families (OTP, auction/negotiation, matrimony, auto, health, finance, real estate, education, support, sales, notification, ecommerce, other). No agent was modified. Numbers are what production agents in this account actually use — useful as a sanity check, not as gospel.
 
 ## Architecture spread
 

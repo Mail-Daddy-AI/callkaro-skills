@@ -41,7 +41,7 @@ useMultiTranscribers · publishedVersionsByLanguage · agentStatus
 | `lastPublishedDate` | Date | Set alongside `publishedVersionId`. |
 | `agentStatus` | `live` \| `in-progress` | `in-progress` = still being built. |
 | `abTestEnabled` / `abTestVersions` | bool / `[{versionId, ratio 0–100}]` | Traffic split across versions. **Never modify as a side effect** of another change. |
-| `advancedAbTestEnabled` / `advancedAbTestRules` | bool / rule array | **Rule-based A/B**: ordered if/elseif/else chain over call `metadata.*`, evaluated BEFORE the ratio A/B (only when no version is pinned). Each rule: `{kind: if\|elseif\|else, condition, returnType: version\|language, targets:[{versionId\|language, ratio}]}`. `version` short-circuits (that version runs); `language` only overrides language and resolution continues. Conditions use the §4 expression grammar with `metadata.*` operands; ratios are integers summing to 100 per rule. Manage via `ck agents ab-advanced`. |
+| `advancedAbTestEnabled` / `advancedAbTestRules` | bool / rule array | **Rule-based A/B**: ordered if/elseif/else chain over call `metadata.*`, evaluated BEFORE the ratio A/B (only when no version is pinned). Each rule: `{kind: if\|elseif\|else, condition, returnType: version\|language, targets:[{versionId\|language, ratio}]}`. `version` short-circuits (that version runs); `language` only overrides language and resolution continues. Conditions use the §4 expression grammar with `metadata.*` operands; ratios are integers summing to 100 per rule. Manage via `manage_ab_testing` (`configure_advanced`); read with `read_ab_test_configuration`. |
 | `useMultiTranscribers` | bool | Run the primary and secondary transcriber simultaneously instead of primary-with-fallback. |
 | `systempromptType` | int 0–3 | Routed here, but **not stored** — see the trap below. |
 
@@ -327,8 +327,8 @@ with no logic.
   that name. Advanced `source_code` reads the runtime object/dict with
   `x_secrets["CRM_API_TOKEN"]` and constructs `Bearer <token>` in code, where the registered secret
   is only the token. Never duplicate the `Bearer ` prefix.
-- Run `ck secrets list --json` before authoring. After saving, report every missing secret name and
-  tell the user to run `ck secrets set <name>`, add it at
+- Reuse a matching registered secret name when one is known (secrets are listed and set on the
+  CallKaro dashboard). After saving, report every missing secret name and tell the user to add it at
   https://callkaro.ai/dashboard/settings/secrets, or ask their admin to update the registry.
 
 ### Field sets per custom variant
@@ -603,10 +603,9 @@ Write **only** the keys the provider uses:
 | **Smallest AI** | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `voice_speed` | models `lightning-v3.1` (default, 80+ voices) and many global; voices (English) `emily` `sophia` `james` `olivia`; voices (Hindi) `priya` `arjun` `ananya` `rohan` `meera` `vikram`; speed **0.5–2.0** (1.0) |
 | **Callkaro** (restricted / admin-gated) | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `voice_gender`, `voice_speed`, plus generation controls `temperature`, `top_p`, `top_k`, `repetition_penalty` | model `ck-tts-v1`; languages `hi`, `en`; voices `aaryan` `raju` `mahesh` (male) / `kanika` `priya` `tarini` (female) — set `voice_gender` to match; speed **0.7–1.2**; temperature **0–2** (0.4); top_p **0–1** (0.85); top_k **−1–100** (30); repetition_penalty **1.1–2** (1.1). Don't select it unless the account exposes it |
 
-Discover all of this from the CLI rather than recalling it: `ck voices --providers` lists providers and
-models, `ck voices --provider <name> --fields` prints exactly the keys and ranges one provider takes,
-and `ck voices --provider <name> [--model m] [--language l] [--gender g]` lists the voices themselves
-(Speechify needs `--language`).
+Discover voices rather than recalling them: `list_voices` (load the voices tools) with no provider
+lists the providers and models this account may use, and with a provider (optionally model, language,
+gender) lists the voices themselves (Speechify needs a language).
 
 Language coverage differs per provider: Cartesia, Azure and Eleven Labs are language-indexed (each
 voice has a language/locale), while Sarvam voices are multilingual and not language-indexed — which
@@ -651,9 +650,8 @@ Guidance:
 - Some accounts have the transcriber language **locked** — leave it unchanged there.
 - `useMultiTranscribers` (agent doc) makes the secondary run alongside the primary rather than only
   on failure.
-- Discover this from the CLI instead of recalling it: `ck transcribers` lists every provider/model with
-  its language field and languages, and `ck transcribers --provider <name> --fields` prints the exact
-  keys that provider takes.
+- There is no transcriber catalogue tool: use the table above for provider, model, language field
+  and keys, and never invent a value it does not list.
 
 ---
 
@@ -749,11 +747,11 @@ Webhook header example:
 }
 ```
 
-Run `ck secrets list --json` before authoring sensitive headers and reuse matching names. Use exact
+Reuse matching registered secret names (listed on the CallKaro dashboard) for sensitive headers. Use exact
 `x_secrets.NAME` values for API keys, tokens, passwords, and other credentials; never place their
 literal values in an agent payload or chat. The saved secret must contain the complete header value
 expected by the destination, including `Bearer ` when required. After every successful create or
-update, report each missing name and tell the user to run `ck secrets set <name>`, add it at
+update, report each missing name and tell the user to add it at
 `https://callkaro.ai/dashboard/settings/secrets`, or ask their admin to update the registry. See
 [../secrets.md](../secrets.md) for source-code syntax and the full workflow.
 

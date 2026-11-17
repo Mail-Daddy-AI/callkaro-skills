@@ -3,8 +3,8 @@
 
 Use when **building from a PRD/BRD** (this is the checklist that turns a spec
 into a test suite), auditing a live client agent, fixing a reported
-misbehaviour, or hardening an agent before it ships. The mechanics (export,
-patch, simulate) are in [create-update.md](create-update.md),
+misbehaviour, or hardening an agent before it ships. The mechanics (load,
+edit, simulate) are in [create-update.md](create-update.md),
 [versions.md](versions.md) and [../simulations.md](../simulations.md) — this
 file is **what to test** and **what each branch must do**.
 
@@ -42,10 +42,11 @@ branch behaves correctly *and* terminal branches actually terminate.
 
 ## Verification: two passes, always
 
-```bash
-ck sim run <agentId> --tests <failingTestId> --versions <vid>   # 1. the exact failure
-ck sim run <agentId> --tests <allTestIds>   --versions <vid>    # 2. the FULL set
-```
+With the simulation tools loaded, run `start_simulation_batch` for the version
+1. with the exact failing test case, then
+2. with the FULL set of test cases,
+
+and read each with `get_simulation_batch_status` / `analyze_simulation_batch`.
 
 **A single-case pass is not a pass.** Narrow fixes routinely break a
 neighbouring branch (a missing-context tweak swallowing the wrong-number path
@@ -65,5 +66,5 @@ Beyond the config sanity checks in [voice-and-transcriber.md](voice-and-transcri
 - [ ] No conflict between happy-path instructions and terminal branches.
 - [ ] Every terminal branch really ends the call: its closing line is in
       `end_call_msg` (preferred), or an `end` function is present where one is used.
-- [ ] Each fix committed with a reason (`--commit "…"`) so the change is
-      auditable.
+- [ ] Each fix saved (`save_version_to_db`) as its own version, with the reason
+      recorded, so the change is auditable.

@@ -1,6 +1,5 @@
 <!-- graph-summary: Website widget install and CRM links (HubSpot, LeadSquared, Heltar, AI Sensy), number verification and DND. Use when embedding the widget or connecting a CRM. -->
 <!-- source: TejasLamba2006/callkaro-skills skills/callkaro-widget-integrations/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
-<!-- audience: ck -->
 
 # CallKaro Widget and Integrations
 

@@ -1,71 +1,70 @@
-<!-- graph-summary: Phone numbers: list, buy, release, spam flags, inbound vs outbound assignment rules (inbound is one agent per number). Use before assigning a number; buying one spends credits. -->
+<!-- graph-summary: Phone numbers: list and assign through the numbers tools, inbound vs outbound rules (inbound is one agent per number); buying, releasing and spam flags are on the dashboard and buying spends credits. Use before assigning a number. -->
 # Phone Numbers
 
 Numbers come from CallKaro's own pool (no bring-your-own). A number can be:
 - **outbound** for MANY agents (caller ID for outgoing calls)
 - **inbound** for exactly ONE agent (the server rejects a second inbound
-  assignment with a 409 — surface that message to the user)
+  assignment with a 409 — surface that message to the user; they release it
+  from the other agent first, do not retry with another number)
 
-All commands accept **either the number's id or the phone number itself**
-(with/without `+`, spaces, dashes): `ck numbers spam 918244464128` works.
+Load the `numbers` tool group first.
 
-## Commands
+## Tools
 
-| Command | What it does |
+| Tool | What it does |
 |---|---|
-| `ck numbers list [--json]` | Your numbers: number, id, purchase date, spam flag, active/released, which agent uses it inbound, which agents use it outbound. |
-| `ck numbers catalog [--json]` | Buyable pool + `pricepernumber` (₹, deducted from credits). |
-| `ck numbers buy <numberOrPhone> [--yes]` | Buy (allot) a pool number. **Spends credits** — confirm with the user first; `--yes` skips the CLI's own prompt. |
-| `ck numbers spam <numberOrPhone> [--off]` | Mark as spam (`--off` unmarks). |
-| `ck numbers unspam <numberOrPhone>` | Same as `spam --off`. |
-| `ck numbers release <numberOrPhone> [--yes]` | Release (unrent) — the number is unassigned from ALL agents. Destructive; confirm first. |
+| `list_phone_numbers` (`kind`: `voice` or `whatsapp`) | Your numbers: number, id, spam flag, active/released, which agent uses it inbound, which agents use it outbound. Call it before assigning; never invent an id. |
 
-## Assigning numbers to agents (lives under `ck agents`)
+On the CallKaro dashboard (no tool): the buyable pool and its
+`pricepernumber` (₹, deducted from credits); buying a number (**spends
+credits** — confirm with the user first); marking or unmarking spam; releasing
+a number (unassigned from ALL agents — destructive, confirm first).
 
-| Command | What it does |
+## Assigning numbers to agents
+
+`assign_phone_number` (`agentId`, `action`, `phoneNumberId`):
+
+| `action` | What it does |
 |---|---|
-| `ck agents set-outbound <agentId> --number <numberId>` | Set the agent's caller-ID number for outgoing calls. |
-| `ck agents set-outbound <agentId> --clear` | Remove it. |
-| `ck agents set-inbound <agentId> --number <numberId>` | Route this number's incoming calls to the agent. Fails with 409 if another agent already has it inbound. |
-| `ck agents set-inbound <agentId> --number <numberId> --remove` | Unassign. |
+| `set_voice_outbound` | Set the agent's caller-ID number for outgoing calls. |
+| `set_voice_inbound` | Route this number's incoming calls to the agent. Fails with 409 if another agent already has it inbound. |
+| `clear_*` | Remove the assignment. |
 
 ## Typical flow: give an agent a number
 
-```bash
-ck numbers list --json                 # anything free?
-# none free →
-ck numbers catalog --json              # show user the options + price
-ck numbers buy <id>                    # after user confirms the spend
-ck agents set-outbound <agentId> --number <id>
-ck agents set-inbound  <agentId> --number <id>   # only if it should answer calls
-```
+1. `list_phone_numbers` — anything free?
+2. None free → the user picks and buys one on the dashboard (after confirming
+   the spend).
+3. `assign_phone_number` with `set_voice_outbound`; also `set_voice_inbound`
+   only if it should answer calls.
 
-An agent needs an **outbound** number before `ck calls make` or a batch can
+An agent needs an **outbound** number before a real call or a batch can
 dial from it (test calls may use platform defaults).
 
-## WhatsApp numbers — different pool, no `buy`
+## WhatsApp numbers — different pool, no buying
 
 Voice numbers above come from CallKaro's own pool. **WhatsApp numbers do not**
 — they come from Meta, via the WhatsApp Business Account the user links **on
-the CallKaro dashboard, manually** (not the CLI/MCP). Adding a number is
-Meta's embedded signup ("+ Add Phone Number") — an interactive Facebook-login
-popup that cannot be driven headlessly. There is no `ck whatsapp catalog`,
-`buy`, or `register`; if the user wants a new WhatsApp number, send them to
-the dashboard, then use the commands below to list/assign what's already
-linked.
+the CallKaro dashboard, manually**. Adding a number is Meta's embedded signup
+("+ Add Phone Number") — an interactive Facebook-login popup that cannot be
+driven headlessly. If the user wants a new WhatsApp number, send them to the
+dashboard, then list/assign what's already linked.
 
-Requires an **active WhatsApp subscription** on the account — `ck whatsapp
-list` and the `set-whatsapp-*` commands below return a
-`SUBSCRIPTION_REQUIRED` / `SUBSCRIPTION_PAUSED` error otherwise. Surface that
-message as-is; it means the dashboard subscription needs activating, not a
-CLI/auth problem.
+Requires an **active WhatsApp subscription** on the account — listing and
+assigning WhatsApp numbers return a `SUBSCRIPTION_REQUIRED` /
+`SUBSCRIPTION_PAUSED` error otherwise. Surface that message as-is; it means
+the dashboard subscription needs activating, not an auth problem.
+`check_whatsapp_readiness` checks this.
 
-| Command | What it does |
+| Tool | What it does |
 |---|---|
-| `ck whatsapp list [--json]` | Numbers on the linked WhatsApp Business Account, with status/quality. Read-only — the only way to add a new number is the dashboard. |
-| `ck agents set-whatsapp-outbound <agentId> --number <id>` / `--clear` | Set/clear a **voice agent's** WhatsApp outbound number. |
-| `ck agents set-whatsapp-inbound <agentId> --number <id>` / `--clear` | Set/clear a **voice agent's** WhatsApp inbound number. Unassigns it from any other agent first (one-agent rule, same as voice inbound). |
+| `list_phone_numbers` (`whatsapp`) | Numbers on the linked WhatsApp Business Account, with status/quality. Read-only — the only way to add a new number is the dashboard. |
+| `assign_phone_number` (`set_whatsapp_outbound` / `clear_*`) | Set/clear a **voice agent's** WhatsApp outbound number. |
+
+A **voice agent's** WhatsApp inbound number is set on the dashboard; it
+unassigns the number from any other agent first (one-agent rule, same as
+voice inbound).
 
 For **chat agents**, WhatsApp number assignment is a field on the agent, not a
-separate command — see `chat-agents.md` (`whatsappPhoneNumber` /
-`whatsappDisplayPhN` via `ck chat-agents update`).
+separate step — see [chat-agents.md](chat-agents.md) (`whatsappPhoneNumber` /
+`whatsappDisplayPhN` via `update_chat_agent`).

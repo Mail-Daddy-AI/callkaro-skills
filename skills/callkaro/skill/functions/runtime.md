@@ -1,5 +1,5 @@
 <!-- graph-summary: What custom function code can see at runtime (globals, utils, ctx.session, language-switching internals), measured on real calls. Read before writing a function that needs more than its arguments. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-voice-agents/REFERENCE-function-runtime.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-voice-agents/REFERENCE-function-runtime.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # CallKaro function runtime: what custom function code can see and use
 
@@ -10,7 +10,7 @@ recipe at the bottom before relying on a detail.
 
 ## Seeing output from a function
 
-- `logger.info(...)` reaches the call log (`ck calls logs <id>`, or the log blob). The line prefix shows
+- `logger.info(...)` reaches the call log (ask the user for the log lines; the harness cannot read the log). The line prefix shows
   `[<string>:N]`, where N is the line inside the function body.
 - A bare `print(...)` did not show up in the call log. Use `logger.info`. UNVERIFIED whether `print` lands
   in some other sink.
@@ -257,17 +257,17 @@ Test these on a throwaway version, one change per call, reading the object back 
 
 ## Probe recipe (to re-measure or go deeper)
 
-1. Clone a version: `ck agents clone-version <agent> --versions <src> --name "<probe name>" --prompt-type 2
-   --language hi`. Never probe on a live or published version.
-2. Add two functions with `ck agents update <agent> --versions <new> --set @file.json` (only `functions` and
-   `capabilities`): a `custom_pre_call` that logs and returns `system_prompt` unchanged, and a `custom_in_call`
-   taking `ctx` that logs and returns a dict.
+1. Load the source version with `read_agent_state`. Never probe on a live or published version: the probe is
+   saved once, as a new version, at the end of step 3.
+2. With `trigger_single_pipeline` set `systempromptType: 2` and `default_language: "hi"`, and add two functions
+   with `edits` (op `add`): a `custom_pre_call` that logs and returns `system_prompt` unchanged, and a
+   `custom_in_call` taking `ctx` that logs and returns a dict.
 3. Add one sentence to the first capability prompt telling the model to call the in-call probe once, silently,
-   before speaking.
+   before speaking. Then `review_draft` and `save_version_to_db` with a probe name, choosing save as new version.
 4. Filter every logged value. Drop the whole value when the name looks secret (key, secret, token, password,
    auth, cookie, credential). Masking only part of a secret leaves its tail in a stored log.
-5. Dial with `ck calls make --agent <a> --to <n> --metadata "$(cat compact.json)" --versions <new> --test`
-   (git-bash; metadata must be one-line JSON). Test calls need the owner's go-ahead each time.
+5. The user places a test call to the new version from the dashboard (metadata must be one-line JSON). Test
+   calls need the owner's go-ahead each time.
 6. Read the log and write the results to a file (terminal output can be swallowed). Check that the probe's
    start and end marker lines are both present before concluding anything: a call can fail before the probe
    runs, for example when the primary LLM times out and the caller hangs up before the model's first turn.

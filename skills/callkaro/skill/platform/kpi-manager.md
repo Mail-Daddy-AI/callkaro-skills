@@ -1,5 +1,5 @@
 <!-- graph-summary: KPI Manager: data sources, metrics and targets, the RCA prompt and reports, the Pending Tasks board. Use to set up KPI tracking or read why a metric missed its target. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-kpi-manager/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-kpi-manager/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # CallKaro KPI Manager
 
@@ -61,7 +61,7 @@ Categories: Agent behaviour, Function call or integration, Post-call measurement
 
 Columns: Action Items (new cards land here), In Progress, Testing in A/B, Live in Prod, Done, Rejected. A card can be assigned to a person or to AI FDE, given target agent versions, re-severity'd, commented on, given attachments, dragged or moved, or created by hand. Nothing reaches AI FDE unless a person assigns the card; if AI FDE is already working that agent version the new fix queues until the current one is Done or Rejected. Read the evidence and prompt excerpt before assigning.
 
-There is no `ck` command for the board; use the dashboard. Rejected is how a card is retired, there is no delete.
+There is no harness tool for the board; the user works it on the dashboard. Rejected is how a card is retired, there is no delete.
 
 ## Run Manual RCA
 

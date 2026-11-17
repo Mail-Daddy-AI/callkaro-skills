@@ -1,5 +1,5 @@
 <!-- graph-summary: The standard QA method: Agent Brief, branch enumeration, simulation and manual cases, scoring (pass at 85, critical cases 5 of 5). Use to plan, run or score QA on a version. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-qa-framework/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-qa-framework/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # CallKaro Agent QA Framework
 
@@ -77,7 +77,7 @@ Mark critical cases: the main conversion path, compliance paths (DND, AI disclos
 
 ### Reuse before creating
 
-1. List the agent's existing test cases (`ck sim tests <agentId>`; `ck sim runs <agentId>` lists past runs, not cases).
+1. List the agent's existing test cases (`list_simulation_test_cases`; `list_simulation_batches` lists past runs, not cases). Load the `simulation` tool group first.
 2. Map them to the branch list.
 3. Create only the missing ones. Never delete existing cases.
 
@@ -86,7 +86,7 @@ Mark critical cases: the main conversion path, compliance paths (DND, AI disclos
 | Field | Content |
 |---|---|
 | `testcaseName` | `<stage> - <branch> - <variant>`, short and distinctive (`Identity - proxy answers - gives callback time`) |
-| `userPersona` | who the caller is: identity, relationship to the business, language/register, what they know (exact values matching `testVariables`) and what they do NOT know ("never guess prices/timings"). Sent ahead of `userPrompt` |
+| `userPersona` | who the caller is: identity, relationship to the business, language/register, what they know (exact values matching `testVariables`) and what they do NOT know ("never guess prices/timings"). `create_simulation_test_case` has no separate field: put it at the start of `userPrompt` |
 | `userPrompt` | what happens in this call: one-sentence goal, numbered beats with the exact test move, a trap beat if the agent does the wrong thing ("accept whatever time it offers" to expose invention), and the hang-up holdback rule ("Do not say goodbye or end the call yourself; reply briefly ('Theek hai') and wait"). Never instructions for the agent |
 | `successCriteria` | numbered observable PASS checks (turn evidence, function name/args/count, closing line + `end_call`), followed by the universal FAIL lines below, then `Expected post-call: <field> = <value>` |
 | `testVariables` | realistic values for every `{{variable}}` and every field a pre-call function adds; edge tests change one variable against a shared baseline |
@@ -111,20 +111,11 @@ Universal FAIL lines to copy into every `successCriteria` (the grader passes any
 - **Grader crashes are INVALID, not FAIL:** when `analysisStatus` is `"failed"` (or summary is `"Failed to run LLM analysis on simulation results."`), `isTestSucceed: false` is a platform grader crash. Rerun before counting.
 - **Read results in four steps:** (1) Validity (`analysisStatus` not `failed`, caller did not drift off script regardless of `isPerformedLikeUser`), (2) Mechanics (function calls in transcript, no sentinel leaks, closing turn), (3) Post-call values (`post_call` matches expected), (4) Verdict (`isTestSucceed` — tighten criteria if a pass contradicts steps 2–3).
 
-```bash
-ck sim create <agentId> --name "Identity - proxy answers - gives callback time" \
-  --prompt "<caller instructions>" --criteria "<observable criteria>" \
-  --variables @vars.json --functions '[{"name":"fn","response":{"status":"success"}}]'
-```
+Create each case with `create_simulation_test_case` (`testcaseName`, `userPrompt`, `successCriteria`, `testVariables`, `testFunctions`, `testLLMModel`); it pauses for the user's approval. Change an existing case with `update_simulation_test_case`.
 
 ### Running
 
-```bash
-ck sim run <agentId> --tests <id1>,<id2> --versions <versionUnderQA>
-ck sim results <batchId> --agent <agentId>
-```
-
-`--wait` blocks until every result exists and exits 1 on any failure or timeout. Five runs per case; confirm the run count in the first results. Record per case: runs, passes, pass %, what happened, how the agent handled it. A case passing some runs and failing others is flaky behaviour, not a pass: note the pattern.
+`start_simulation_batch` with the test case ids, the version under QA and `epoch` 5 (it spends credits: confirm with the user; at most 50 runs per batch). Then `get_simulation_batch_status` until `isComplete`, and `analyze_simulation_batch` (pass rates per case, failing transcripts) or `analyze_simulations` (why runs failed). Five runs per case; confirm the run count in the first results. Record per case: runs, passes, pass %, what happened, how the agent handled it. A case passing some runs and failing others is flaky behaviour, not a pass: note the pattern.
 
 Honest limits: simulations run with empty metadata unless `testVariables` are given, and auto-grading can fail platform-side. Sim transcripts test logic only; live calls prove the metadata path ([operations](../platform/operations.md), sim honesty).
 
@@ -143,7 +134,7 @@ Written for human testers on real calls. Same branch list, written as tester ins
 
 ## The workbook (.xlsx)
 
-Do not hand-format. Write the cases to one JSON file and run `python build_workbook.py qa.json out.xlsx` (needs `openpyxl`); it produces the same styled workbook for every agent. Exact JSON keys, columns and the colour legend are in [qa workbook](qa-workbook.md).
+Do not hand-format. Write the cases as one JSON document; the harness cannot run scripts or produce files, so give the user the JSON and they run `python build_workbook.py qa.json out.xlsx` (needs `openpyxl`). It produces the same styled workbook for every agent. Exact JSON keys, columns and the colour legend are in [qa workbook](qa-workbook.md).
 
 Tabs: **Summary** (live Review %, Simulation %, QA score, critical cases, verdict, cases per category with chart), **Agent Brief**, **Agent Review**, **Simulation Results**, **Manual Test Cases**. Every case carries a Category (colour-coded), Persona, Critical flag and a Layer / fault column (prompt, function, config, voice/platform, data) so a failure routes straight to the right debug layer. Status, Critical and Layer are dropdowns; scores and pass rates are colour-scaled.
 

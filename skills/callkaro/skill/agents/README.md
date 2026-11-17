@@ -1,4 +1,4 @@
-<!-- graph-summary: What a voice agent is (LLM, voice, transcriber, prompt, functions, post-call) and the ck agent commands. Use as the entry point for any voice-agent task. -->
+<!-- graph-summary: What a voice agent is (LLM, voice, transcriber, prompt, functions, post-call) and the harness tools that act on it. Use as the entry point for any voice-agent task. -->
 # Voice Agents — the core entity
 
 A CallKaro **agent** is a phone-calling AI: an LLM + voice (TTS) + transcriber
@@ -15,7 +15,7 @@ Read next: **[AGENT-VERSION-REFERENCE.md](AGENT-VERSION-REFERENCE.md) — the co
 field, its values, per-provider voice/transcriber sets, functions, pathways,
 traps). Load it before writing any agent/version payload.** Then
 [prompts.md](prompts.md) (how to write the script), [create-update.md](create-update.md)
-(CLI workflows + starter JSON), [versions.md](versions.md) (publish/A/B),
+(create/edit workflow + starter JSON), [versions.md](versions.md) (publish/A/B),
 [voice-and-transcriber.md](voice-and-transcriber.md) (voice + STT choices),
 [functions.md](functions.md) (abilities incl. advanced code).
 
@@ -36,28 +36,26 @@ traps). Load it before writing any agent/version payload.** Then
 
 Everything else has sane defaults.
 
-## Commands
+## Tools
 
-| Command | Does |
+| Tool | Does |
 |---|---|
-| `ck agents list [--json]` | all agents: name, id, status, numbers, published versions |
-| `ck agents get <id> [--json]` | agent-level fields only (no version data) |
-| `ck agents get <id> --versions <vid> --json` | ONE merged agent+version JSON — the full working config |
-| `ck agents versions <id> [--json]` | version list: name, id, language, type, active |
-| `ck agents create [json\|--file f.json]` | create from a single JSON object (`name` required; `versionName` defaults `v1`). **The new agent is immediately published.** |
-| `ck agents clone-version <id> --versions <sourceVid> --name <name> --prompt-type <0-3> --language <code>` | clone a source into a sibling version under the same agent; see [versions.md](versions.md) |
-| `ck agents update <id> --set '{json}' [--versions <vid>] [--commit "msg"]` | patch fields; see [create-update.md](create-update.md) for the level split |
-| `ck agents export <id> [--versions <ids>] [--file out.json]` | sanitized JSON (ids/publish state stripped, `x_agent_id` added) — re-importable |
-| `ck agents import file.json [--dry-run]` | object → one agent; array → one agent with several versions. Validates like the web importer first |
-| `ck agents publish <id> --versions <vid>` | publish (per-language; replaces that language's published version) |
-| `ck agents toggle-active <id> --versions <vid>` | activate/deactivate a version |
-| `ck agents ab <id> --versions "v1=60,v2=40"` / `--disable` | A/B traffic split (≥2 versions, ratios sum to 100) |
-| `ck agents ab-advanced <id> --rules @rules.json` / `--show` / `--disable` | **rule-based A/B**: if/elseif/else on call metadata → version or language (see [versions.md](versions.md)) |
-| `ck agents set-inbound / set-outbound <id> --number <nId>` | phone assignment — see [../numbers.md](../numbers.md) |
+| `list_agents` | all agents with each published version per language; pass `name` to find the one the user means |
+| `list_versions` | all versions: id, name, language, prompt type, active/published state, A/B use |
+| `read_agent_state` | loads one version (the published one when `versionId` is omitted) into the working draft — the full working config |
+| `read_version` | selected sections of a saved version or the draft; start with the schema, fetch only what you need |
+| `create_agent_in_db` → `trigger_single_pipeline` → `review_draft` → `save_version_to_db` | create an agent and its first version. **The first version is immediately published** for its language |
+| `trigger_single_pipeline` (`draftPatch` or `edits`) or `edit_draft_script` → `review_draft` → `save_version_to_db` | change version fields; see [create-update.md](create-update.md) for the level split. A published base version is always saved as a new version, never overwritten |
+| `manage_version_publishing` | `publish_version` (per-language; replaces that language's published version), `set_display_version`, `set_status` |
+| `read_ab_test_configuration`, `discover_ab_test_metadata`, `manage_ab_testing` | A/B traffic split (≥2 versions, ratios sum to 100) and **rule-based A/B**: if/elseif/else on call metadata → version or language (see [versions.md](versions.md)). Load the ab_testing tools first |
+| `list_phone_numbers` → `assign_phone_number` | phone assignment (load the numbers tools) — see [../numbers.md](../numbers.md) |
+
+Export/import (sanitized JSON: ids and publish state stripped, `x_agent_id` added) and
+activating/deactivating a version are done on the CallKaro dashboard.
 
 ## Rules the server enforces (expect these errors)
 
-- Version-level fields in `update` without `--versions <vid>` → 400
+- Version-level fields written without a version id → 400
   *"Version ID is required to update version-specific fields."*
 - An inbound number already inbound on another agent → 409.
 - A published or A/B version cannot be deactivated or deleted.

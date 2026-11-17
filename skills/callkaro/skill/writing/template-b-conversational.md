@@ -1,5 +1,5 @@
 <!-- graph-summary: Paste-in Section 0B for semi-scripted agents: how the model reads SAY lines vs composed GOAL / MUST CONTAIN / NEVER blocks, turn length and how it sounds. Fill every [[FILL]] first. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-conversational-agents/TEMPLATE-B.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-conversational-agents/TEMPLATE-B.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Template B: Section 0B (conversational agent)
 

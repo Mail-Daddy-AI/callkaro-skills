@@ -1,5 +1,5 @@
 <!-- graph-summary: Skeleton code for P0 and prompt-rewriting pre-call, on_connected, in-call and post-call functions. Fill from the design; delete what the agent does not need. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-functions/TEMPLATES.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-functions/TEMPLATES.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Function skeletons
 

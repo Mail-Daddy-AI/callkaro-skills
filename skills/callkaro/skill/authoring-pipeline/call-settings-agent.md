@@ -52,5 +52,5 @@ rescheduled_follow_up_prompt default:
 7. webhook must be a valid HTTPS URL string, or "" to clear it.
 8. noise_cancellation_strength must be between 0.05 and 1.0 and is relevant only when noise_cancellation is true.
 9. punctuations_to_remove must contain strings only. Preserve each exact string; do not interpret entries as regular expressions.
-10. webhook_headers must be an array of {key_name, value} strings. Use non-sensitive literals directly. For credentials, first use the names supplied by `ck secrets list --json`, then set the entire value to an exact x_secrets.NAME reference. Never emit a plaintext credential or an embedded value such as "Bearer x_secrets.NAME".
+10. webhook_headers must be an array of {key_name, value} strings. Use non-sensitive literals directly. For credentials, first use the secret names the user supplies (secrets are listed on the CallKaro dashboard), then set the entire value to an exact x_secrets.NAME reference. Never emit a plaintext credential or an embedded value such as "Bearer x_secrets.NAME".
 11. Do NOT handle warm_transfer, conversion_reason, or useOthersDropOffReason here — those are handled by other sections.

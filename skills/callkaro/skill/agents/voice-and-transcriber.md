@@ -9,27 +9,21 @@
 
 ## Find real voices — never invent one
 
-```bash
-ck voices --providers                      # every provider + its models
-ck voices --provider cartesia --fields     # exact keys, ranges and defaults
-ck voices --provider sarvam --model bulbul:v3 --language hi-IN --gender female
-ck transcribers                            # every provider/model + languages
-ck transcribers --provider gnani --fields
-```
+Load the voices tools and use `list_voices`: with no `provider` it lists the
+providers (and models) this account may use; with a `provider` it searches that
+provider's voices by `model`, `language`, `gender` or `query`. It covers Eleven
+Labs, Cartesia, Sarvam, Azure, Speechify, Deepgram, Open AI and Murf. Speechify
+**requires** a language because its voices are locale-scoped. **Copy
+`voice_name`/`voice_id` verbatim** — a remembered id goes stale or belongs to
+another provider. Transcriber providers, models and languages: reference §10.
 
-`ck voices` covers **all** providers — Eleven Labs, Cartesia, Sarvam, Azure,
-Speechify, Deepgram, Open AI, Murf (`--all` adds admin-gated ones). `--language hi`
-matches `hi-IN` too; Speechify **requires** `--language` because its voices are
-locale-scoped. **Copy `voice_name`/`voice_id` verbatim** — a remembered id goes
-stale or belongs to another provider.
-
-`--fields` is the fastest way to write a correct config: it prints only the keys
-that provider uses, so you never write one it ignores.
+The reference tables list only the keys each provider uses, so you never write
+one it ignores.
 
 ## Choosing a voice
 
 1. Filter by language, then gender, then style.
-2. If the user names a specific voice, search **without** `--gender` — the
+2. If the user names a specific voice, search **without** a gender — the
    filter could hide it.
 3. Default gender when nothing is stated: **masculine** for `hi en kn gu ml`,
    **feminine** for `mr ta te bn`.
@@ -70,9 +64,8 @@ reference §7.
 
 ## Verify after writing
 
-```bash
-ck agents get <agentId> --versions <vid> --json    # did .transcriber / .voice_configuration round-trip?
-ck calls make --agent <agentId> --to <number> --test   # real audio
-```
+Read the saved version back with `read_version`: did `transcriber` /
+`voice_configuration` round-trip? For real audio, the user places a test call
+from the CallKaro dashboard.
 Some accounts have the transcriber language locked (provider envelope) — if a
 write doesn't round-trip, report it instead of claiming success.

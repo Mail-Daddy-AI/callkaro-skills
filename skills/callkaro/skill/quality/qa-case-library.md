@@ -1,5 +1,5 @@
 <!-- graph-summary: Branch patterns to turn into QA cases from the Agent Brief: who answers, availability, slot attacks, objections, functions, endings. Critical cases are marked C. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-qa-framework/CASE-LIBRARY.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-qa-framework/CASE-LIBRARY.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Case library
 

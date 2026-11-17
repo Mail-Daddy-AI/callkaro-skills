@@ -1,5 +1,5 @@
 <!-- graph-summary: Post-call variables, analysis prompt, conversion_reason, dispositions and per-duration models. Use when defining outputs or when extracted values are wrong, empty or guessed. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-post-call/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-post-call/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Post-Call Variables and Outcomes
 

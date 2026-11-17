@@ -1,5 +1,5 @@
 <!-- graph-summary: Make the agent sound human: short turns, goals over scripts, example exchanges, rationed fillers, prompt size vs latency, Hinglish. Use when calls sound robotic, long or repetitive. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-conversational-voice/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-conversational-voice/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # Conversational Voice: Sounding Human on CallKaro
 

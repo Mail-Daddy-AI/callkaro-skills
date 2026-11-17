@@ -1,5 +1,5 @@
 <!-- graph-summary: Function contracts, execution order, global vs capability scope, P0 and placeholder rules, failure patterns. Use when writing any function or when one crashes a call or fights another. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-functions/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-functions/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # CallKaro Functions
 
@@ -89,7 +89,7 @@ Pre-calls run once per capability at call start and again on the merged prompt (
 
 ## Secrets
 
-New code reads from the vault: `x_secrets["API_KEY"]` in Python and JavaScript, `"x_secrets.API_KEY"` as a header value in declarative configs and webhook headers. Older agents hardcode client keys in function code; that is common and not a review finding, but new code should use the vault. `ck secrets set NAME` creates one.
+New code reads from the vault: `x_secrets["API_KEY"]` in Python and JavaScript, `"x_secrets.API_KEY"` as a header value in declarative configs and webhook headers. Older agents hardcode client keys in function code; that is common and not a review finding, but new code should use the vault. The user creates one on the CallKaro dashboard.
 
 ## Common function bugs
 

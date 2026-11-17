@@ -1,5 +1,5 @@
 <!-- graph-summary: Turn a follow-up plan into a workflow: step types, Conditions, importable JSON, enrolment, reading a run's path. Use to design a workflow or find why a run took the wrong branch. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-workflows/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-workflows/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # CallKaro Workflows
 
@@ -96,14 +96,9 @@ From your own system, `POST https://api.callkaro.ai/workflow/assign`, header `X-
 
 Workflows, open one: Total Leads, Active, Completed, Failed, Cancelled, search by phone. Columns: Status, Current Step, Enrolled, Calls Attempted, Last Call, Duration, Cost. Click a row for the timeline: each step, call SID and outcome, API response, the branch taken and why, errors. Wrong path: open the timeline, look at the Conditions step, it shows the value each rule compared. Usual causes are an empty or differently spelled field, rule order, a last-call source tested before any Send Call, or a post-call variable the agent never extracts.
 
-## Terminal (`ck workflows` and `ck contacts`)
+## On the dashboard
 
-Operate workflows and CRM contacts directly from the CLI (see [ck](../tools/ck.md)):
-
-- **Schema & CRUD:** `ck workflows schema`, `list`, `get <id>`, `create <name> --file graph.json`, `import --file wf.json`, `update <id>`, `validate [<id>] [--file graph.json]`, `export <id>`, `duplicate <id>`, `delete <id> --yes`.
-- **Surgical node edits:** `ck workflows add-node <id> --type <type> [--after <nodeId>] [--handle <exitId>] [--set <json>]`, `set-node <id> <nodeId> --set <json>`, `remove-node <id> <nodeId> [--reconnect] --yes`, `connect <id> --from <aId> --to <bId> [--handle <exitId>]`, `disconnect <id> --from <aId> [--handle <exitId>]`.
-- **Runs & debugging:** `ck workflows leads <id>`, `lead <id> <phone>`, `run <id> <phone> [--json]` (step-by-step timeline, `action_results` and run variables), `journey <id> <phone>` (every call in the workflow for that phone).
-- **Enrolling from CRM via CLI:** `ck contacts assign --workflow <id> [--phones a,b | --attr k=v] [--at <ISO>] [--force] --dry-run` (always preview with `--dry-run` first). Manage contacts and CRM attributes with `ck contacts list|get|create|update|delete|upload|export` and `ck contacts attributes list|set|delete`.
+There is no harness tool for workflows or contacts: the user creates, imports, edits and deletes workflows, enrolls contacts, and reads runs on the CallKaro dashboard. Confirm who an enrolment targets, and how many, before it runs. The run timeline shows each step, its `action_results` and the run variables; a lead's journey shows every call in the workflow for that phone.
 
 ## Full spec
 

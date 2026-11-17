@@ -1,25 +1,23 @@
 ---
 name: callkaro
 description: >
-  Design, build, test and operate CallKaro voice and chat AI agents with the ck
-  CLI. Use for designing an agent, writing its prompt, functions and post-call
-  analysis, QA and debugging, and for managing versions, numbers, batches,
-  workflows, contacts, secrets, simulations, audits and analytics.
+  Design, build, test and operate CallKaro voice and chat AI agents through the
+  ai-fde harness tools. Use for designing an agent, writing its prompt, functions
+  and post-call analysis, building from a BRD, QA and debugging, and for managing
+  versions, numbers, simulations, calls and analytics.
 ---
 # CallKaro skill graph
 
-Use `ck` to build and operate CallKaro voice and chat agents. Start with
-[How to Work](skill/INSTRUCTIONS.md), then open only the nodes needed for the
-task. Links between nodes are graph edges; follow them when their detail is
-relevant. Inside ai-fde's harness, map every `ck` command through
-[tools/harness.md](skill/tools/harness.md).
+Start with [How to Work](skill/INSTRUCTIONS.md), then open only the nodes needed
+for the task. Links between nodes are graph edges; follow them when their detail
+is relevant. Act through the harness tools: [tools/harness.md](skill/tools/harness.md)
+maps every job to its tool and lists what only the dashboard can do.
 
-Keep these invariants: check authentication first, prefer JSON read commands,
-discover IDs instead of inventing them, use `--versions` for version selection,
-and obtain explicit confirmation before a command spends credits or starts real
-calls/messages. Design before writing a prompt; write prompts as plain text;
-end calls through `end_call_msg` rather than an `end` function; fix a bad call
-at its root cause, never with another rule.
+Keep these invariants: discover IDs instead of inventing them, and obtain explicit
+confirmation before anything spends credits or starts real calls/messages. Design
+before writing a prompt; write prompts as plain text; end calls through
+`end_call_msg` rather than an `end` function; fix a bad call at its root cause,
+never with another rule.
 
 ## Nodes
 
@@ -29,32 +27,30 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 
 ### Core operations
 
-- [Analytics](skill/analytics.md) — Account, agent and version performance (calls, connect and conversion rates, minutes, credits). Use to answer how an agent is doing or compare versions after an A/B test.
-- [Audit Strategies (AI Auditor)](skill/audit-strategies.md) — AI Auditor strategies via ck: score sampled calls with an LLM, scoped by call filters. Use to create or update an audit strategy; creating one spends credits on live calls.
-- [Auth & Account](skill/auth.md) — Signing in to the ck CLI (ck login, whoami, logout) and where the token lives. Use when ck reports not logged in or the wrong account.
+- [Analytics](skill/analytics.md) — Account, agent and version performance (calls, connect and conversion rates, minutes, credits) through the call analytics tool. Use to answer how an agent is doing or compare versions after an A/B test.
 - [Batch Calls](skill/batches.md) — Batch call campaigns from a CSV of leads: validate, create, schedule, monitor, retry. Creating one dials real people at once, so confirm row count and spend first.
-- [Calls — placing, history, live queues](skill/calls.md) — Placing calls (test by default), call history, a call's transcript and raw log, live queues. Use to make a test call, read what happened on a call, or debug a failed call from its log.
-- [Chat agents](skill/chat-agents.md) — WhatsApp and Instagram chat agents via ck chat-agents: create, version, publish, templates, predefined functions. Use for any chat-agent task; never send chat payloads to voice agents.
-- [Contacts (CRM)](skill/contacts.md) — CRM contacts: attribute schema, create, upload, update, delete, assign to an agent or workflow. Use when managing leads or the fields a workflow or agent reads.
+- [Calls — placing, history, live queues](skill/calls.md) — Placing calls (test by default, done on the dashboard), call history and a call's transcript through the calls tools, the raw log, live queues. Use to read what happened on a call or debug a failed call.
+- [Chat agents](skill/chat-agents.md) — WhatsApp and Instagram chat agents via the chat-agent tools: create, version, publish, templates, predefined functions. Use for any chat-agent task; never send chat payloads to voice agents.
+- [Contacts (CRM)](skill/contacts.md) — CRM contacts: attribute schema, CSV import, hand-set protection, assigning to an agent or workflow (done by the user on the dashboard). Use when managing leads or the fields a workflow or agent reads.
 - [How to Work — operating instructions for AI agents using CallKaro](skill/INSTRUCTIONS.md) — How to work on any CallKaro task: the operating loop, design first, safety and money rules, and playbooks for PRD builds, new agents, fixing bad calls, batches and comparisons. Read first.
-- [Phone Numbers](skill/numbers.md) — Phone numbers: list, buy, release, spam flags, inbound vs outbound assignment rules (inbound is one agent per number). Use before assigning a number; buying one spends credits.
+- [Phone Numbers](skill/numbers.md) — Phone numbers: list and assign through the numbers tools, inbound vs outbound rules (inbound is one agent per number); buying, releasing and spam flags are on the dashboard and buying spends credits. Use before assigning a number.
 - [Account Secrets](skill/secrets.md) — The account Secrets Vault: names-only discovery and the reference syntax for function code and webhook headers. Use whenever an integration needs an API key or token; never inline one.
 - [Simulations & Test Cases](skill/simulations.md) — Simulation test cases and runs: an LLM caller talks to a version and a judge grades PASS/FAIL. Use to create test cases, run them, and read results before publishing.
 - [Workflows + Contacts together](skill/workflows-and-contacts.md) — How contacts and workflows connect: enrolment, the data a workflow reads from the CRM, and writing results back. Use when a workflow must act on contact attributes or update them.
-- [Workflows](skill/workflows.md) — Workflow graphs via ck: steps (call, wait, WhatsApp, branch, CRM update), validation, import and runs. Use to build, edit or inspect a workflow from the CLI.
+- [Workflows](skill/workflows.md) — Workflow graphs: steps (call, wait, WhatsApp, branch, CRM update), the JSON spec, validation rules and reading runs. Use to design a workflow the user builds on the dashboard.
 
 ### Agents
 
 - [Account survey reference (301 agents, Sept 2026)](skill/agents/account-survey.md) — What 301 production agents actually configure (types, voices, transcribers, models, time limits, silence). Use to sanity-check a config against real practice, not as rules.
 - [CallKaro Agents & Versions — Complete Reference](skill/agents/AGENT-VERSION-REFERENCE.md) — Every agent and version field: where it lives, allowed values, traps, minimal payloads. Use to check a field before any create or update; read it by section, it is long.
-- [Creating & Updating Agents](skill/agents/create-update.md) — Creating an agent in one JSON (agent and version fields together) and updating it with --versions. Use when assembling agent.json or patching an existing version.
+- [Creating & Updating Agents](skill/agents/create-update.md) — Creating an agent (agent and version fields together) and changing a version through the working draft. Use when assembling a new agent's fields or editing an existing version.
 - [CallKaro Voice Agents](skill/agents/field-notes.md) — Production traps: default snippet texts, the systempromptType trap, endpointing, fields that silently drop, speech hygiene, A/B rule chains. Use with the field reference before a write.
 - [Functions — giving the agent abilities](skill/agents/functions.md) — Which function type to use (transfer, hold, booking, custom pre/in/post-call), basic or advanced, and where to attach it. Read first when adding a function; then function-authoring.
 - [Post-Call Variables and Outcomes](skill/agents/post-call.md) — Post-call variables, analysis prompt, conversionreason, dispositions and per-duration models. Use when defining outputs or when extracted values are wrong, empty or guessed.
 - [Writing Agent Prompts](skill/agents/prompts.md) — The sections of a complete agent prompt and how to choose the prompt type (0 to 3). Use as background when writing or restructuring a prompt; house rules point to the writing nodes.
-- [Voice Agents — the core entity](skill/agents/README.md) — What a voice agent is (LLM, voice, transcriber, prompt, functions, post-call) and the ck agent commands. Use as the entry point for any voice-agent task.
+- [Voice Agents — the core entity](skill/agents/README.md) — What a voice agent is (LLM, voice, transcriber, prompt, functions, post-call) and the harness tools that act on it. Use as the entry point for any voice-agent task.
 - [Client Regression — branch coverage & verification discipline](skill/agents/regression.md) — Branch library and verification checklist that turns a PRD into a test suite. Use when building from a spec, auditing a live agent, or checking a fix did not break another branch.
-- [Versions, Publishing & A/B Testing](skill/agents/versions.md) — Versions, cloning, publishing per language and A/B testing (normal and advanced rules). Use when making a new version, publishing, or splitting traffic between versions.
+- [Versions, Publishing & A/B Testing](skill/agents/versions.md) — Versions, new versions from an existing one, publishing per language and A/B testing (normal and advanced rules). Use when making a new version, publishing, or splitting traffic between versions.
 - [Voice (TTS) & Transcriber (STT) — choosing them](skill/agents/voice-and-transcriber.md) — Choosing the voice (TTS) and transcriber (STT) for a language and persona, and fixing mishearing. Use when setting or changing voice or transcriber; field tables are in the reference.
 
 ### Authoring Pipeline
@@ -98,10 +94,16 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 - [CallKaro function runtime: what custom function code can see and use](skill/functions/runtime.md) — What custom function code can see at runtime (globals, utils, ctx.session, language-switching internals), measured on real calls. Read before writing a function that needs more than its arguments.
 - [Function skeletons](skill/functions/templates.md) — Skeleton code for P0 and prompt-rewriting pre-call, onconnected, in-call and post-call functions. Fill from the design; delete what the agent does not need.
 
+### Harness
+
+- [Building an agent from a BRD](skill/harness/brd-build.md) — Build a voice agent from a client's document (BRD) in the harness: extract the requirements checklist, agree a stage map, create the agent, write units with sub-agents, close every requirement, review, save. Use when the user attaches or pastes a BRD.
+- [Debugging real calls](skill/harness/call-debugging.md) — Debug real calls in the harness: find calls, read transcripts and post-call data, let the call analyst find the cause, check analytics, and fix it in a new version. Use when the user reports bad calls or asks how an agent performs.
+- [Editing and saving a voice agent](skill/harness/editing-drafts.md) — Change a voice agent in the harness: load a version into the draft, edit it (a patch, targeted edits or a script), review, save as a new version or commit, publish only when asked. The write rules that bite. Use for any change to an existing agent.
+- [Large results, documents and drafts](skill/harness/large-results.md) — Work with large data in the harness without filling context: offloaded tool results, stored documents, the draft and the skills, searched or paged with the context tools. Use when a result says it was offloaded or a draft or document is long.
+
 ### Integrations
 
 - [CallKaro Calls API](skill/integrations/calls-api.md) — Trigger CallKaro calls and campaigns over REST. Use when placing outbound calls, scheduling, retries, creating v1 or v2 campaigns, deleting scheduled calls, reading call history, handling errors.
-- [CallKaro MCP](skill/integrations/mcp.md) — The remote CallKaro MCP server: which tool to use, the account-mismatch trap, safe edits, MCP vs ck. Use when CallKaro MCP tools are available or being set up.
 - [CallKaro Webhooks](skill/integrations/webhooks.md) — Receive CallKaro realtime events. Use when setting up webhook destinations, handling callended, messagereceived, messagesent, templatesent, messagestatusupdated payloads.
 - [CallKaro WhatsApp](skill/integrations/whatsapp.md) — Run WhatsApp on CallKaro. Use when connecting numbers, managing templates, sending via API, building campaign CSVs, reading inbox history, handling delivery status.
 - [CallKaro Widget and Integrations](skill/integrations/widget-integrations.md) — Website widget install and CRM links (HubSpot, LeadSquared, Heltar, AI Sensy), number verification and DND. Use when embedding the widget or connecting a CRM.
@@ -125,8 +127,7 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 
 ### Tools
 
-- [The ck CLI](skill/tools/ck.md) — The ck CLI: rules that bite on every write (whole objects, whole function arrays, changed fields only), raw call logs, export/import, and what ck cannot do. Use for terminal work.
-- [Harness tool map](skill/tools/harness.md) — For ai-fde's own harness: which harness tool does what a ck command in these nodes does, and which tasks have no harness tool yet. Read before acting on any ck instruction inside the harness.
+- [Harness tool map](skill/tools/harness.md) — Every harness tool by job (find, read, edit, save, publish, test, calls, numbers, chat agents, research), the tool groups to load, and what only the dashboard can do. Read to pick the tool for a task.
 
 ### Writing
 

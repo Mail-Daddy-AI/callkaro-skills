@@ -1,5 +1,5 @@
 <!-- graph-summary: Verbatim official workflow spec (docs.callkaro.ai, fetched 2026-10-13): the importable workflow JSON, step types and Conditions. Source of truth when it disagrees with other nodes. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-workflows/REFERENCE-official-spec.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-workflows/REFERENCE-official-spec.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 <!-- Verbatim copy of the official CallKaro workflow spec, fetched 2026-10-13 from https://docs.callkaro.ai/workflows/build-with-claude. Source of truth if it disagrees with SKILL.md. -->
 

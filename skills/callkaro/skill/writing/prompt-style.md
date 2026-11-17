@@ -1,5 +1,5 @@
 <!-- graph-summary: Plain-text house style for prompts: no markdown, banner sections, SSML pauses, the begin message, placeholder-safe rewrites. Use when writing, converting or shrinking any prompt. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-prompt-style/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-prompt-style/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # CallKaro Prompt Style
 
@@ -48,7 +48,18 @@ Keep the docs' prompt rules while you are in there: one rule said once, literal 
 
 ## Language of the prompt
 
-For a bot in any language other than English, the prompt's instructions, section labels, conditions and guidance are always in English; only the lines the bot speaks (dialogue, opening and closing lines, end_call_msg) are in the target language, in its native script (Hindi in Devanagari). This overrides any older guidance that says to write the whole prompt in the target language.
+For a bot in any language other than English:
+
+1. The prompt's instructions, section labels, conditions and guidance are in English only.
+2. Only the lines the bot speaks (dialogue, opening and closing lines, sample replies, objection answers,
+   end_call_msg) are in the target language. Its words go in their own script and the English words a speaker
+   uses stay in English letters: "Hello, आप कैसे हैं?", never "Hello, aap kaise hain?" (romanised Hindi) or
+   "हेलो, आप कैसे हैं?" (English respelled).
+3. The bot writes its own replies during the call or chat, so its language section tells it the same rule, in
+   English: "When you reply, write Hindi words in Devanagari and English words in English letters. Never write
+   Hindi in English letters." (For another language, name it and its script.) Voice and chat bots alike.
+
+This overrides any older guidance that says to write the whole prompt in the target language.
 
 ```
 STEP 2: CONFIRM IDENTITY

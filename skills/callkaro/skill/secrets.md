@@ -6,32 +6,23 @@ credentials referenced by agent functions or webhook headers. Never place a
 secret value in an agent JSON payload, prompt, chat message, command-line
 argument, log, or generated source code.
 
-## Commands
+## On the dashboard
 
-```bash
-ck secrets list --json                    # names + masked values only
-ck secrets set CRM_API_TOKEN              # hidden interactive prompt
-printf '%s\n' "$VALUE" | ck secrets set CRM_API_TOKEN --stdin
-ck secrets rename OLD_NAME NEW_NAME
-ck secrets remove CRM_API_TOKEN           # confirms before removal
-ck secrets remove CRM_API_TOKEN --yes      # non-interactive removal
-```
-
-Prefer the hidden prompt. Use `--stdin` only when the value already comes from
-a protected runtime source; never put a value directly in the command or echo
-it into visible output. Listing secrets never returns plaintext values.
+The user adds, renames and removes secrets on the CallKaro dashboard. Listing
+secrets never returns plaintext values; never ask the user to paste a value
+into chat.
 
 ## Authoring Workflow
 
 Before creating or updating an agent that needs credentials:
 
-1. Run `ck secrets list --json` and use only the returned secret names as LLM
-   context. Never ask for or expose decrypted values.
+1. Ask the user which secret names exist (the dashboard shows names and masked
+   values only) and use only those names. Never ask for or expose decrypted values.
 2. Reuse a matching existing name when possible.
 3. If no matching name exists, use a descriptive pending name such as
    `CRM_API_TOKEN`; do not invent a credential value.
 4. Save the agent with the appropriate reference syntax below.
-5. Report every missing name and tell the user to run `ck secrets set <name>`
+5. Report every missing name and tell the user to add it on the dashboard
    or ask their account admin to configure it.
 
 ## Reference Syntax

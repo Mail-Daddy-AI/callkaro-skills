@@ -1,5 +1,5 @@
 <!-- graph-summary: AI Auditor: writing audit strategies, filters, sampling, extra variables, reading strategy and batch reports, turning findings into fixes. Use to set up or read call audits. -->
-<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-ai-auditor/SKILL.md @ 1171578; adapted: ck commands, graph links, agreed decisions -->
+<!-- source: TejasLamba2006/callkaro-skills skills/callkaro-ai-auditor/SKILL.md @ 1171578; adapted: harness tools, graph links, agreed decisions -->
 
 # CallKaro AI Auditor
 
@@ -29,9 +29,13 @@ Enable and Disable also only change the draft. Press **Save** (new) or **Update*
 
 Start with one simple strategy and add checks after reading the first results.
 
-## From the CLI
+## Values come from the account
 
-`ck audit-strategies list <agentId>`, `ck audit-strategies models`, `ck audit-strategies create <agentId> --strategy "..."`. See [ck](../tools/ck.md). Reads are safe, creating or enabling one starts spending credits on live calls, so confirm first.
+The harness has no audit-strategy tool: the user creates and edits strategies on the dashboard, and you help write
+the strategy text, filters and extra variables. Never invent a filter, model or version value: drop-off reasons and
+boolean post-call filters are the ones configured on the agent's versions, the audit model is one the account may
+use, and version ids come from `list_versions`. Re-transcription is an option on the strategy. Creating or enabling
+one starts spending credits on live calls, so the user confirms first.
 
 ## Audit Reports
 
@@ -56,7 +60,7 @@ Issue panel: Problem, Severity, Proof (call evidence), Expected, Actual, Recomme
 
 1. Read Proof, Expected, Actual and Recommended Fix.
 2. Check the same issue appears across several calls, never change a live agent from one call.
-3. Create or edit a safe test version of the agent, fix the prompt, function, variable, voice or transcriber.
+3. Fix the prompt, function, variable, voice or transcriber in a new version of the agent: load it with `read_agent_state`, edit the draft, `review_draft`, then `save_version_to_db` (a published version is saved as a new one). See [editing drafts](../harness/editing-drafts.md).
 4. Re-test before publishing. Use [review debug](../quality/review-debug.md) for root cause (fault layer, smallest fix, no stacking NEVER lines) and [qa framework](../quality/qa-framework.md) to verify.
 
 AI FDE can investigate the finding (Ask mode) or prepare the fix in a new version (Plan mode, approve before it builds).
