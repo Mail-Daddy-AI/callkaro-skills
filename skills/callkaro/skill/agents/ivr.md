@@ -49,7 +49,7 @@ Do **not** use IVR nodes for conversations that require understanding free-form 
     "max_retries": 2,
     "skip_input": false,
     "hangup_after_message": false,
-    "no_input_next": "language_select",
+    "no_input_next": "no_input_goodbye",
     "invalid_key_next": "language_select",
     "options": [
       { "key": "1", "next_capability": "english_agent" },
@@ -70,14 +70,18 @@ Do **not** use IVR nodes for conversations that require understanding free-form 
 | `max_retries` | number | `2` | Total number of times the message plays before routing to `no_input_next`. E.g. `2` means: play once, if no key → play again, if still no key → route. |
 | `skip_input` | bool | `false` | Speak the message and immediately route to `no_input_next` without waiting for a key. Use for announcements or pass-through nodes. |
 | `hangup_after_message` | bool | `false` | Speak the message and end the call. Use for rejection/termination nodes. |
-| `no_input_next` | string | same node | Capability name to route to when `max_retries` exhausts with no input. |
-| `invalid_key_next` | string | same node | Capability name to route to when the caller presses a key not in `options`. |
+| `no_input_next` | string | same node | Capability name to route to when `max_retries` exhausts with no input. Empty or absent means the same node, and the call never ends on its own: see the routing rules. |
+| `invalid_key_next` | string | same node | Capability name to route to when the caller presses a key not in `options`. Empty or absent means the same node: the menu replays. |
 | `options` | array | `[]` | DTMF routing table. Each entry: `{ "key": "1", "next_capability": "cap_name" }`. `key` is a single digit 0–9 or `*`/`#`. |
 
 ### Routing rules
 
 - `no_input_next` and `invalid_key_next` **can point to another IVR node** (re-prompt) or to an LLM capability node.
-- If `no_input_next` is absent and `max_retries` exhausts, the call is hung up.
+- If `no_input_next` is absent or empty, it means the same node: the call is **never** hung up for no input. The
+  message plays `max_retries` times, routes back to the same node and plays again; the retry count is not reset on
+  that route, so from then on every timeout replays the message at once, until the caller hangs up. To end a call
+  that gets no input, point `no_input_next` at a terminal node with `hangup_after_message: true`.
+- An absent or empty `invalid_key_next` likewise means the same node: a wrong key replays the menu.
 - `options` targets can be IVR nodes (chain menus) or LLM capability nodes (hand off).
 - Only one node in a pathway can have `is_starting: true` — make it the first IVR node.
 
@@ -106,11 +110,16 @@ IVR nodes support `msg_while_switching_type` / `msg_while_switching`, just like 
 
 After the message is spoken, the IVR runner evaluates a list of **conditions** before waiting for a key press. The first condition that matches immediately routes the call to its target node — no DTMF needed.
 
+`conditions` goes **inside `ivr_config`**. Put on the capability itself, it is ignored.
+
 ```json
-"conditions": [
-  { "condition": "(metadata.language == 'english')", "next_capability": "english_agent" },
-  { "condition": "(metadata.opted_out == True)",      "next_capability": "opt_out_node"   }
-]
+"ivr_config": {
+  "message": "...",
+  "conditions": [
+    { "condition": "(metadata.language == 'english')", "next_capability": "english_agent" },
+    { "condition": "(metadata.opted_out == True)",      "next_capability": "opt_out_node"   }
+  ]
+}
 ```
 
 ### Rules
@@ -184,7 +193,9 @@ The values from the **last IVR node the call was on when it ended** are the ones
 - [ ] Every `next_capability` in `options`, `no_input_next`, and `invalid_key_next` matches an existing `capability` name in the version.
 - [ ] Terminal IVR nodes use `hangup_after_message: true` (not an empty `options` list).
 - [ ] `max_retries ≥ 1`. Setting `0` causes an immediate route on the first attempt.
-- [ ] `skip_input: true` nodes do not need `options` (they always route to `no_input_next`).
+- [ ] Every menu node's `no_input_next` leads to a node that ends the call (`hangup_after_message: true`) or hands off to an LLM node; left empty, it replays forever.
+- [ ] `conditions` is inside `ivr_config`, not on the capability.
+- [ ] `skip_input: true` nodes do not need `options` (they always route to `no_input_next`), but they do need `no_input_next` set to another node: empty, it is the same node and the announcement replays.
 - [ ] IVR nodes have no `system_prompt`, no `functions`, no `extract_variables`, no `transitions` — those fields are for LLM nodes.
 - [ ] `use_ivr_postcall: true` nodes have `ivr_postcall` populated with at least `conversation_status` and `disposition_reason`.
 
@@ -204,7 +215,7 @@ The values from the **last IVR node the call was on when it ended** are the ones
         "message": "Hello {{customer_name}}. Press 1 for English, press 2 for Hindi.",
         "timeout_secs": 8,
         "max_retries": 2,
-        "no_input_next": "lang_menu",
+        "no_input_next": "no_input_goodbye",
         "invalid_key_next": "lang_menu",
         "options": [
           { "key": "1", "next_capability": "english_main" },
@@ -214,6 +225,20 @@ The values from the **last IVR node the call was on when it ended** are the ones
       "use_ivr_postcall": true,
       "ivr_postcall": [
         { "name": "conversation_status", "value": "false",            "type": "boolean" },
+        { "name": "disposition_reason",  "value": "Hung up during IVR menu", "type": "string"  }
+      ]
+    },
+    {
+      "capability": "no_input_goodbye",
+      "node_type": "ivr",
+      "is_starting": false,
+      "ivr_config": {
+        "message": "We did not receive a response. Goodbye.",
+        "hangup_after_message": true
+      },
+      "use_ivr_postcall": true,
+      "ivr_postcall": [
+        { "name": "conversation_status", "value": "false",           "type": "boolean" },
         { "name": "disposition_reason",  "value": "No IVR response", "type": "string"  }
       ]
     },
@@ -247,6 +272,8 @@ The values from the **last IVR node the call was on when it ended** are the ones
 |---|---|---|
 | Setting `max_retries: 0` | Node routes immediately without waiting | Set `max_retries ≥ 1` |
 | `no_input_next` points to a non-existent capability | Runtime hangs up the call | Check that every target name exists |
+| `no_input_next` empty, absent, or pointing at its own node | The menu replays until the caller hangs up; the call never ends on its own | Point it at a `hangup_after_message` node or an LLM node |
+| `conditions` on the capability instead of inside `ivr_config` | Conditions are ignored; DTMF routing runs | Move `conditions` into `ivr_config` |
 | Putting `system_prompt` on an IVR node | Field is ignored; may confuse future editors | Leave it empty or omit it |
 | Trying to `switch_capability` to an IVR node from an LLM node | Blocked by the runtime guard | IVR nodes are only enterable at call start |
 | `hangup_after_message` + non-empty `options` | `options` is ignored when `hangup_after_message: true` | Remove `options` from hangup nodes |
