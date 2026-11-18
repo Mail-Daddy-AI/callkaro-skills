@@ -33,6 +33,7 @@ an agent.
 | Silence Instructions | `silence_instructions` | "The user has been silent after your last response. Generate a brief reply to check if the user is still there on the call." |
 | Silence Prompts (fixed lines) | `silence_prompts` | Only used when the mode is not `dynamic`. Per agent/version |
 | Detect Gender | `detect_gender` | Off |
+| Gender Detection Strategy | `gender_detection_strategy` | `default`. `advanced` (Tazo) for higher accuracy. Only when Detect Gender is on |
 | Gender Detection Delay | `gender_detection_delay` | 30 (seconds). Only when Detect Gender is on |
 | Gender Prompt Snippet | `gender_prompt_snippet` | Per agent/version. Only when Detect Gender is on |
 | Language Switching | `language_switching` | Off |

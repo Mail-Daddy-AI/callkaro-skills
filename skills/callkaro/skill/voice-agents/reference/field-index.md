@@ -69,6 +69,8 @@ Topic key -> open this node:
 | `language_switch_min_words` | int | `3` | call |
 | `language_switching_v1` | bool | `false` | call |
 | `detect_gender` | bool | `false` | call |
+| `gender_detection_strategy` | enum `default`\|`advanced` | `"default"` | call |
+| `gender_detection_delay` | number | `30` | call |
 | `formatToNumberAsIndian` | bool | `false` | call |
 | `bgNoise` | bool | `true` | call |
 | `bgNoiseVolume` | number 0–1 | `0.2` | call |

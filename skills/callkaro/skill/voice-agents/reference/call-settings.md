@@ -35,6 +35,8 @@ Part of the [version reference](../AGENT-VERSION-REFERENCE.md) (which document a
 | `language_switching_v1` | bool, `false` | Switch language only after the caller's **explicit consent/request**. Pair either flag with `language_switch_snippet` and `switchableLanguages`. |
 | `detect_gender` | bool, `false` | Detect the caller's gender from audio and adapt address forms. |
 | `gender_prompt_snippet` | string \| null | Prompt injected when `detect_gender` is on. |
+| `gender_detection_strategy` | enum `default` \| `advanced`, `default` | How the gender is decided. `default`: on-server voice-pitch estimate. `advanced`: Tazo speech model (more accurate, external API call). Both use the same delay and need ~2s of caller speech after it. Used only when `detect_gender` is on. |
+| `gender_detection_delay` | number (seconds), `30` | Caller audio is ignored for this long after they first speak, so IVR/voicemail greetings don't drive detection. Lower it (e.g. 2–8) for short calls — a call that ends before delay + ~2s of speech never detects. Used only when `detect_gender` is on. |
 | `formatToNumberAsIndian` | bool, `false` | Speak/format numbers in the Indian system (lakh/crore, Indian digit grouping). |
 
 **`vad_configuration`** — voice-activity / barge-in / endpointing tuning. Treat it as
