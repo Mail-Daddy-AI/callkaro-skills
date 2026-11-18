@@ -17,7 +17,7 @@ traps). Load it before writing any agent/version payload.** Then
 [prompts.md](prompts.md) (how to write the script), [create-update.md](create-update.md)
 (create/edit workflow + starter JSON), [versions.md](versions.md) (publish/A/B),
 [voice-and-transcriber.md](voice-and-transcriber.md) (voice + STT choices),
-[functions.md](functions.md) (abilities incl. advanced code).
+[functions.md](functions.md) (abilities incl. advanced code), [ivr.md](ivr.md) (DTMF menus before the LLM, Pathways only).
 
 ## Prompt types (`systempromptType`)
 
@@ -26,7 +26,7 @@ traps). Load it before writing any agent/version payload.** Then
 | 0 | Basic | one `systemprompt` string — **start here unless told otherwise** |
 | 1 | Advanced | structured: `role`, `goal`, `callFlow`, `instructions[]`, `guardrails[]`, `rebuttals[]` |
 | 2 | Multi-prompt | base `systemprompt` + `capabilities[]` (named sub-prompts the call switches between) |
-| 3 | Pathways | graph of `capabilities[]` nodes with `transitions[]`, `extract_variables[]`; type-1 fields must stay empty |
+| 3 | Pathways | graph of `capabilities[]` nodes with `transitions[]`, `extract_variables[]`; type-1 fields must stay empty; may start with [IVR nodes](ivr.md) |
 
 ## Minimum viable agent
 

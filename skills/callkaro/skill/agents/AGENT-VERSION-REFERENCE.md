@@ -190,7 +190,7 @@ Type-3 node-only fields:
 
 | Field | Type | Meaning |
 | --- | --- | --- |
-| `node_type` | `normal` \| `global` | `normal` = reachable only via an inbound transition. `global` = reachable from **anywhere**; the runtime tests `when_to_jump` every turn, jumps in, then **returns to the node it came from with context intact**. |
+| `node_type` | `normal` \| `global` \| `ivr` | `normal` = reachable only via an inbound transition. `global` = reachable from **anywhere**; the runtime tests `when_to_jump` every turn, jumps in, then **returns to the node it came from with context intact**. `ivr` = a fixed TTS message and DTMF menu that runs before the LLM starts, configured in `ivr_config`: see [IVR nodes](ivr.md). |
 | `when_to_jump` | string | **Global nodes only** — natural-language trigger. Must be non-empty for `global` and empty for `normal`; both directions are validated. |
 | `transitions` | object[] | Outgoing edges. Terminal nodes have `[]`; globals normally have `[]` because they return rather than route. |
 | `extract_variables` | object[] | Values captured live inside this node. |

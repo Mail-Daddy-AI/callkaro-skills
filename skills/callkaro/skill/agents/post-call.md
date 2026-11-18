@@ -41,6 +41,7 @@ Global rules for extraction. A pattern that works: extract only what the transcr
 - Top-level `postcall` fields are extracted for every call.
 - A capability- or node-level `postcall` belongs to that stage.
 - Do not repeat one output name across scopes unless the consumer expects it.
+- A call that ends in an IVR node has no transcript to analyse: that node can set static values instead (`use_ivr_postcall`, [IVR nodes](ivr.md)).
 
 ## Model strategy
 
