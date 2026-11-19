@@ -34,7 +34,7 @@ user.
 | Write or change fields | `trigger_single_pipeline` (`draftPatch` for fields you wrote; `edits` for one node, function or snippet) |
 | The same change in many places | `edit_draft_script` (Python, jq or sed over /draft/version.json) |
 | Several languages at once | `trigger_parallel_pipeline` (`lanePatches`), then `read_parallel_drafts` (languages group) |
-| Build from a BRD | `extract_requirements`, `write_unit`, `write_units`, `update_requirements`: [BRD build](../harness/brd-build.md) |
+| Build from a BRD | `extract_requirements`, `write_unit`, `write_units`, `verify_units`, `update_requirements`: [BRD build](../harness/brd-build.md) |
 | Check the draft before saving | `review_draft` |
 | Save | `save_version_to_db`: a published base is always saved as a new version, never overwritten ([editing drafts](../harness/editing-drafts.md)) |
 
