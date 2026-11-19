@@ -39,7 +39,7 @@ Type-3 node-only fields:
 
 | Field | Type | Meaning |
 | --- | --- | --- |
-| `node_type` | `normal` \| `global` | `normal` = reachable only via an inbound transition. `global` = reachable from **anywhere**; the runtime tests `when_to_jump` every turn, jumps in, then **returns to the node it came from with context intact**. |
+| `node_type` | `normal` \| `global` \| `ivr` \| `end_call` \| `wait` | `normal` = reachable only via an inbound transition. `global` = reachable from **anywhere**; the runtime tests `when_to_jump` every turn, jumps in, then **returns to the node it came from with context intact**. `ivr`, `end_call` and `wait` are non-LLM nodes that run at the start of a call (keypad menus, hang-up, timed silence) — see [ivr-nodes.md](../ivr-nodes.md). LLM `transitions` can never target them. |
 | `when_to_jump` | string | **Global nodes only** — natural-language trigger. Must be non-empty for `global` and empty for `normal`; both directions are validated. |
 | `transitions` | object[] | Outgoing edges. Terminal nodes have `[]`; globals normally have `[]` because they return rather than route. |
 | `extract_variables` | object[] | Values captured live inside this node. |
