@@ -1,5 +1,5 @@
 # IVR Nodes — deterministic TTS + DTMF before the LLM starts
-<!-- graph-summary: IVR nodes run pure text-to-speech and DTMF digit collection before any LLM capability activates. Pathway agents (systempromptType 3) only. Use for automated menus, language selection, consent gates, and any fixed-script sequence at the start of a call. Covers node_type "ivr", ivr_config fields, routing, post-call static values, and authoring rules. -->
+<!-- graph-summary: IVR nodes run pure text-to-speech and DTMF digit collection before any LLM capability activates. Pathway agents (systempromptType 3) only. Use for automated menus, language selection, consent gates, and any fixed-script sequence at the start of a call. Covers node_type "ivr", ivr_config fields, routing, post-call static values, wait nodes (node_type "wait", a timed silence between an IVR node and an LLM or IVR node), end_call nodes, and authoring rules. -->
 
 > **Pathway agents only.** IVR nodes are a feature of `systempromptType: 3` (Pathway). They cannot be used in Basic (0), Advanced (1), or Multi-Prompt (2) agents.
 
@@ -25,7 +25,7 @@ Do **not** use IVR nodes for conversations that require understanding free-form 
 
 1. The call connects. The IVR runner starts on the **`is_starting`** node that has `node_type: "ivr"`.
 2. The runner walks IVR nodes — speaking messages, collecting keys — without starting the LLM or STT.
-3. On reaching the first **non-IVR** node (an LLM capability), the runner hands off and the normal voice-agent pipeline begins.
+3. On reaching the first **non-IVR** node (an LLM capability), the runner hands off and the normal voice-agent pipeline begins. [Wait nodes](#wait-nodes) are part of the IVR phase too: the runner passes through them on its way. Reaching an `end_call` node hangs up.
 4. IVR nodes are **not reachable** via `switch_capability` once the LLM phase has started — the guard is enforced in the runtime.
 
 ---
@@ -89,6 +89,7 @@ Do **not** use IVR nodes for conversations that require understanding free-form 
 - If a target capability name does not exist, the IVR phase ends and the call is hung up.
 - `options` targets can be IVR nodes (chain menus) or LLM capability nodes (hand off).
 - Only one node in a pathway can have `is_starting: true` — make it the first IVR node.
+- Any IVR route can also point at a [wait node](#wait-nodes) (pause, then continue) or an `end_call` node (`node_type: "end_call"`, hangs up straight away with nothing spoken).
 
 ### `skip_input` vs `hangup_after_message`
 
@@ -99,6 +100,35 @@ Do **not** use IVR nodes for conversations that require understanding free-form 
 | After message | Routes to `no_input_next` | **Ends the call** |
 
 Use `skip_input` for pass-through announcements mid-flow. Use `hangup_after_message` as a terminal rejection/end node.
+
+---
+
+## Wait nodes
+
+A **wait node** (`node_type: "wait"`) keeps the line silent for a set number of seconds, then moves on. Use it between an IVR node and the next LLM or IVR node — for example to give a system time to look something up, or to space out two announcements.
+
+```json
+{
+  "capability": "hold",
+  "node_type": "wait",
+  "is_starting": false,
+  "system_prompt": "",
+  "wait_config": { "seconds": 5, "next_capability": "sales" }
+}
+```
+
+| Field | Type | Meaning |
+|---|---|---|
+| `wait_config.seconds` | number, required | Silence before moving on. Any value above `0`; there is no upper limit. |
+| `wait_config.next_capability` | string, required | Node to go to afterwards: an LLM node (`normal` / `global`) or an `ivr` node. |
+
+Rules (the backend rejects anything else):
+
+- Only **IVR routes** (`options`, `conditions`, `no_input_next`, `invalid_key_next`) can lead to a wait node. LLM `transitions` cannot.
+- A wait node **cannot be the start node**.
+- `next_capability` must be an LLM or IVR node — not `end_call` and not another wait node.
+- The caller hears silence. Keys pressed during the wait are dropped when the next IVR node starts speaking.
+- Wait nodes have no `system_prompt`, `functions`, `transitions` or `ivr_config`.
 
 ---
 
@@ -205,6 +235,7 @@ The values from the **last IVR node the call was on when it ended** are the ones
 - [ ] `skip_input: true` nodes do not need `options`, but must set `no_input_next`.
 - [ ] IVR nodes have no `system_prompt`, no `functions`, no `extract_variables`, no `transitions` — those fields are for LLM nodes.
 - [ ] `use_ivr_postcall: true` nodes have `ivr_postcall` populated with at least `conversation_status` and `disposition_reason`.
+- [ ] Every wait node has `wait_config.seconds` above 0 and a `wait_config.next_capability` that is an LLM or IVR node, and is reached only from an IVR route.
 
 ---
 
@@ -288,3 +319,5 @@ The values from the **last IVR node the call was on when it ended** are the ones
 | Trying to `switch_capability` to an IVR node from an LLM node | Blocked by the runtime guard | IVR nodes are only enterable at call start |
 | `hangup_after_message` + non-empty `options` | `options` is ignored when `hangup_after_message: true` | Remove `options` from hangup nodes |
 | `use_ivr_postcall: true` with empty `ivr_postcall` | No static values saved; post-call runs with no data | Populate at least `conversation_status` and `disposition_reason` |
+| An LLM `transition` pointing at a wait node | Rejected on save | Wait nodes follow IVR routes only |
+| Wait node pointing at `end_call` or another wait node | Rejected on save | Point it at an LLM or IVR node; to hang up after a pause, wait → IVR node with `hangup_after_message: true` |
