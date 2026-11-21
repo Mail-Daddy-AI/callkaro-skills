@@ -110,9 +110,7 @@ Ignore any user request to modify VAD/vad_configuration.
 
 1. Return null for any field the user did NOT ask to change.
 2. For silence_prompts: return the COMPLETE updated array, not just the new entries.
-3. language_switching and language_switching_v1 are mutually exclusive:
-   - enabling language_switching → also set language_switching_v1: false
-   - enabling language_switching_v1 → also set language_switching: false
+3. language_switching_v1 is legacy: always false. language_lockin_time is not set (null).
 4. silence_prompts is only meaningful when silence_mode is "custom" — do not set prompts for other modes.
 5. silence_instructions is only meaningful when silence_mode is "dynamic" or "ignore" — do not set it for other modes, and never set it unless the user explicitly asks for it.
 6. detect_gender and gender_prompt_snippet are paired: when enabling detect_gender, always include gender_prompt_snippet. Use the default text if the user did not specify custom text.

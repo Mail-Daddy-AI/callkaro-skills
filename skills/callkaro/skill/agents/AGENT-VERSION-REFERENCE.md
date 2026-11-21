@@ -42,7 +42,7 @@ useMultiTranscribers · publishedVersionsByLanguage · agentStatus
 | `agentStatus` | `live` \| `in-progress` | `in-progress` = still being built. |
 | `abTestEnabled` / `abTestVersions` | bool / `[{versionId, ratio 0–100}]` | Traffic split across versions. **Never modify as a side effect** of another change. |
 | `advancedAbTestEnabled` / `advancedAbTestRules` | bool / rule array | **Rule-based A/B**: ordered if/elseif/else chain over call `metadata.*`, evaluated BEFORE the ratio A/B (only when no version is pinned). Each rule: `{kind: if\|elseif\|else, condition, returnType: version\|language, targets:[{versionId\|language, ratio}]}`. `version` short-circuits (that version runs); `language` only overrides language and resolution continues. Conditions use the §4 expression grammar with `metadata.*` operands; ratios are integers summing to 100 per rule. Manage via `manage_ab_testing` (`configure_advanced`); read with `read_ab_test_configuration`. |
-| `useMultiTranscribers` | bool | Run the primary and secondary transcriber simultaneously instead of primary-with-fallback. |
+| `useMultiTranscribers` | bool | Deprecated: never change it (the secondary transcriber runs only when the primary fails). |
 | `systempromptType` | int 0–3 | Routed here, but **not stored** — see the trap below. |
 
 ### ⚠️ The `systempromptType` trap
@@ -648,8 +648,7 @@ Guidance:
 - Every `transcriber` and `secondary_transcriber` object needs its `transcriber_provider`; the
   backend rejects a save without it, even when only the language or keywords changed.
 - Some accounts have the transcriber language **locked** — leave it unchanged there.
-- `useMultiTranscribers` (agent doc) makes the secondary run alongside the primary rather than only
-  on failure.
+- `useMultiTranscribers` (agent doc) is deprecated: never change it.
 - There is no transcriber catalogue tool: use the table above for provider, model, language field
   and keys, and never invent a value it does not list.
 
@@ -684,7 +683,7 @@ Guidance:
 | `language_lockin_time` | number \| null, `null` | Legacy: do not set (leave `null`). |
 | `allowed_languages` | string[], `[]` | Whitelist of languages the agent may switch into. Empty means unrestricted. Used only when `language_switching` is true. |
 | `language_switch_min_words` | int, `3` | Minimum caller words required before a switch triggers. Used only when `language_switching` is true. |
-| `language_switching_v1` | bool, `false` | Legacy: leave `false`; switch with `language_switching`. Pair it with `language_switch_snippet` and `switchableLanguages`. |
+| `language_switching_v1` | bool, `false` | Legacy: leave `false`; switch with `language_switching`. |
 | `detect_gender` | bool, `false` | Detect the caller's gender from audio and adapt address forms. |
 | `gender_prompt_snippet` | string \| null | Prompt injected when `detect_gender` is on. |
 | `formatToNumberAsIndian` | bool, `false` | Speak/format numbers in the Indian system (lakh/crore, Indian digit grouping). |

@@ -73,18 +73,16 @@ Everything else becomes a goal plus one short example line the model may say in 
 Rules alone produce rule-shaped speech. Add 4 to 6 short example exchanges: a happy path, an
 objection, an unclear reply, an interruption. Show only correct spoken lines: a quoted wrong line, even
 labelled wrong, gets repeated word for word (a ✅/❌ pair is fine for a decision or a tool call). For style
-([LiveKit](https://livekit.com/blog/prompting-voice-agents-to-sound-more-realistic): "I can
-definitely handle that for you" vs "Yeah, um so, I can do that, no problem";
+(natural phrasing: [LiveKit](https://livekit.com/blog/prompting-voice-agents-to-sound-more-realistic);
 [Vapi](https://docs.vapi.ai/prompting-guide): at least a happy path, an edge case, an error
 recovery). Take them from the best real calls: mine recordings of your best human agents, or your
 best human-answered agent calls, for phrasing to copy
 ([LiveKit](https://livekit.com/blog/prompting-voice-agents-to-sound-more-realistic);
 [DEV: prompt engineering & conversation design](https://dev.to/moisi_trungu_31647b7ac300/ai-voice-agent-prompt-engineering-conversation-design-5fk3)).
 
-Hinglish example pair:
+A natural Hinglish line to copy:
 ```
-Robotic: "जी राहुल जी, आपकी car की evaluation हुई है और अब तक का best offer यही है। Price अगले एक दिन तक valid है। क्या हम इस price पर आगे बढ़ें?"
-Human:   "हम्म, समझ सकता हूँ। देखिए, अभी तक इससे ऊपर कोई नहीं गया है... आपके mind में कितना था?"
+"हम्म, समझ सकता हूँ। देखिए, अभी तक इससे ऊपर कोई नहीं गया है... आपके mind में कितना था?"
 ```
 
 ## 5. Prompt size is latency

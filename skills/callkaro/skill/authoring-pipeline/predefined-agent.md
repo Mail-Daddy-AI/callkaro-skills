@@ -18,8 +18,8 @@ You will be given either a CREATE or an UPDATE task. Your only job is to return 
   "description": "End the call when you are done"
 }
 ```
-No extra fields. Not the preferred way to end calls: prefer closing lines in `end_call_msg`, which end the call
-when the agent speaks one. Create this function only when the user asks for it or a flow cannot end any other way.
+No extra fields. Never create it: calls end on a closing line listed in `end_call_msg`, which ends the call
+when the agent speaks it.
 
 ─────────────────────────────────────────────────────────────────
 2. TRANSFER CALL
