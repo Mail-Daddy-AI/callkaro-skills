@@ -10,23 +10,24 @@
 
 ## House defaults
 
-Use these for a new agent, or a field that is empty, unless the document or the user asks for something else. An
-existing agent keeps its voice, transcriber and models unless the user asks to change them. When a choice here is unclear
-for this bot (the persona's gender is not stated, a default voice is not in `list_voices`), ask the
-user; never guess.
+`create_agent_in_db` sets these on every **new** agent: the voice by `voiceGender`, the languages by the agent's
+language. An existing agent, and a new version of one, keeps its own unless the user asks to change it. When the
+persona's gender is not stated, ask the user before creating the agent; never guess.
 
 | Setting | Default |
 |---|---|
-| `transcriber` | **Soniox**, with only the languages this version speaks. No keywords or context unless calls show a mishearing that decides the call. |
-| `secondary_transcriber` | **Sarvam**, in the bot's main language (one language per Sarvam configuration). |
-| `voice_configuration` | **Eleven Labs**: a voice of the persona's gender for the bot's language, found with `list_voices`. |
-| `secondary_voice_configuration` | Male persona: **Sarvam v4** (`bulbul:v4` family), voice **`ashutosh`**. Female persona: **Gnani v2.5**, voice **`chitra`**. |
-| `model` | **`callkaro/arjuna-2.5`**. |
-| `secondary_model` | Chosen for this bot: see [reference §7](AGENT-VERSION-REFERENCE.md). |
+| `transcriber` | Soniox, `transcriber_language` `["en", "hi"]` (for an agent in another language, only that language, e.g. `["ta"]`), empty `transcriber_general_context`, `transcriber_translation_terms` and `keywords` |
+| `secondary_transcriber` | Sarvam, `transcriber_model` `saaras:v4`, `transcriber_language` `unknown`, `transcriber_mode` `transcribe` |
+| `voice_configuration`, male | Eleven Labs "Raju - Human-like Customer Care Voice", `voice_id` `pzxut4zZz4GImZNlqQ3H`, `eleven_v4_turbo`, category `professional`, stability 0.5, similarity boost 1, style 0.5, speed 1 |
+| `voice_configuration`, female | Eleven Labs "Tarini -  Calm & Assertive Recovery Agent", `voice_id` `kiaJRdXJzloFWi6AtFBf`, same model and settings |
+| `secondary_voice_configuration`, male | Sarvam `ashutosh_hi_conversational`, `bulbul:v4-flash`, speed 1 |
+| `secondary_voice_configuration`, female | Gnani "Chitra" (`voice_id` `Chitra`), `timbre-v2.5`, `voice_language` `auto`, speed 1 |
+| `model` / `secondary_model` | `callkaro/arjuna-2.5` / `gpt-5.4-mini`; each stage's `llms` the same, temperature 0.2 |
+| `post_call_strategy` | `callkaro/krishna-2.5` for `1-10`, `11-30` and `31-60`; `gpt-6-luna` for `>60`; `only_agent_turns` `DEFAULT_VALUES` |
+| `secondary_post_call_strategy` | `gpt-6-luna` for `1-10`, `11-30` and `31-60`; `callkaro/krishna-2.5` for `>60`; `only_agent_turns` `DEFAULT_VALUES` |
 
-- Copy the provider name, model and voice id exactly as `list_voices` returns them; the names above
-  are what to search for, not ids to write from memory.
-- The persona's gender comes from the document. When the document does not say, ask the user.
+`voice_language` matches the agent's language: `hi` (Eleven Labs), `hi-IN` (Sarvam). Gnani stays `auto`.
+For any other voice the user asks for, search with `list_voices` and copy its values exactly.
 
 ## Find real voices — never invent one
 

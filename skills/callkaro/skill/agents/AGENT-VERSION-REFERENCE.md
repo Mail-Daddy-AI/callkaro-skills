@@ -168,7 +168,7 @@ Shared fields (both types):
 | `msg_while_switching_type` | `silent` \| `static` \| `dynamic` | What the caller hears while switching **into** this capability. `silent` (default) = nothing; `static` = speak `msg_while_switching` verbatim; `dynamic` = `msg_while_switching` is a *prompt* for generating a bridging line. |
 | `msg_while_switching` | string | The literal line, or the generation prompt. `""` for `silent`. |
 | `endpointing` | `{mode, min_delay, max_delay}` | Controls when the caller's turn is complete while this capability/node is active. `mode` is `fixed` or `dynamic`; `min_delay` is 0–1 seconds and `max_delay` is 0–6 seconds. Defaults: `{ "mode": "fixed", "min_delay": 0.5, "max_delay": 3 }`. See below. |
-| `llms` | `{primary_model, secondary_model, temperature}` | Per-capability model choice — how you control cost/quality per phase (cheap model for the greeting, stronger for negotiation). House defaults: primary `callkaro/arjuna-2.5`, a secondary chosen for the capability as in §7, temperature `0.2`. **`temperature` here is 0–1** (§7). |
+| `llms` | `{primary_model, secondary_model, temperature}` | Per-capability model choice — how you control cost/quality per phase (cheap model for the greeting, stronger for negotiation). House default for a new agent's stages: `callkaro/arjuna-2.5` / `gpt-5.4-mini` / `0.2`, unless the user asks for others. **`temperature` here is 0–1** (§7). |
 | `functions` | object[] | Functions callable while inside this capability (§6). |
 | `postcall` | object[] | Post-call variables scoped to this capability (§8). |
 | `use_filler` | bool | Use filler sounds during this capability. Only meaningful when version `filler_config.filler_type` ≠ `none`. |
@@ -515,7 +515,7 @@ transfer function; expect to read them back at version level.
 | Field | Type | Default | Notes |
 | --- | --- | --- | --- |
 | `model` | string | `callkaro/arjuna-2.5` | Primary LLM driving new Basic and Advanced agents. |
-| `secondary_model` | string | chosen per bot | Fallback LLM, used only if the primary fails. House default: pick it for the prompt — `gpt-5.6-luna` or `gpt-5.4-mini` for a small, straightforward prompt; `gpt-4.1` for a large prompt or heavier reasoning. Ask the user when unsure. |
+| `secondary_model` | string | `gpt-5.4-mini` | Fallback LLM, used only if the primary fails. House default for new agents; keep an existing agent's value. |
 | `temperature` | number | `3` | **Version-level scale is 0–10**. Capability `llms.temperature` is **0–1** (new-agent default 0.2). Never copy one into the other without ×10 / ÷10. |
 | `caching_strategy` | `response` \| `sentence` \| `none` | `response` | `response` caches whole responses (fastest repeats), `sentence` caches per sentence (more reuse, finer grain), `none` disables it. |
 
@@ -542,8 +542,8 @@ On type 3, version-level `model`/`secondary_model`/`temperature` do not drive ro
 | --- | --- | --- | --- |
 | `postcall` | object[] | `[]` | Variables extracted from the transcript **after** the call. |
 | `postcallmodel` | enum | `callkaro/krishna-2.5` | Legacy fallback used when `post_call_strategy` is absent or empty. Preserve existing values; use the strategy fields for new configurations. |
-| `post_call_strategy` | object | four duration buckets use `callkaro/krishna-2.5`; `only_agent_turns` uses `DEFAULT_VALUES` | Primary model **per call-duration bucket** — keys `1-10`, `11-30`, `31-60`, `>60` (seconds) and `only_agent_turns`. `DEFAULT_VALUES` skips model extraction and uses configured field fallbacks. |
-| `secondary_post_call_strategy` | object | four duration buckets use `gpt-5.4-nano`; `only_agent_turns` uses `DEFAULT_VALUES` | Secondary post-call fallback with the same five-key shape. |
+| `post_call_strategy` | object | house default: `callkaro/krishna-2.5` for the first three buckets, `gpt-6-luna` for `>60`; `only_agent_turns` uses `DEFAULT_VALUES` | Primary model **per call-duration bucket** — keys `1-10`, `11-30`, `31-60`, `>60` (seconds) and `only_agent_turns`. `DEFAULT_VALUES` skips model extraction and uses configured field fallbacks. |
+| `secondary_post_call_strategy` | object | house default: `gpt-6-luna` for the first three buckets, `callkaro/krishna-2.5` for `>60`; `only_agent_turns` uses `DEFAULT_VALUES` | Secondary post-call fallback with the same five-key shape. |
 | `post_call_analysis_prompt` | string | `""` | How to analyse the transcript. |
 | `conversion_reason` | string | `""` | What counts as a conversion. |
 | `default_disposition_reason` | string | `""` | Fallback disposition when none is extracted. |
