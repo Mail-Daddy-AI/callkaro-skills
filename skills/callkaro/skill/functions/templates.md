@@ -54,21 +54,65 @@ On the merged run `system_prompt` can be a `CapabilitySystemPrompt`, not a `str`
 
 ```python
 async def check_something(ctx: RunContext, customer_value: str) -> dict:
-    """Call only after <precondition>. Returns status plus what to say next."""
-    if not customer_value.strip():
+    """Check <what> for the caller. Call only after <precondition>.
+
+    Args:
+        ctx: LiveKit RunContext
+        customer_value: str, the value the caller gave
+
+    Returns:
+        dict: {status: "success" | "error", result_words: str (on success), message: str (on error)}
+
+    Side effects: none.
+    """
+    # Imports this function needs go here, inside it, under the docstring (e.g. from rapidfuzz import fuzz).
+
+    if not isinstance(customer_value, str) or not customer_value.strip():
         return {"status": "error", "message": "customer_value is required"}
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.post(
-                "https://api.example.com/check",
-                json={"value": customer_value},
-                headers={"Authorization": "Bearer " + x_secrets["API_KEY"]},
-            )
-        response.raise_for_status()
-        return {"status": "success", "result_words": response.json().get("result_words")}
-    except httpx.RequestError:
-        return {"status": "error", "message": "service unavailable"}
+    async with httpx.AsyncClient(timeout=10.0) as client:   # one client for every request of this call
+        for attempt in range(3):
+            try:
+                response = await client.post(
+                    "https://api.example.com/check",
+                    json={"value": customer_value},
+                    headers={"Authorization": "Bearer " + x_secrets["API_KEY"]},
+                )
+            except httpx.RequestError as e:
+                if attempt == 2:
+                    logger.error(f"check_something failed: {e}")
+                    return {"status": "error", "message": "service unavailable"}
+                await asyncio.sleep(0.5 * 2 ** attempt)    # transient: back off and retry
+                continue
+            if response.status_code >= 500 and attempt < 2:
+                await asyncio.sleep(0.5 * 2 ** attempt)
+                continue
+            if response.status_code != 200:
+                return {"status": "error", "message": f"check API error: {response.status_code}"}
+            return {"status": "success", "result_words": response.json().get("result_words")}
 ```
+
+Drop the retry loop for a call that books, pays or sends: a retried side effect can happen twice unless the API is idempotent.
+
+## On-connected function
+
+```python
+async def notify_crm_on_connect(ctx: JobContext, metadata: dict):
+    """Tell the CRM the call has started, once, right when the call (or this capability) connects."""
+    lead_id = metadata.get("lead_id")
+    if not lead_id:
+        return
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.post(
+                "https://crm.example.com/api/call-started",
+                json={"lead_id": lead_id},
+                headers={"Authorization": f"Bearer {x_secrets['CRM_API_KEY']}"},
+            )
+    except httpx.RequestError as e:
+        logger.error(f"Failed to notify CRM on connect: {e}")
+```
+
+No `RunContext`, no `ctx.session`; the return value is ignored.
 
 ## Post-call override
 

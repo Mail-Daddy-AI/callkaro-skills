@@ -22,6 +22,7 @@ If this node and one of those disagree, follow the served reference.
 - **Updates are surgical.** Change only what was asked and leave every other field exactly as it was. In `source_code`, keep the function name, signature and unrelated logic, and keep existing `x_secrets` references unless asked to change them.
 - **Missing integration data never blocks.** Missing URL, headers, parameters, auth or sample payload: use placeholders and carry on (reference §6). Never leave `api` empty on create. Ask the user only when the function's *purpose* is unclear.
 - **Flags.** `update_call_data` and `execute_while_switching` are always booleans, never null. `execute_while_switching` is `false` unless the user explicitly asked for it.
+- **Imports go inside the function.** In Python `source_code`, every `import` is written inside the function body, right under the docstring, never above the `async def`: only the first `def` runs, so an import outside it is lost and the call fails. Never import the pre-imported helpers listed below. JavaScript post-call code imports nothing (`require()` is forbidden).
 
 ## Basic functions: rules shared by all three
 
@@ -75,8 +76,10 @@ If this node and one of those disagree, follow the served reference.
   - add or overwrite keys as needed;
   - assign the result back with `call_data["metadata"] = metadata`;
   - mutate in place, and never return a prompt or a replacement object.
-- **HTTP**: use `httpx.AsyncClient(timeout=...)` (the source example uses 5.0), wrapped in `try/except httpx.RequestError`. On a non-200 status, `logger.error` the status code and fall back. Never let a failure escape.
-- **Pre-imported, no import needed**: `asyncio`, `httpx`, `json`, `pytz`, `datetime`, `timedelta`, `re`, `math`, `logger`, `get_job_context`, `RunContext`, `num2words`, `get_local_time`, `check_functions_called`, `custom_llm_completion`, `send_email`, `x_secrets`. For `json`, follow the caveat in [runtime.md](runtime.md).
+- **HTTP**: use `httpx.AsyncClient(timeout=...)` (the source example uses 5.0), wrapped in `try/except httpx.RequestError`. On a non-200 status, `logger.error` the status code and fall back. Never let a failure escape. Retries and client reuse: see advanced in-call.
+- **Pre-imported, no import needed**: `asyncio`, `httpx`, `json`, `pytz`, `datetime`, `timedelta`, `re`, `math`, `logger`, `get_job_context`, `RunContext`, `num2words`, `get_local_time`, `check_functions_called`, `custom_llm_completion`, `send_email`, `x_secrets`, `x_call_history`. For `json`, follow the caveat in [runtime.md](runtime.md).
+  - `num2words(raw_count, lang='en_IN')` turns a number into words; `get_local_time(time, language)` renders a time for `"hi"`, `"en"`, `"ta"`, `"kn"`, `"te"` or `"mr"`.
+  - `x_call_history` is a list of earlier calls with the same contact, newest first, and empty unless Call Memory is on for the agent version. Each item has `call_sid`, `time`, `created_at`, `call_duration`, `connected`, `conversion_status`, `disposition_reason`, `post_call`, `call_metadata`, `functions_called` (and `transcript` if enabled), for example `x_call_history[0]["disposition_reason"]`. It is read-only; never send it whole to an outside service.
 - **`x_secrets` is a dict.** Use `x_secrets["NAME"]` or `x_secrets.get("NAME")`, never attribute access. Never read credentials from metadata or hardcode them in source.
 
 ## Advanced in-call (`custom_in_call` + Python)
@@ -86,21 +89,40 @@ If this node and one of those disagree, follow the served reference.
 - Shape:
 
   ```python
-  async def <name>(ctx: RunContext, <param>: <scalar type>, ...) -> dict:
+  async def <name>(ctx: RunContext, <param>: <type>, ...) -> dict:
       """Purpose. Args: ctx: LiveKit RunContext; <param>: <type> — <meaning>.
-      Returns: dict {status: "success"|"error", <result fields>, message: str on error}"""
+      Returns: dict {status: "success"|"error", <result fields>, message: str on error}.
+      Side effects: <what it changes outside the call, or none>."""
   ```
 
+- **Docstring**: purpose, every argument with its type, the return structure with its types, and any side effects.
 - **Annotations**: annotate every parameter and the return type.
-  - Allowed parameter types: `str`, `int`, `float`, `bool`, `None`.
-  - Forbidden: `dict`, `list`, `Any`, unstructured `Union`, file objects, custom classes, functions or lambdas.
-  - For a nested payload, take a `str`, tell the model in the docstring to pass a JSON-encoded string, and parse it with `json.loads` inside `try/except`.
+  - Allowed parameter types: `str`, `int`, `float`, `bool`, `None`, `dict`, `list`, and other JSON-serializable types.
+  - Forbidden: file objects, custom classes, functions or lambdas, and anything that is not JSON-serializable.
 - **Validate every input at the top**, before any logic or side effect. Invalid input returns `{"status": "error", "message": "..."}`.
-- **Return contract**: always a dict with `status`. Success is `{"status": "success", ...fields}`; error is `{"status": "error", "message": ...}`.
+- **Return contract**: always a dict with `status`. Success is `{"status": "success", "data": {...}}` or `{"status": "success", ...fields}`; error is `{"status": "error", "message": "<detailed message>"}`.
 - **HTTP**: use `httpx.AsyncClient` for every request, with a 10-second default timeout. `except httpx.RequestError` returns `{"status": "error", "message": "Network error: ..."}`. Never raise into the call.
-- **Email**: if `send_email` returns a non-success `result["status"]`, return `{"status": "error", "message": result["message"]}`.
+  - **Retries**: retry a transient failure (a timeout, a connection error, a 5xx) at most twice, with exponential backoff (`await asyncio.sleep(0.5 * 2 ** attempt)`). Never retry a 4xx, and never retry a side effect that may already have happened unless the API is idempotent.
+  - **Reuse one client**: open one `httpx.AsyncClient` per function call and send every request of that call through it.
+  - Keep memory small: never hold a whole upstream payload when only a few fields are needed.
+- **Email**: `result = await send_email(to=..., subject=..., body=..., username=..., password=...)`. It never raises, so check `result["status"]`; on a non-success status return `{"status": "error", "message": result["message"]}`.
+  - `username` and `password` are required and come from `x_secrets`; for Gmail the password is a 16-character App Password, not the account password.
+  - Optional: `cc`, `bcc` (hidden from other recipients), `html_body`, `reply_to`, `from_name`, `attachments`. `to`, `cc` and `bcc` take a string, a comma-separated string or a list.
+  - Each attachment is a public URL, a local file path, or a dict: `{"filename": "a.pdf", "content": <bytes or base64 str>}`, `{"url": "..."}` or `{"path": "..."}`, each with an optional `"mime_type"`. The total stays under 18 MB.
+  - A success result is `{"status": "success", "message": ..., "to": [...], "cc": [...], "bcc": [...], "attachments": <count>}`.
 - **Secrets**: use `x_secrets["NAME"]` dict indexing only. Never accept a fixed credential as a model-supplied parameter. Never return or log a secret value.
 - Same pre-imported helpers as advanced pre-call.
+
+## Advanced on-connected (`on_connected` + Python)
+
+- Fields: `type: "on_connected"`, `name`, `description` (one sentence on the side effect), `source_code`, and optionally a static execution message ([reference §6](../agents/AGENT-VERSION-REFERENCE.md)).
+- **When it runs**: automatically, exactly once right after the call connects; a copy inside a capability or node runs once when the call enters that scope. The LLM never calls it and never sees its description, so write no "call this when" logic.
+- **Shape**: exactly `async def <name>(ctx: JobContext, metadata: dict):` with a docstring. There is no LLM turn behind it, so there is no `RunContext` and no model-supplied argument.
+  - `ctx` is the job's `JobContext`: use `ctx.room`, `ctx.proc.userdata` and `ctx.api`. `ctx.session` and `ctx.userdata` do not exist here.
+  - `metadata` is the call's metadata dict (the same pre-call variables as elsewhere); read it with `metadata.get("name")`.
+- **Return value**: ignored. Use it for side effects (calling an API, logging the connection, warming up data), never for anything the conversation needs back.
+- **Keep it fast**: it runs at connect time, so set a timeout on every external call (5 seconds is typical) and never block the call on slow work. Catch `httpx.RequestError` and `logger.error` it; never let an exception escape.
+- Same pre-imported helpers as advanced pre-call (`get_job_context` and `JobContext` included), the same code-safety rules, and imports inside the function body.
 
 ## Advanced post-call (`custom_post_call` + JavaScript)
 
@@ -124,9 +146,14 @@ If this node and one of those disagree, follow the served reference.
   - `_` (lodash);
   - `console.log` and `console.error`;
   - `sendEmail`: await it and check `result.status`;
-  - `x_secrets`: `x_secrets['NAME']`, with dot access only for names that are valid identifiers.
+  - `x_secrets`: `x_secrets['NAME']`, with dot access only for names that are valid identifiers;
+  - `x_call_history`: an array of earlier calls with the same contact, newest first, with the same item fields as the Python `x_call_history`; empty unless Call Memory is on. Read-only; never send it whole to an outside service.
 
   Use `axios`, not `fetch`.
+- **`sendEmail({...})`** never throws: check `result.status` instead of using try/catch. Mail goes from your own mailbox, so `username` and `password` are required and come from `x_secrets` (or from `context.call_metadata` for a call-specific value); for Gmail the password is a 16-character App Password.
+  - Options: `to`, `subject`, `body`, `cc`, `bcc`, `html`, `replyTo`, `fromName`, `attachments`.
+  - Each attachment is a public URL, a local file path, or an object `{filename, content}` (Buffer or base64 string), `{filename, url}` or `{filename, path}`, each with an optional `contentType`. The total stays under 18 MB.
+  - It defaults to `smtp.gmail.com:465`; pass `host`, `port` and `secure` for another provider.
 - **Secrets**: never log, return or hardcode a value read from `x_secrets`.
 
 ## Backend save checks (Python functions)
@@ -139,7 +166,8 @@ own 400 messages (October 2026).
   `aiohttp asyncio audio.audio_handler base64 calendar collections copy dataclasses datetime decimal
   enum functools hashlib hmac html httpx itertools json livekit math num2words pytz random rapidfuzz re
   statistics string textwrap time typing unicodedata urllib.parse uuid zoneinfo`. For fuzzy matching
-  use `rapidfuzz` (`from rapidfuzz import process, fuzz`), not `difflib`.
+  use `rapidfuzz` (`from rapidfuzz import process, fuzz`), not `difflib`. Every import sits inside the
+  function body, under the docstring (the harness refuses a save with an import outside it).
 - **Docstring.** The function must have a docstring right under the `async def` line saying what it
   does and when the agent should call it. Keep it when rewriting the function.
 
@@ -168,19 +196,20 @@ own 400 messages (October 2026).
 7. **`custom_pre_call` (advanced)**: `update_call_data` is a boolean and pairs with exactly one signature:
    - `false` with `async def name(metadata: dict, system_prompt: str) -> str`;
    - `true` with `async def name(call_data: dict)` mutating in place.
-8. **`custom_in_call` (advanced)**: async Python; `ctx: RunContext` first; typed scalar business parameters; `-> dict`; input validation at the top; `status`-based result dicts on every path.
-9. **Python**: `httpx` for HTTP; `x_secrets` read by dict indexing, never attribute access; email through `send_email`, awaited, with `result["status"]` checked; every import on the allow-list; a docstring under `def`.
-10. **`custom_post_call` (advanced)**:
+8. **`custom_in_call` (advanced)**: async Python; `ctx: RunContext` first; every business parameter typed with a JSON-serializable type (`dict` and `list` allowed); `-> dict`; a docstring with purpose, arguments, return structure and side effects; input validation at the top; `status`-based result dicts on every path.
+9. **`on_connected` (advanced)**: exactly `async def name(ctx: JobContext, metadata: dict):`; no `ctx.session`, `ctx.userdata` or `RunContext`; a timeout on every external call; side effects only.
+10. **Python**: `httpx` for HTTP, with a timeout and at most two backed-off retries of transient failures; `x_secrets` read by dict indexing, never attribute access; email through `send_email`, awaited, with `result["status"]` checked; every import on the allow-list and inside the function body, and no import of a pre-imported helper; a docstring under `def`.
+11. **`custom_post_call` (advanced)**:
     - async JavaScript taking exactly `context`;
     - `context.call_metadata`, not `context.metadata`;
     - `axios`, not `fetch` or `require`;
     - the mandatory `functions_called` entry with only the five fields;
     - email through `sendEmail` with `result.status` checked.
-11. **`transfer`**:
+12. **`transfer`**:
     - `warm_transfer` is present as `true` or `false`;
     - if `true`, `warm_transfer_prompt` is a non-empty string;
     - if the user asked for a waiting message, `msg_while_executing` is a non-empty array.
-12. **What counts**: accept a function that is functionally correct, even if imperfect. Reject it for structural or runtime-contract problems:
+13. **What counts**: accept a function that is functionally correct, even if imperfect. Reject it for structural or runtime-contract problems:
     - wrong type or purpose;
     - missing required fields;
     - signature and protocol mismatch;
@@ -189,6 +218,6 @@ own 400 messages (October 2026).
     - a failed delete;
     - a duplicate;
     - a credential leak.
-13. **Fix or recreate**:
+14. **Fix or recreate**:
     - delete and recreate when the type is wrong, the purpose is different, it is a duplicate, or the code is structurally broken beyond a targeted fix;
     - fix in place when the name and type are right and only a detail is wrong (URL, a field value, a missing condition, a small logic error).

@@ -50,7 +50,7 @@ RULES:
 1. MUST be async (async def).
 2. MUST include a complete docstring (purpose, args with types, returns structure).
 3. MUST type-annotate every parameter AND the return type (-> dict).
-4. CRITICAL SCHEMA RULE: NEVER use generic "dict" or "list" as input parameter types in the function signature. This breaks LLM tool validation schemas under Strict Mode. If a parameter must receive a complex dictionary or nested JSON payload, type-annotate it as a "str" and instruct the model in the docstring to pass a JSON-encoded string. Then parse it internally using json.loads() wrapped in a try/except block.
+4. Parameter types follow the in-call protocol: str, int, float, bool, None, dict, list, or another JSON-serializable type. Write every import inside the function body, under the docstring.
 5. MUST return a dict with at least a "status" field:
    - Success: { "status": "success", <your fields> }
    - Error:   { "status": "error", "message": "<detail>" }
@@ -62,8 +62,8 @@ RULES:
 9. Wrap external calls in try/except:
    except httpx.RequestError as e:
        return { "status": "error", "message": "Network error: ..." }
-10. Allowed signature types: str, int, float, bool, None. (Complex types must be handled internally via string deserialization).
-11. FORBIDDEN input types: dict, list, Any, Union types with unstructured shapes, File objects, custom classes, functions/lambdas.
+10. Allowed signature types: str, int, float, bool, None, dict, list, and other JSON-serializable types.
+11. FORBIDDEN input types: File objects, custom classes, functions/lambdas, non-serializable objects.
 
 PRE-IMPORTED HELPERS:
   asyncio, httpx, json, pytz, datetime, timedelta, re, math, logger,
