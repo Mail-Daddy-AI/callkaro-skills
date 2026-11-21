@@ -520,7 +520,7 @@ transfer function; expect to read them back at version level.
 | `caching_strategy` | `response` \| `sentence` \| `none` | `response` | `response` caches whole responses (fastest repeats), `sentence` caches per sentence (more reuse, finer grain), `none` disables it. |
 
 Typical model families available: `gpt-4o`, `gpt-4o-mini`, `gpt-4.1`, `gpt-4.1-mini`, `gpt-4.1-nano`,
-`gpt-5-mini`, `gpt-5-nano`, `gpt-5.1-chat`, `gpt-5.2-chat`, `gpt-5.4-mini`, `gpt-5.4-nano`,
+`gpt-5-mini`, `gpt-5-nano`, `gpt-5.1-chat`, `gpt-5.2-chat`, `gpt-5.4-mini`, `gpt-5.4-nano`, `gpt-5.6-luna`,
 `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `gpt-4o-realtime-preview`,
 `gpt-4o-mini-realtime-preview`, `gemini-2.5-flash`, `llama-3.1-8b-instant`,
 `llama-3.3-70b-versatile`, `meta-llama/llama-4-scout-17b-16e-instruct`,

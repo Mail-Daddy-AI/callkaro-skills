@@ -10,7 +10,8 @@
 
 ## House defaults
 
-Use these unless the document or the user asks for something else. When a choice here is unclear
+Use these for a new agent, or a field that is empty, unless the document or the user asks for something else. An
+existing agent keeps its voice, transcriber and models unless the user asks to change them. When a choice here is unclear
 for this bot (the persona's gender is not stated, a default voice is not in `list_voices`), ask the
 user; never guess.
 

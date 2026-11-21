@@ -62,7 +62,7 @@ Tune speed, stability, similarity boost, style per provider. No emojis or specia
 
 **Always set `secondary_voice_configuration` from a DIFFERENT provider** (the house defaults in [voice and transcriber](voice-and-transcriber.md)), so a single provider outage can't take both voices down — the same reasoning as the LLM primary/secondary pair. Realtime LLM models (`*realtime*`) force `voice_provider: "Open AI"`.
 
-**Default voice gender when the script doesn't state one:** masculine for `hi en kn gu ml`, feminine for `mr ta te bn`. And match whatever persona gender the prompt declares — Hindi verb conjugation drifts if the voice and the stated gender disagree.
+**Voice gender when the script doesn't state one:** ask the user (house defaults in [voice and transcriber](voice-and-transcriber.md)). And match whatever persona gender the prompt declares — Hindi verb conjugation drifts if the voice and the stated gender disagree.
 
 ## Transcriber
 
@@ -159,7 +159,7 @@ Starting points from the team that builds these agents. Where they differ from t
 - **LLM**: default `callkaro/arjuna-2.5`. Smaller prompts and a straightforward flow: `gpt-5.6-luna` or `gpt-5.4-mini`. Large prompts or heavy reasoning (a long negotiation stage): `gpt-4.1`. Do not use `gpt-5.6-terra` or `gpt-5.6-sol`. Multi-prompt and pathway agents set models per capability or node, so a small start stage can run a small model. Secondary is a compatible fallback used only if the primary fails.
 - **Temperature scales differ**: top-level `temperature` is 0 to 10 (send 3 for 0.3); capability `llms.temperature` is 0 to 1. Observed range 0.2 to 0.3.
 - **Transcriber**: Soniox is the team's first choice (select only the languages this version must support; leave context fields empty), Sarvam second (lower latency, one language per config), Smallest AI and Azure good. Other providers are not used. `secondary_transcriber` only on failure; `useMultiTranscribers` is deprecated, leave it.
-- **Voice**: Smallest AI is the default, ElevenLabs is polished and stable but dearer, Sarvam is more natural but rougher with lower latency and cost. Voice gender must match the persona gender; if unsure, copy the voice from an existing agent of the same language and gender and flag it.
+- **Voice**: house default Eleven Labs (polished and stable, dearer) with a Sarvam v4 `ashutosh` (male) or Gnani v2.5 `chitra` (female) secondary ([voice and transcriber](voice-and-transcriber.md)); Sarvam is more natural but rougher, with lower latency and cost. Voice gender must match the persona gender; if unsure, ask the user.
 - **Language fields**: `language_switching: true` for same-version implicit switching (the platform marks it legacy, but the backend runs the current implementation behind it); do not set `language_lockin_time`; leave `language_switching_v1` false; `switchableLanguages` is a different thing (hands the call to another published version). See [language switching](../writing/language-switching.md).
 - **Opening**: `speakfirst.value` 0 waits for the caller, 1 generates an opening, 2 speaks `customMsg`. If the platform speaks first, the prompt must say so and not repeat the greeting.
 - **Ending**: prefer ending calls by speaking a line listed in `end_call_msg`, in every language the version speaks, rather than with the `end` function.
