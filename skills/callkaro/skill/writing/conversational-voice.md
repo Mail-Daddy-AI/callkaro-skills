@@ -71,7 +71,8 @@ Everything else becomes a goal plus one short example line the model may say in 
 ## 4. Show, don't only tell: example exchanges
 
 Rules alone produce rule-shaped speech. Add 4 to 6 short example exchanges: a happy path, an
-objection, an unclear reply, an interruption. Write them as a bad line vs a better line
+objection, an unclear reply, an interruption. Show only correct spoken lines: a quoted wrong line, even
+labelled wrong, gets repeated word for word (a ✅/❌ pair is fine for a decision or a tool call). For style
 ([LiveKit](https://livekit.com/blog/prompting-voice-agents-to-sound-more-realistic): "I can
 definitely handle that for you" vs "Yeah, um so, I can do that, no problem";
 [Vapi](https://docs.vapi.ai/prompting-guide): at least a happy path, an edge case, an error
@@ -187,7 +188,7 @@ backs every rule above with numbers from the platform itself:
 - [ ] React to the customer before any line; one question per turn; no prescribed opener list
 - [ ] Price and validity said once per phase, not every turn
 - [ ] No sentence ever said twice; "what?" gets a short new sentence
-- [ ] 4 to 6 example exchanges from real calls, bad vs better
+- [ ] 4 to 6 example exchanges from real calls, correct spoken lines only
 - [ ] Fillers rationed, none on price/deductions/closing
 - [ ] Prompt deduplicated; labelled CALL DATA; no unfilled placeholders
 - [ ] Soniox list has no script-colliding language; min words matches the prompt ([language switching](language-switching.md))

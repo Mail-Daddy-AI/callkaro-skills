@@ -681,10 +681,10 @@ Guidance:
 | `silence_language` | enum + `multi`, `en` | Language of those prompts. |
 | `language_switching` | bool, `false` | Switch language based on the caller's **last message** (reactive, no confirmation). Makes the agent SPEAK a different language mid-call while staying on this SAME version/script — no transfer. Do not confuse with `switchableLanguages` (§14), which hands the call off to a DIFFERENT PUBLISHED VERSION authored in that language. |
 | `language_switching_instructions` | string \| null, `null` | Instructions for how the agent should switch language mid-call. Used only when `language_switching` is true. Optional — leave unset unless the user asks for it; the platform falls back to a built-in multilingual detection prompt. |
-| `language_lockin_time` | number \| null, `null` | Seconds to lock onto a language after switching, before switching again. Used only when `language_switching` is true. |
+| `language_lockin_time` | number \| null, `null` | Legacy: do not set (leave `null`). |
 | `allowed_languages` | string[], `[]` | Whitelist of languages the agent may switch into. Empty means unrestricted. Used only when `language_switching` is true. |
 | `language_switch_min_words` | int, `3` | Minimum caller words required before a switch triggers. Used only when `language_switching` is true. |
-| `language_switching_v1` | bool, `false` | Switch language only after the caller's **explicit consent/request**. Pair either flag with `language_switch_snippet` and `switchableLanguages`. |
+| `language_switching_v1` | bool, `false` | Legacy: leave `false`; switch with `language_switching`. Pair it with `language_switch_snippet` and `switchableLanguages`. |
 | `detect_gender` | bool, `false` | Detect the caller's gender from audio and adapt address forms. |
 | `gender_prompt_snippet` | string \| null | Prompt injected when `detect_gender` is on. |
 | `formatToNumberAsIndian` | bool, `false` | Speak/format numbers in the Indian system (lakh/crore, Indian digit grouping). |

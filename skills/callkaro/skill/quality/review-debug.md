@@ -57,8 +57,10 @@ Output format when not producing the workbook:
 
 4. **Check existing text first.** Search the prompt and snippets for anything that already covers or contradicts the behaviour. Most "missing rules" are present but overridden elsewhere. Quote what you find.
 5. **Fix at the root, smallest change.** Prefer, in order: fix data or a pre-call function; fix design; remove or merge conflicting text; fix the function; add a rule only when one is genuinely missing. For a rule the agent keeps missing, deliberate double placement in prompt and snippet is allowed; contradictions between the two never are.
-6. **Verify.** Apply in a NEW version (edit the loaded draft, `review_draft`, then `save_version_to_db`: a published base is saved as a new version). Rerun the failing case 5 times plus related regression cases; compare with the old version.
+6. **Verify.** Apply in a NEW version (edit the loaded draft, `review_draft`, then `save_version_to_db`: a published base is saved as a new version). Replay the failing conversation several times, rerun the related cases, then confirm on a real test call (a simulation PASS alone is not proof: it runs another model and no pre-call code); compare with the old version.
 7. **Report**: symptom, evidence, frequency, root cause, fix, verification result.
+
+When sources disagree, trust them in this order: real calls, replays of real conversations, simulations, how often a pattern appears in kept versions, then the docs.
 
 ### Do not
 

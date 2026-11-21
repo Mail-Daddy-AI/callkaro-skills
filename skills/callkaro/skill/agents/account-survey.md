@@ -78,7 +78,7 @@ Most agents' prompts are markdown-free already (0 bold, 0 headings) — the hous
 
 ## Structural prompt patterns worth copying
 
-- **Output contract up top** ("everything you output is spoken aloud; output only the customer's words; never speak labels or routing") — seen in the auto-service and Payoneer agents, placed before all other sections
-- **Priority hierarchy block** — the Omaxe agents open with an explicit precedence list (hard opt-out > pricing > primary flow) to resolve rule conflicts deterministically
+- **Output contract up top** ("everything you output is spoken aloud; output only the customer's words; never speak labels or routing") — seen in an auto-service and a payments agent, placed before all other sections
+- **Priority hierarchy block** — real-estate agents open with an explicit precedence list (hard opt-out > pricing > primary flow) to resolve rule conflicts deterministically
 - **Persona gender + verb conjugation pinned** — several agents state "persona gender: female, use consistently feminine Hindi forms in every spoken response," which prevents gender drift in Hindi morphology
 - **No-thought-tags guard** — one agent explicitly bans `<thought>` and internal reasoning tags in output

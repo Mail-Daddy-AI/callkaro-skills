@@ -45,7 +45,7 @@ Signature: `async def name(metadata: dict, system_prompt: str) -> str`. Return t
     raises and fails every call (`PRE_CALL_FN_FAILED`). Guard with `isinstance(system_prompt, str)` or use
     `str(system_prompt)`;
   - it can also be an empty string. Do not assume it is non-empty.
-- A pre-call function with `update_call_data=True` writes back to the call data and needs 2 positional args.
+- A pre-call function with `update_call_data=True` writes back to the call data and takes one argument, `call_data`; the `update_call_data=False` form takes two, `(metadata, system_prompt)` ([function rules](function-rules.md)).
 
 ### Names already bound in a function's globals (60)
 

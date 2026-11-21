@@ -26,7 +26,7 @@ SECTION 2: LANGUAGE CONFIG
 =========================================
 
 - plain bullets are fine
-- -> for branch arrows, → also fine
+- -> for branch arrows (never →)
 
 STEP 3: CONTEXT SETTING
 =========================================
@@ -70,6 +70,8 @@ Ask whether you are speaking to {{customer_name}}:
 - If no -> ask for a better time to call and end the call.
 ```
 
+A version that speaks one language carries no dialogue in another: English lines in a Hindi version make the model slip into English. In one prompt for several languages, write a stock line as an instruction plus one example per language, never a quoted English line.
+
 ## Principles behind the style
 
 - As short as possible without losing performance: too long and the model gets lost, too short and it misses the context.
@@ -83,10 +85,13 @@ Ask whether you are speaking to {{customer_name}}:
 
 - Numbers as words, never numerals: "five lakh thirty thousand rupees". Never the ₹ symbol — say "rupees".
 - No markdown, emojis, or special characters in anything meant to be spoken.
+- Never quote a wrong spoken line, even labelled wrong: the model repeats it. Describe the error and show the correct line; a ✅/❌ pair is fine for a decision or a tool call.
+- A SAY-exactly line wins over context (an earlier briefing, a follow-up note): say so in the prompt's precedence, so the two never fight.
+- Never write "your ONLY action is the tool call": the model then skips a clarifying question it needs. Show one worked example of the missing-information case instead.
 
 ### Output contract block (highest-priority section, proven pattern)
 
-Opening a base prompt with a hard output contract is the single most effective anti-narration defense. Two production shapes seen in the account (auto service, Payoneer), both placed before everything else and worded as "read before every reply":
+Opening a base prompt with a hard output contract is the single most effective anti-narration defense. Two production shapes seen in the account (an auto-service agent and a payments agent), both placed before everything else and worded as "read before every reply":
 
 ```
 §0 OUTPUT CONTRACT — READ BEFORE EVERY REPLY
@@ -103,8 +108,8 @@ Do not output analysis, reasoning, internal state names, labels, routing
 decisions, simulation annotations, function calls, or backend data.
 ```
 
-Related: the Omaxe real-estate agents open with a PRIORITY HIERARCHY block that resolves overlapping rules by explicit precedence (hard opt-out > pricing > primary flow). Use the same shape when rules genuinely conflict — a written precedence list beats hoping the model infers one.
-- Language-specific quirks belong in Section-style language config (e.g. Hindi: always "रहाहूँ" with no space, names in Devanagari, Hinglish register).
+Related: real-estate agents in the account open with a PRIORITY HIERARCHY block that resolves overlapping rules by explicit precedence (hard opt-out > pricing > primary flow). Use the same shape when rules genuinely conflict — a written precedence list beats hoping the model infers one.
+- Language-specific quirks belong in Section-style language config (e.g. names in Devanagari, Hinglish register). A pronunciation fix such as writing "रहाहूँ" with no space belongs to the voice it was found on (certain ElevenLabs voices), not to every voice.
 
 ## Pauses: SSML tags (UNVERIFIED — read this before using them)
 
@@ -115,7 +120,7 @@ What live agents in this account actually contain:
 - `<break time="0.2s"/>` … `0.3s`, `0.5s`, `0.7s` in one agent's internal pause table (clause boundaries, after a price/name, after an info block, after a high-impact line)
 - `<prosody rate="85%" pitch="-20Hz" volume="soft">…</prosody>` around whole sentences for a softer, slower, lower register
 - `<prosody rate="50%" pitch="-50Hz" volume="soft">hello—</prosody>` as an entire custom begin message — a soft, drawn-out opener
-- One Omaxe rule: "wrap only the perspective in prosody; in that turn ask no question, offer no callback" — prosody marking an advisory aside, not decorating everything
+- One real-estate agent's rule: "wrap only the perspective in prosody; in that turn ask no question, offer no callback" — prosody marking an advisory aside, not decorating everything
 
 Rules regardless of support level:
 
@@ -136,6 +141,9 @@ Call initiation for outbound has three modes: user speaks first, AI dynamic begi
 
 ## Placeholder wiring (check after every rewrite)
 
+- Every placeholder needs a named source (call metadata, a pre-call function) and a fallback, so a missing value never reaches the caller as literal braces.
+- Caching: everything before the first `{{var}}` or `{VAR}` is the cacheable prefix. Put values only in the last section (CALL DETAILS); rules elsewhere name the value as `<pincode>`, never `{{pincode}}`.
+- The platform appends today's date (and tomorrow's and the day after's) to every in-call prompt: never add a date variable.
 - `insert_metadata_in_prompt` is false on these agents: the platform will NOT auto-substitute prompt placeholders. Every `{{token}}` / `{token}` needs a writer (a pre-call function's replacements dict, or a dynamic `.replace(placeholder, ...)` loop).
 - Two-layer naming: prompts reference short RESOLVED keys (`customer_name`, `active_price`, `step_2_context`); functions read raw NAMESPACED call-metadata keys (`lead_information_customer_name`, `car_metadata_atp`, `cep`). The dashboard Variables panel only shows the resolved layer — typing there cannot test raw-input branching.
 - Style transforms must be placeholder-safe: strip backticks AROUND tokens, never strip the braces; keep `{{x}}` byte-identical.

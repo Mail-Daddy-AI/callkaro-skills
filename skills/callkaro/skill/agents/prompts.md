@@ -98,7 +98,7 @@ platform default; set `""` to suppress it entirely.
 - **Never write two contradicting rules** — the model picks one; this is the #1
   cause of bugs.
 - **Literal instructions**: "ask for the 6-digit pincode", not "handle location".
-- **No arrow symbols** (`→`); write "then". **No math or logic to compute** —
+- **Arrows**: `->` for a branch, never `→`. **No math or logic to compute** —
   the agent reads the prompt as text and cannot calculate; precompute dates and
   values and hand them as ready facts (or via a pre-call function).
 - **Cover every path**: interested, not interested, busy/callback, wrong
