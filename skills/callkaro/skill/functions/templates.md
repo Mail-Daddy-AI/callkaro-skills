@@ -69,13 +69,16 @@ async def check_something(ctx: RunContext, customer_value: str) -> dict:
 
     if not isinstance(customer_value, str) or not customer_value.strip():
         return {"status": "error", "message": "customer_value is required"}
+    api_key = x_secrets.get("API_KEY")
+    if not api_key:
+        return {"status": "error", "message": "API_KEY is not in the Secrets Vault"}
     async with httpx.AsyncClient(timeout=10.0) as client:   # one client for every request of this call
         for attempt in range(3):
             try:
                 response = await client.post(
                     "https://api.example.com/check",
                     json={"value": customer_value},
-                    headers={"Authorization": "Bearer " + x_secrets["API_KEY"]},
+                    headers={"Authorization": "Bearer " + api_key},
                 )
             except httpx.RequestError as e:
                 if attempt == 2:
@@ -88,7 +91,13 @@ async def check_something(ctx: RunContext, customer_value: str) -> dict:
                 continue
             if response.status_code != 200:
                 return {"status": "error", "message": f"check API error: {response.status_code}"}
-            return {"status": "success", "result_words": response.json().get("result_words")}
+            try:
+                data = response.json()
+            except ValueError:
+                return {"status": "error", "message": "check API sent a body that is not JSON"}
+            if not isinstance(data, dict):
+                return {"status": "error", "message": "check API sent an unexpected shape"}
+            return {"status": "success", "result_words": data.get("result_words")}
 ```
 
 Drop the retry loop for a call that books, pays or sends: a retried side effect can happen twice unless the API is idempotent.
@@ -98,15 +107,16 @@ Drop the retry loop for a call that books, pays or sends: a retried side effect 
 ```python
 async def notify_crm_on_connect(ctx: JobContext, metadata: dict):
     """Tell the CRM the call has started, once, right when the call (or this capability) connects."""
-    lead_id = metadata.get("lead_id")
-    if not lead_id:
+    lead_id, api_key = metadata.get("lead_id"), x_secrets.get("CRM_API_KEY")
+    if not lead_id or not api_key:
+        logger.error("notify_crm_on_connect skipped: lead_id or CRM_API_KEY missing")
         return
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             await client.post(
                 "https://crm.example.com/api/call-started",
                 json={"lead_id": lead_id},
-                headers={"Authorization": f"Bearer {x_secrets['CRM_API_KEY']}"},
+                headers={"Authorization": f"Bearer {api_key}"},
             )
     except httpx.RequestError as e:
         logger.error(f"Failed to notify CRM on connect: {e}")
