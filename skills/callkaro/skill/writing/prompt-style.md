@@ -64,8 +64,8 @@ This overrides any older guidance that says to write the whole prompt in the tar
 ```
 STEP 2: CONFIRM IDENTITY
 =========================================
-Ask whether you are speaking to {{customer_name}}:
-"क्या मेरी बात {{customer_name}} जी से हो रही है?"
+Ask whether you are speaking to <customer_name>:
+"क्या मेरी बात <customer_name> जी से हो रही है?"
 - If yes -> go to STEP 3.
 - If no -> ask for a better time to call and end the call.
 ```
@@ -142,8 +142,8 @@ Call initiation for outbound has three modes: user speaks first, AI dynamic begi
 ## Placeholder wiring (check after every rewrite)
 
 - Every placeholder needs a named source (call metadata, a pre-call function) and a fallback, so a missing value never reaches the caller as literal braces.
-- Caching: everything before the first `{{var}}` or `{VAR}` is the cacheable prefix. Put values only in the last section (CALL DETAILS); rules elsewhere name the value as `<pincode>`, never `{{pincode}}`.
-- The platform appends today's date (and tomorrow's and the day after's) to every in-call prompt: never add a date variable.
+- Caching: everything before the first `{{var}}` or `{VAR}` is the cacheable prefix. Put values only in the last section (CALL DETAILS); rules and spoken lines elsewhere name the value as `<pincode>`, never `{{pincode}}`, and CALL DETAILS holds it once (`pincode: {{pincode}}`).
+- The platform appends today's date (and tomorrow's and the day after's) to every in-call prompt: never add a variable for today's date (a lead's own dates, such as an appointment, are still call values).
 - `insert_metadata_in_prompt` is false on these agents: the platform will NOT auto-substitute prompt placeholders. Every `{{token}}` / `{token}` needs a writer (a pre-call function's replacements dict, or a dynamic `.replace(placeholder, ...)` loop).
 - Two-layer naming: prompts reference short RESOLVED keys (`customer_name`, `active_price`, `step_2_context`); functions read raw NAMESPACED call-metadata keys (`lead_information_customer_name`, `car_metadata_atp`, `cep`). The dashboard Variables panel only shows the resolved layer — typing there cannot test raw-input branching.
 - Style transforms must be placeholder-safe: strip backticks AROUND tokens, never strip the braces; keep `{{x}}` byte-identical.

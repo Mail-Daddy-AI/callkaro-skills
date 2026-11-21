@@ -36,7 +36,7 @@ Structured context (`transcriber_general_context` key/values, `transcriber_text_
 
 - `value=1` (dynamic begin message) with no custom text: 15 of 26 — the platform default
 - `value=2` (custom begin message) with text: 6 agents, `message_interruption: true` on most
-- Custom messages are full openers with `{{variable}}` substitution, e.g. `"नमस्ते, मैं Auto power Motors की service team से Alia बोल रही हूँ। क्या मेरी बात {{customer_name}} जी से हो रही है?"`
+- Custom messages are full openers with `{{variable}}` substitution, e.g. `"नमस्ते, मैं Acme Motors की service team से Alia बोल रही हूँ। क्या मेरी बात {{customer_name}} जी से हो रही है?"`
 - One agent uses a prosody-wrapped fragment as its entire custom message: `<prosody rate="50%" pitch="-50Hz" volume="soft">hello—</prosody>`
 
 ## Silence and termination

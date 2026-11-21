@@ -220,10 +220,10 @@ executor knows exactly which sub-tools to invoke and what to change.
     silence_instructions        — instructions for "dynamic" or "ignore" silence mode (default: null; only set if asked)
     language_switching          — boolean: enable v2 mid-call language switching
     language_switching_instructions — instructions for language-switching behaviour (default: null; only set if asked; only used when language_switching is true)
-    language_lockin_time        — seconds to lock onto a language after switching (default: null; only used when language_switching is true)
+    language_lockin_time        — legacy: leave null, never set
     allowed_languages           — whitelist of languages the agent may switch into (default: []; only used when language_switching is true)
     language_switch_min_words   — minimum caller words before a switch triggers (default: 3; only used when language_switching is true)
-    language_switching_v1       — boolean: enable v1 mid-call language switching
+    language_switching_v1       — legacy: leave false
     (language_switching/language_switching_v1 make the agent SPEAK a different language mid-call while
     staying on this SAME version/script — no transfer, no version change. Do not confuse with
     switchableLanguages below, which hands the call off to a DIFFERENT PUBLISHED VERSION in that language.)
