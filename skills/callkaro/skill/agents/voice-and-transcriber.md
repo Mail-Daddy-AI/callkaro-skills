@@ -5,7 +5,27 @@
 > §9 (voice) and §10 (transcriber)** — every provider's exact keys, models,
 > ranges and defaults. Don't restate them; look them up there.
 > This file is *how to choose*. For the full production selection policy, the
-> pipeline stage is [../authoring-pipeline/voice-transcriber-agent.md](../authoring-pipeline/voice-transcriber-agent.md).
+> pipeline stage is [../authoring-pipeline/voice-transcriber-agent.md](../authoring-pipeline/voice-transcriber-agent.md);
+> its LANGUAGE DEFAULTS predate the house defaults below, which win.
+
+## House defaults
+
+Use these unless the document or the user asks for something else. When a choice here is unclear
+for this bot (the persona's gender is not stated, a default voice is not in `list_voices`), ask the
+user; never guess.
+
+| Setting | Default |
+|---|---|
+| `transcriber` | **Soniox**, with only the languages this version speaks. No keywords or context unless calls show a mishearing that decides the call. |
+| `secondary_transcriber` | **Sarvam**, in the bot's main language (one language per Sarvam configuration). |
+| `voice_configuration` | **Eleven Labs**: a voice of the persona's gender for the bot's language, found with `list_voices`. |
+| `secondary_voice_configuration` | Male persona: **Sarvam v4** (`bulbul:v4` family), voice **`ashutosh`**. Female persona: **Gnani v2.5**, voice **`chitra`**. |
+| `model` | **`callkaro/arjuna-2.5`**. |
+| `secondary_model` | Chosen for this bot: see [reference §7](AGENT-VERSION-REFERENCE.md). |
+
+- Copy the provider name, model and voice id exactly as `list_voices` returns them; the names above
+  are what to search for, not ids to write from memory.
+- The persona's gender comes from the document. When the document does not say, ask the user.
 
 ## Find real voices — never invent one
 
@@ -25,12 +45,11 @@ one it ignores.
 1. Filter by language, then gender, then style.
 2. If the user names a specific voice, search **without** a gender — the
    filter could hide it.
-3. Default gender when nothing is stated: **masculine** for `hi en kn gu ml`,
-   **feminine** for `mr ta te bn`.
+3. When nothing states the gender, ask the user (house defaults above).
 4. Match the persona gender declared in the script ([prompts.md](prompts.md)).
 5. Always set `secondary_voice_configuration` from a **different provider** so
-   one provider outage can't take both voices down (Sarvam `bulbul:v3` is the
-   standard partner).
+   one provider outage can't take both voices down (the house defaults above pair
+   Eleven Labs with Sarvam v4 `ashutosh` or Gnani v2.5 `chitra`).
 
 ## Choosing a transcriber
 
@@ -43,8 +62,8 @@ one it ignores.
 | Caller may switch languages mid-call | An **array**-language provider: Soniox (best) or Azure |
 | Brand/product words misheard | Add `keywords[]` **inside** the transcriber object |
 
-**Standard pairing: Soniox primary + Azure secondary** (Sarvam secondary when
-Azure lacks the locale). Always a different provider from the primary.
+**Standard pairing: Soniox primary + Sarvam secondary** (house defaults above).
+Always a different provider from the primary.
 `useMultiTranscribers: true` (agent-level) runs both at once instead of failover.
 
 ## The two traps

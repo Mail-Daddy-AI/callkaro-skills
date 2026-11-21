@@ -26,7 +26,7 @@ Call the relevant provider tool(s) to get the current model list before validati
 Call only the relevant tool based on what the user asked for.
 Never set a model not returned by these tools.
 
-Defaults: model=gpt-4.1-mini, secondary_model=gpt-4.1-nano, temperature=8, caching_strategy=response
+Defaults: model=callkaro/arjuna-2.5, secondary_model chosen for the prompt (agents/AGENT-VERSION-REFERENCE.md §7), temperature=8, caching_strategy=response
 
 ═══════════════════════════════════════════════════════════════════
  CACHING STRATEGY
