@@ -60,7 +60,7 @@ Post-call extraction recommended model: `callkaro/krishna-2.5`.
 
 Tune speed, stability, similarity boost, style per provider. No emojis or special chars in prompts, they break live calls.
 
-**Always set `secondary_voice_configuration` from a DIFFERENT provider** (Sarvam `bulbul:v3` is the standard partner), so a single provider outage can't take both voices down — the same reasoning as the LLM primary/secondary pair. Realtime LLM models (`*realtime*`) force `voice_provider: "Open AI"`.
+**Always set `secondary_voice_configuration` from a DIFFERENT provider** (the house defaults in [voice and transcriber](voice-and-transcriber.md)), so a single provider outage can't take both voices down — the same reasoning as the LLM primary/secondary pair. Realtime LLM models (`*realtime*`) force `voice_provider: "Open AI"`.
 
 **Default voice gender when the script doesn't state one:** masculine for `hi en kn gu ml`, feminine for `mr ta te bn`. And match whatever persona gender the prompt declares — Hindi verb conjugation drifts if the voice and the stated gender disagree.
 

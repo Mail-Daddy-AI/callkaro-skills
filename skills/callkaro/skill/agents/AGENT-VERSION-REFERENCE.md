@@ -168,7 +168,7 @@ Shared fields (both types):
 | `msg_while_switching_type` | `silent` \| `static` \| `dynamic` | What the caller hears while switching **into** this capability. `silent` (default) = nothing; `static` = speak `msg_while_switching` verbatim; `dynamic` = `msg_while_switching` is a *prompt* for generating a bridging line. |
 | `msg_while_switching` | string | The literal line, or the generation prompt. `""` for `silent`. |
 | `endpointing` | `{mode, min_delay, max_delay}` | Controls when the caller's turn is complete while this capability/node is active. `mode` is `fixed` or `dynamic`; `min_delay` is 0–1 seconds and `max_delay` is 0–6 seconds. Defaults: `{ "mode": "fixed", "min_delay": 0.5, "max_delay": 3 }`. See below. |
-| `llms` | `{primary_model, secondary_model, temperature}` | Per-capability model choice — how you control cost/quality per phase (cheap model for the greeting, stronger for negotiation). New-agent defaults are `callkaro/arjuna-2.5` / `gpt-5.4-nano` / `0.2`. **`temperature` here is 0–1** (§7). |
+| `llms` | `{primary_model, secondary_model, temperature}` | Per-capability model choice — how you control cost/quality per phase (cheap model for the greeting, stronger for negotiation). House defaults: primary `callkaro/arjuna-2.5`, a secondary chosen for the capability as in §7, temperature `0.2`. **`temperature` here is 0–1** (§7). |
 | `functions` | object[] | Functions callable while inside this capability (§6). |
 | `postcall` | object[] | Post-call variables scoped to this capability (§8). |
 | `use_filler` | bool | Use filler sounds during this capability. Only meaningful when version `filler_config.filler_type` ≠ `none`. |
@@ -515,7 +515,7 @@ transfer function; expect to read them back at version level.
 | Field | Type | Default | Notes |
 | --- | --- | --- | --- |
 | `model` | string | `callkaro/arjuna-2.5` | Primary LLM driving new Basic and Advanced agents. |
-| `secondary_model` | string | `gpt-5.4-nano` | Fallback LLM for new agents. |
+| `secondary_model` | string | chosen per bot | Fallback LLM, used only if the primary fails. House default: pick it for the prompt — `gpt-5.6-luna` or `gpt-5.4-mini` for a small, straightforward prompt; `gpt-4.1` for a large prompt or heavier reasoning. Ask the user when unsure. |
 | `temperature` | number | `3` | **Version-level scale is 0–10**. Capability `llms.temperature` is **0–1** (new-agent default 0.2). Never copy one into the other without ×10 / ÷10. |
 | `caching_strategy` | `response` \| `sentence` \| `none` | `response` | `response` caches whole responses (fastest repeats), `sentence` caches per sentence (more reuse, finer grain), `none` disables it. |
 
@@ -594,7 +594,7 @@ Write **only** the keys the provider uses:
 | --- | --- | --- |
 | **Eleven Labs** | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `voice_category`, `voice_speed`, `voice_stability`, `voice_similarity_boost`, `voice_style` | models `eleven_flash_v2_5` (default), `eleven_turbo_v2_5`, `eleven_turbo_v2`, `eleven_flash_v2`; speed **0.7–1.2** (1.0); stability / similarity / style **0–1** (0.5 / 1 / 0.5); category `professional` |
 | **Cartesia** | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `voice_category`, `voice_speed`, `voice_volume`, `cartesia_emotions[]` | models `sonic-3` (default), `sonic-3.5`, `sonic-turbo`, `sonic-2`, `sonic`; speed **−1.0–1.0** (0); volume **0.5–2.0** (1.0); category `similarity`; emotions `[]` unless asked. Voices also carry a sublanguage (`hinglish-IN` vs `hi-IN`) — pick per script style |
-| **Sarvam** | `voice_provider`, `voice_id`, `voice_language`, `voice_model`, `voice_speed`, `voice_pitch` — **no `voice_name`, no `voice_category`** | models `bulbul:v3` (default), `bulbul:v3-beta` — never `bulbul:v2` (no longer offered, so a config naming it can't be edited in the UI); language like `hi-IN`; speed **0.7–1.2** (1.0); pitch **−2–2** (0.5). Voice categories `Customer Care` (default) / `Content Creation` / `International` select *which voices exist*; they are not stored |
+| **Sarvam** | `voice_provider`, `voice_id`, `voice_language`, `voice_model`, `voice_speed`, `voice_pitch` — **no `voice_name`, no `voice_category`** | models `bulbul:v4` family (house default for a male secondary voice: `ashutosh`; copy the exact model name from `list_voices`), `bulbul:v3`, `bulbul:v3-beta` — never `bulbul:v2` (no longer offered, so a config naming it can't be edited in the UI); language like `hi-IN`; speed **0.7–1.2** (1.0); pitch **−2–2** (0.5). Voice categories `Customer Care` (default) / `Content Creation` / `International` select *which voices exist*; they are not stored |
 | **Deepgram** | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model` | model `aura-2`; `voice_language` **`en` only**. Curated voices: `thalia` (default), `andromeda`, `helena`, `theia` (AU) / `apollo`, `arcas`, `aries`, `draco` (UK). No speed/pitch controls |
 | **Speechify** | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `speechify_loudness_normalization`, `speechify_text_normalization` | model `simba-multilingual`; locales `hi-IN en-IN en ur-IN bn-IN gu-IN mr-IN ta-IN te-IN`; both normalization flags default **false**. Voices are **locale-scoped** — resolve them for the chosen locale, they are not a fixed list |
 | **Murf** (restricted / per account) | `voice_provider`, `voice_name`, `voice_id`, `voice_language`, `voice_model`, `voice_style`, `voice_speed`, `voice_pitch` | model `FALCON` only (GEN2 streaming deprecated 2026-08-16); 26 locales; `voice_id` is locale-prefixed (`hi-IN-aman`); `voice_style` e.g. `Conversation` (default), `Promo`, `Narration`, `Customer Support Agent`; speed / pitch default **0**. Curated voices exist for `hi-IN en-IN en-US en-UK en-AU ta-IN bn-IN` only. Don't select it unless the account exposes it |
@@ -634,9 +634,9 @@ Honour it, and never write a field the account has no control for.
 
 Guidance:
 
-- Soniox is the strongest default primary (realtime, multi-language, richest context support);
-  Azure — or Sarvam when Azure lacks the locale — is the usual secondary. Always pick a **different
-  provider** for the secondary.
+- House default: Soniox primary (realtime, multi-language, richest context support) and Sarvam
+  secondary in the bot's main language ([voice and transcriber](voice-and-transcriber.md)). Always pick
+  a **different provider** for the secondary.
 - A provider whose language field is a *string* cannot cover several languages at once. For genuinely
   mixed-language calls use an array provider (Azure, Soniox) or a code-mixing model (Deepgram
   `multi`, Eleven Labs `multi`, Sarvam `codemix` mode).

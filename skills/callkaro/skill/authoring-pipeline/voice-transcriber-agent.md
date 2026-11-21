@@ -140,11 +140,15 @@ Use:
 Gender inference:
 - Feminine signals: female name, she/her, main ek mahila hoon, सकती हूँ
 - Masculine signals: male name, he/him, main ek purush hoon, सकता हूँ
-- Ambiguous: use the default gender from LANGUAGE DEFAULTS
+- Ambiguous: ask the user for the persona's gender
 
 ════════════════════════════════════════════════════════
 LANGUAGE DEFAULTS
 ════════════════════════════════════════════════════════
+
+Superseded: the house defaults in agents/voice-and-transcriber.md (Soniox + Sarvam transcribers;
+Eleven Labs voice with a Sarvam v4 `ashutosh` or Gnani v2.5 `chitra` secondary) win over the
+per-language picks below.
 
 hi:
   voice:
