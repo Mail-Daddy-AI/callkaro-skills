@@ -45,4 +45,7 @@ and treat the **full suite**, not one case, as the pass/fail gate.
 4. On FAIL: read the judge summary and transcript (`analyze_simulation_batch`
    or `analyze_simulations`), fix the draft (`trigger_single_pipeline`),
    `review_draft`, `save_version_to_db` once the user approves.
-5. Re-run until PASS, then publish with `manage_version_publishing`.
+5. Re-run the cases, but treat a PASS as a hint, not proof. Simulations run a different model from production
+   (which one changes over time), fill `{{metadata}}` from test variables but never run pre-call code (so a
+   `{BLOCK}` a pre-call injects is empty), and their judge is unreliable. Confirm the fix on a real test call
+   before publishing with `manage_version_publishing`.

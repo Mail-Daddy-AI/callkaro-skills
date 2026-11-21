@@ -9,7 +9,7 @@ HOUSE RULES (these override anything below that disagrees)
 - Script decision points, closing lines and legal lines as exact SAY lines; compose everything else
   ([conversational-agents](../writing/conversational-agents.md)). Multilingual agents start with
   [Template A](../writing/template-a-language.md); semi-scripted agents with [Template B](../writing/template-b-conversational.md).
-- Every closing line also goes into end_call_msg, character for character. Prefer ending calls this way over
+- Every closing line also goes into end_call_msg, character for character. Calls end this way; never use
   an end function.
 - Never resolve in the prompt what a pre-call function can compute before the call
   ([agent-design](../design/agent-design.md)). Per-call data goes in the last section.

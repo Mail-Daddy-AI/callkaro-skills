@@ -1,4 +1,4 @@
-<!-- graph-summary: Pipeline stage 6: generates no-code functions (transfer, hold, availability, booking, end). Prefer end_call_msg over an end function. Use when the plan calls for a predefined function. -->
+<!-- graph-summary: Pipeline stage 6: generates no-code functions (transfer, hold, availability, booking, end). End calls with end_call_msg, never an end function. Use when the plan calls for a predefined function. -->
 # Predefined Functions Agent
 
 *Production prompt — ai-fde's **Predefined Functions Agent** (function-generator). Adopt this role for this stage; see [README.md](README.md) for how its tool names map to `ck`.*

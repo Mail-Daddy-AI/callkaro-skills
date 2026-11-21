@@ -65,7 +65,7 @@ one it ignores.
 
 **Standard pairing: Soniox primary + Sarvam secondary** (house defaults above).
 Always a different provider from the primary.
-`useMultiTranscribers: true` (agent-level) runs both at once instead of failover.
+`useMultiTranscribers` is deprecated: never change it.
 
 ## The two traps
 

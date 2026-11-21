@@ -111,7 +111,7 @@ To add/remove/reorder a rule: edit the array (order = evaluation order; keep
    base stays untouched.
 3. Test the new version with simulations (see [../simulations.md](../simulations.md);
    load the simulation tools: `start_simulation_batch`, then
-   `get_simulation_batch_status` and `analyze_simulation_batch`) until PASS.
+   `get_simulation_batch_status` and `analyze_simulation_batch`). A PASS is a hint, not proof: confirm on a real test call.
 4. Either flip over with `manage_version_publishing` (`publish_version`), or A/B
    it against the incumbent with `manage_ab_testing` (`configure_normal`, 50/50).
 5. After enough calls, read the scorecard with `call_analytics`, stop the A/B

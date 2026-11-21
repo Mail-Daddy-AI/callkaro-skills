@@ -102,8 +102,9 @@ Which prompt type? (full guidance: [agents/prompts.md](agents/prompts.md))
   emoji) in any prompt field: it costs tokens and leaks into speech. See
   [writing/prompt-style.md](writing/prompt-style.md).
 - **End calls with `end_call_msg`.** Closing lines listed in `end_call_msg`
-  (character for character the same as in the prompt) end the call. Prefer
-  this over an `end` function.
+  (character for character the same as in the prompt) end the call. Never use
+  an `end` function: every final branch speaks its own closing line, last, and never
+  right after a question the caller has not answered.
 - **Find the cause, never patch with another rule.** A misbehaving call gets
   evidence, frequency and the root-cause layer before any change
   ([quality/review-debug.md](quality/review-debug.md)). Most "missing rules"
@@ -157,7 +158,7 @@ The document is the source of truth for BOTH the script and the test suite.
    function) → `create_agent_in_db` → `trigger_single_pipeline` (`draftPatch`)
    → `review_draft` → `save_version_to_db` once the user approves.
 5. Read back → 2–3 simulation test cases (cooperative / skeptical /
-   wrong-number) → `start_simulation_batch` → iterate until PASS ([simulations.md](simulations.md)).
+   wrong-number) → `start_simulation_batch`. A PASS is a hint, not proof: confirm a fix on a real test call ([simulations.md](simulations.md)).
 6. A new agent's first version is published when it is saved; later versions
    only when the user asks (`manage_version_publishing`). Assign a number if it will really
    call (`list_phone_numbers` → `assign_phone_number`), and ask the user to

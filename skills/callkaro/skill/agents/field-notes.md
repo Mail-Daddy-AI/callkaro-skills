@@ -83,11 +83,11 @@ transcriber_general_context: [
   {"key": "call_purpose", "value": "Verify customer identity before giving any factual payment reminder"},
   {"key": "expected_languages", "value": "Hindi, Hinglish"}
 ]
-transcriber_text_context: "Lokal Matrimony Hindi/Hinglish verification calls. Capture ages,
+transcriber_text_context: "Matrimony-app Hindi/Hinglish verification calls. Capture ages,
   years, dates, and heights as digits. Do not drop year digits."
 ```
 
-Context says what kind of call this is and which forms matter; keywords are only for proper nouns and short forms ("Omaxe Estate", "Chandni Chowk", brand names, model names). Guidelines on keyword count vary by provider — keep the list short, put the rest in context.
+Context says what kind of call this is and which forms matter; keywords are only for proper nouns and short forms (a project name, a locality such as "Chandni Chowk", brand names, model names). Guidelines on keyword count vary by provider — keep the list short, put the rest in context.
 
 **Provider/language shapes seen in production** (from a 301-agent account survey): Soniox with `["hi"]`, `["en","hi"]`, or `["hi","en"]`; Azure with `["hi-IN"]` or `["en-IN"]`; Deepgram `nova-3` with `hi` and language detection on/off; Sarvam `saaras:v4` with `hi-IN`. Deepgram is the most common choice for English-dominant agents, Soniox for Hindi-first ones.
 
@@ -146,7 +146,7 @@ more than its arguments.
 
 Function type frequency: `custom_post_call` 20, `custom_pre_call` 19, `custom_in_call` 15, `end` 11 (+7 capability-scoped), `transfer` 6, `keep_call_on_hold` 3, plus WhatsApp-specific types (`whatsapp_post_call`, `send_to_whatsapp`).
 
-Recurring in-call function names across unrelated businesses — these are the patterns worth copying: `end_call` (by far the most common, 18 uses), `transfer_call` / `transfer_to_human_support`, `verify_otp`, `confirm_pincode` / `update_pincode`, `calculate_hold_deduction`, `submit_verification_outcome`, and a family of `route_*` functions (`route_escalation_safety`, `route_escalation_security`, `route_dnd_delete_request`, `route_duplicate_profile`, `route_fake_suspected`, `route_profile_correction`).
+Recurring in-call function names across unrelated businesses — these are the patterns worth copying (not `end_call`, though teams often kept it: calls end on a closing line in `end_call_msg`): `transfer_call` / `transfer_to_human_support`, `verify_otp`, `confirm_pincode` / `update_pincode`, `calculate_hold_deduction`, `submit_verification_outcome`, and a family of `route_*` functions (`route_escalation_safety`, `route_escalation_security`, `route_dnd_delete_request`, `route_duplicate_profile`, `route_fake_suspected`, `route_profile_correction`).
 
 The `route_*` shape is worth stealing for any agent with compliance or QA branching: one small deterministic function per branch condition, each returning a decision the prompt then acts on. It keeps judgment in code and out of the model's improvisation, and it is auditable per branch — exactly like the pattern used to make OCB eligibility deterministic instead of asking the LLM to do the math.
 
@@ -235,4 +235,4 @@ From building and live-testing a capability-mode agent over ~10 test calls. Read
 - **Scripted "ask the customer X" questions need a "already answered? never ask again" clause.** A literal line in a prompt ("Then ask where the price came from") gets spoken on every entry to that branch, including after the customer already answered. The source question became a loop on a real call; the fix was an explicit once-per-call cap plus a branch for "the source was our own prior quote".
 - **Check `chat_history[].metrics.llm_metadata.model_name` before trusting any transcript.** A platform-wide degraded-mode event sent multiple agents to livekit's generic `FallbackAdapter` even though the agent was correctly configured for arjuna-2.5 — off-script phrasing, missed tool calls, restarted sentences, and a leaked control token all traced back to that, not to prompt bugs. Discard fallback-tainted calls before drawing conclusions.
 - **"Never calculate yourself, call the function" is not enough for pricing steps.** A one-call-per-call guard plus a re-entrancy guard worked, but the model still looped a "would you reconsider?" push line instead of routing onward. Scripts need explicit advance-and-exit conditions, not only prohibitions.
-- **End the call through the end capability, not by speaking a closing phrase from wherever you are.** On a real call the closing phrase came directly from the negotiation capability with no end-capability switch, skipping the callback and wrap-up steps that lived in the end checklist. State the switch explicitly wherever a refusal or "call me later" appears in any capability.
+- **Run the wrap-up steps (callback, summary) before the closing line, wherever the call ends.** On a real call the closing phrase came directly from the negotiation capability with no end-capability switch, skipping the callback and wrap-up steps that lived in the end checklist. State the switch explicitly wherever a refusal or "call me later" appears in any capability.
