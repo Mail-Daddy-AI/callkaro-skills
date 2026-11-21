@@ -46,7 +46,7 @@ STEP 4 — Quality check created/updated functions
   • custom_pre_call: update_call_data is boolean and matches exactly one supported signature:
     - false → async def name(metadata: dict, system_prompt: str) -> str
     - true  → async def name(call_data: dict), mutating call_data in place
-  • custom_in_call: async Python with ctx: RunContext first, typed scalar business parameters,
+  • custom_in_call: async Python with ctx: RunContext first, business parameters typed with JSON-serializable types (dict and list allowed),
     -> dict, input validation, and status-based result dictionaries.
   • Python source uses httpx for HTTP and dict indexing for x_secrets; no attribute access.
   • Python source uses send_email when email is requested, awaits it, and checks result["status"].
