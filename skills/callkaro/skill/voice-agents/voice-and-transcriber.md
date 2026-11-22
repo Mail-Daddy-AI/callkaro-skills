@@ -43,7 +43,7 @@ that provider uses, so you never write one it ignores.
 |---|---|
 | Single Indian language | Sarvam `saaras:v3` (`hi-IN`) or Deepgram `nova-3` |
 | English + a domain (finance, medical, phone) | Deepgram's domain models |
-| Code-mixed / Hinglish | Deepgram `multi`, Eleven Labs `multi`, Sarvam `saaras:v3`/`saaras:v4` with `transcriber_mode: "codemix"`, or Gnani `en-IN,hi-IN` (on `prisma-v3.0`, optionally `transcriber_format: "codemix"`) |
+| Code-mixed / Hinglish | Deepgram `multi`, Eleven Labs `multi`, Sarvam `saaras:v3`/`saaras:v4` with `transcriber_mode: "codemix"`, or Gnani `en-IN,hi-IN` (optionally `transcriber_format: "codemix"`) |
 | Low-latency streaming + Indian languages | Smallest AI `pulse` — single-string language, use `"multi"` for auto-detection |
 | Caller may switch languages mid-call | An **array**-language provider: Soniox (best) or Azure |
 | Brand/product words misheard | Add `keywords[]` **inside** the transcriber object |
