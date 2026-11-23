@@ -1,4 +1,4 @@
-<!-- graph-summary: Workflow graphs: steps (call, wait, WhatsApp, branch, CRM update), the JSON spec, validation rules and reading runs. Use to design a workflow the user builds on the dashboard. -->
+<!-- graph-summary: Workflow graphs: steps (call, wait, WhatsApp, branch, CRM update), the JSON spec, validation rules, versions (draft, publish, which leads run on which) and reading runs. Use to design a workflow the user builds on the dashboard. -->
 # Workflows
 
 A workflow is a **graph of steps run per contact**: call them, wait, WhatsApp
@@ -72,6 +72,27 @@ or a bare graph), duplicates, exports, deletes and edits workflows there.
 Replacing a graph **replaces the whole graph**. Every save is validated: each
 problem is reported with its `nodeId`, and nothing is saved until it is clean.
 
+## Versions
+
+Every workflow has **versions**, each with its own graph, and exactly one is
+**live**. On the workflow's **View** tab the user picks a version from the
+dropdown, makes a draft with **New version** (a name, and which version to copy
+from), saves edits to it with **Update**, and makes it live with **Publish**.
+
+- **New leads run on the live version.** Enrolling into another one is possible
+  from the API (`workflow_version_id`).
+- **A lead already running stays on the version it started on**, even after
+  another version is published.
+- **Editing a version changes the path of leads running on it**, the live one
+  included. To change a workflow with leads running, suggest a new version, edit
+  that, test it, then publish.
+- A new workflow (create, import or duplicate) starts with one live version, `v1`.
+  Duplicate and export work on one version.
+- Commit history is per version; reverting a commit puts the graph back on the
+  version it came from.
+- A version can be deleted unless it is the live one, the only one, or has leads
+  still running on it.
+
 ## Generate a workflow from a request
 
 1. Learn the shapes from the spec.
@@ -105,7 +126,7 @@ connecting nodes.
 - Replacing a conditions node's `exits` drops the edges of exits you removed.
 - The server validates on every save; an edit that would leave **no path to End** is rejected with the reason. Read it, fix, retry.
 - The last save wins — don't edit a workflow someone else may be editing.
-- **Editing a workflow that has leads running** may change what they do next. This pack has not verified how in-flight runs react — confirm with the user first.
+- **Editing a version that has leads running** changes what they do next: each step reads the graph as it stands. Suggest editing a new version and publishing it (see [Versions](#versions)), or confirm with the user first.
 
 ## Read results
 

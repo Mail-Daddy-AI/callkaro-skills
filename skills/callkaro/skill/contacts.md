@@ -86,6 +86,7 @@ call run (optionally language, start time, window, retries and gaps).
 - **Check the count first**: confirm with the user who is targeted and how many contacts match. Phone numbers that are not contacts are silently skipped by a real assign.
 - With **no** phone numbers and no filters, an assign targets *every* contact: never let that happen without the user's explicit yes.
 - Workflow: contacts **currently running** in it are **skipped** (nothing starts for them and it is not a success); forcing restarts them. A contact whose earlier run has **finished** is enrolled again normally.
+- Contacts enrol into the workflow's **live version**, and each run stays on the version it started on.
 - A selection is capped server-side; the result says when it was truncated — narrow the filters to cover the rest.
 - The workflow must have steps; a workflow with an empty graph is refused.
 - This **starts real calls / WhatsApp sends**. Say how many contacts and which workflow/agent, and get a yes.
