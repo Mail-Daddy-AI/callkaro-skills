@@ -48,7 +48,10 @@ Backend-enforced creation rules:
   `speakfirst_inbound` use value `0`, `1`, or `2`; value `2` requires a non-empty
   `customMsg`. A custom silence mode requires at least one non-empty silence
   prompt. `silence_instructions` only takes effect when `silence_mode` is
-  `dynamic` or `ignore`; leave it unset unless the user asks for it. Webhooks
+  `dynamic` or `ignore`; leave it unset unless the user asks for it.
+  `silence_strategy` is `basic` or `advanced`; with `advanced`, every
+  `silence_steps` entry within `silence_count` whose `mode` is `custom` needs a
+  non-empty `message`. `gender_detection_min_audio` is at least `0.1`. Webhooks
   must be empty or valid URLs.
 - **Nested records:** function `type`/`name`, HTTP method, parameters, headers,
   conditions, and execution-message shape are validated. Warm transfer requires

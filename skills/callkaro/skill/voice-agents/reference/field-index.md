@@ -62,6 +62,8 @@ Topic key -> open this node:
 | `silence_mode` | enum | `"default"` | call |
 | `silence_prompts` | string[] | `[]` | call |
 | `silence_instructions` | string \| null | `null` | call |
+| `silence_strategy` | enum `basic`\|`advanced` | `"basic"` | call |
+| `silence_steps` | object[] | `[]` | call |
 | `language_switching` | bool | `false` | call |
 | `language_switching_instructions` | string \| null | `null` | call |
 | `language_lockin_time` | number \| null | `null` | call |
@@ -71,6 +73,7 @@ Topic key -> open this node:
 | `detect_gender` | bool | `false` | call |
 | `gender_detection_strategy` | enum `default`\|`advanced` | `"default"` | call |
 | `gender_detection_delay` | number | `30` | call |
+| `gender_detection_min_audio` | number ≥ 0.1 | `2` | call |
 | `formatToNumberAsIndian` | bool | `false` | call |
 | `bgNoise` | bool | `true` | call |
 | `bgNoiseVolume` | number 0–1 | `0.2` | call |
