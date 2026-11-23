@@ -1,5 +1,5 @@
 # Workflows
-<!-- graph-summary: Build and run workflow graphs per contact: every node type (Send Call, Wait, Conditions, WhatsApp, API, Update Contact, and the Inbound Call, Cancel Workflow and Resume Where They Were nodes for call-backs), the rules that bite, commands, generating a graph from a request using real ids, editing, and reading results. -->
+<!-- graph-summary: Build and run workflow graphs per contact: every node type (Send Call, Wait, Conditions, WhatsApp, API, Update Contact, and the Inbound Call, Cancel Workflow and Resume Where They Were nodes for call-backs), the rules that bite, commands, versions (draft, publish, which leads run on which), generating a graph from a request using real ids, editing, and reading results. -->
 
 A workflow is a **graph of steps run per contact**: call them, wait, WhatsApp
 them, branch on what happened, update their CRM record. The dashboard draws it
@@ -9,6 +9,10 @@ Enrolling contacts is in [contacts.md](contacts.md); the two together are in
 
 Only **normal** workflows are editable. Older "AI" workflows are read-only and
 are not covered here.
+
+Every workflow has **versions**, each with its own graph, and exactly one is
+**live**. Everything below that reads or edits a graph works on the live
+version unless you pass `--version-id <id>`. See [Versions](#versions).
 
 ## The graph
 
@@ -90,17 +94,44 @@ A scheduled time outside the window moves to the next window opening when `carry
 | Command | What it does |
 |---|---|
 | `ck workflows schema` | The graph reference: every node type with a sample, edges, condition ops/sources |
-| `ck workflows list [--search] [--json]` / `get <id> [--json]` | Browse. `get --json` is the full graph |
+| `ck workflows list [--search] [--json]` / `get <id> [--version-id] [--json]` | Browse. `get --json` is the full graph of that version (live by default) plus the version list |
 | `ck workflows create <name> [--file graph.json]` | Create (no graph = just Start and End) |
 | `ck workflows import --file x.json [--name]` | Create from a dashboard export or a bare graph |
-| `ck workflows update <id> [--name] [--file graph.json]` | **Replaces the whole graph** (and/or renames) |
-| `ck workflows validate [<id>] [--file graph.json]` | Dry-run: every problem, each with its `nodeId`. Nothing is saved |
-| `ck workflows export <id> [--file]` / `duplicate <id> [--name]` / `delete <id> [--yes]` | As the dashboard |
-| `ck workflows add-node <id> --type T [--after <nodeId> [--handle h]] [--name] [--set <json\|@file>]` | Add one node. With `--after` it is **spliced into the chain** |
+| `ck workflows update <id> [--name] [--file graph.json] [--version-id] [--commit <msg>]` | **Replaces a version's whole graph** (live by default) and/or renames the workflow |
+| `ck workflows validate [<id>] [--version-id] [--file graph.json]` | Dry-run: every problem, each with its `nodeId`. Nothing is saved |
+| `ck workflows export <id> [--file] [--version-id]` / `duplicate <id> [--name] [--version-id]` / `delete <id> [--yes]` | As the dashboard. A duplicate is a new workflow whose `v1` is that version |
+| `ck workflows versions <id>` | Every version, which one is live |
+| `ck workflows create-version <id> --name <name> [--from <versionId>]` | Draft copy of a version (default: the live one). Names are unique per workflow |
+| `ck workflows publish <id> <versionId>` | Make a version live |
+| `ck workflows delete-version <id> <versionId> [--yes]` | Delete a draft (not the live one, the last one, or one with leads running on it) |
+| `ck workflows add-node <id> --type T [--after <nodeId> [--handle h]] [--name] [--set <json\|@file>]` | Add one node. With `--after` it is **spliced into the chain**. This and the other node edits below take `--version-id` |
 | `ck workflows set-node <id> <nodeId> [--set <json\|@file>] [--name]` | Merge fields into a node (id and type are fixed) |
 | `ck workflows remove-node <id> <nodeId> [--reconnect] [--yes]` | Remove a node and its edges; `--reconnect` bridges its neighbours |
 | `ck workflows connect <id> --from A --to B [--handle h]` / `disconnect <id> --from A [--handle h]` | Edit a link |
-| `ck workflows leads <id>` / `lead <id> <phone>` / `run <id> <phone>` / `journey <id> <phone>` | Results — see below |
+| `ck workflows leads <id> [--version-id]` / `lead <id> <phone>` / `run <id> <phone>` / `journey <id> <phone>` | Results — see below |
+
+## Versions
+
+A workflow holds several versions; each has its own graph. Exactly one is **live**.
+
+- **New leads run on the live version** (enrolled from the CRM, `ck contacts assign`, or the API).
+  To enrol into another one, pass `ck contacts assign … --workflow-version <versionId>`.
+- **A lead already running stays on the version it started on**, even after another version is
+  published. Each run records its version, and every later step reads that version's graph.
+- **Editing a version changes the path of leads running on it** — including the live one. To change
+  a workflow that has leads running without touching them, edit a draft and publish it:
+
+```bash
+ck workflows versions <id>                                          # which is live
+ck workflows create-version <id> --name "Shorter wait"              # draft copy of the live one
+ck workflows set-node <id> <nodeId> --version-id <versionId> --set '{"minutes":60}'
+ck workflows validate <id> --version-id <versionId>
+ck workflows publish <id> <versionId>                               # ask the user first
+```
+
+- A new workflow (create, import or duplicate) starts with one live version, `v1`.
+- Commits (the dashboard's history) are per version; reverting one puts the graph back on the version it came from.
+- `ck workflows leads <id> --version-id <versionId>` shows only leads on that version; `--json` gives each lead's `workflow_version_id`.
 
 ## Generate a workflow from a request
 
@@ -130,7 +161,8 @@ don't guess.
 
 ## Edit an existing workflow
 
-Prefer the small edits; they touch only what you name and re-validate on save:
+Prefer the small edits; they touch only what you name and re-validate on save. They change the
+live version unless given `--version-id`:
 
 ```bash
 ck workflows add-node <id> --type wait --after <callNodeId> --set '{"minutes":120}'
@@ -145,7 +177,7 @@ ck workflows remove-node <id> <nodeId> --reconnect --yes
 - Inline `--set '{…}'` is fragile in shells; for anything non-trivial write a file and use `@file`.
 - The server validates on every save; an edit that would leave **no path to End** is rejected with the reason. Read it, fix, retry.
 - The last save wins — don't edit a workflow someone else may be editing.
-- **Editing a workflow that has leads running** may change what they do next. This pack has not verified how in-flight runs react — confirm with the user first.
+- **Editing a version that has leads running** changes what they do next: each step reads the graph as it stands. Edit a draft and publish it instead (see [Versions](#versions)), or confirm with the user first.
 
 ### Inbound calls — the second entry point
 

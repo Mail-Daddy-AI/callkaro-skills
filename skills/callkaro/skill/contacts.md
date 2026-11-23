@@ -88,7 +88,7 @@ as `list`) and a target — **exactly one** of:
 
 ```bash
 # into a workflow
-ck contacts assign --phones 919812345678 --workflow <workflowId> [--name "Test run"] [--at <ISO>] [--window 10:00-19:00] [--carry-over] [--priority n] [--force]
+ck contacts assign --phones 919812345678 --workflow <workflowId> [--workflow-version <versionId>] [--name "Test run"] [--at <ISO>] [--window 10:00-19:00] [--carry-over] [--priority n] [--force]
 
 # preview first: who would be assigned, where, and which --phones are not contacts. Starts nothing.
 ck contacts assign --phones 919812345678 --workflow <workflowId> --dry-run
@@ -102,6 +102,7 @@ ck contacts assign --attr stage=new --agent <agentId> [--language en] [--at <ISO
 - Workflow: contacts **currently running** in it are **skipped** (the output says how many; nothing starts and it is not reported as a success); `--force` restarts them. A contact whose earlier run has **finished** is enrolled again normally.
 - A selection is capped server-side; the output says when it was truncated — narrow the filters to cover the rest.
 - The workflow must have steps; a workflow with an empty graph is refused.
+- Contacts enrol into the workflow's **live version**; `--workflow-version <versionId>` enrols them into another (e.g. a draft being tested on one number). Each run stays on the version it started on.
 - This **starts real calls / WhatsApp sends**. Say how many contacts and which workflow/agent, and get a yes.
 
 ## Export
