@@ -37,7 +37,7 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 - [Account Secrets](skill/secrets.md) — The account Secrets Vault: names-only discovery and the reference syntax for function code and webhook headers. Use whenever an integration needs an API key or token; never inline one.
 - [Simulations & Test Cases](skill/simulations.md) — Simulation test cases and runs: an LLM caller talks to a version and a judge grades PASS/FAIL. Use to create test cases, run them, and read results before publishing.
 - [Workflows + Contacts together](skill/workflows-and-contacts.md) — How contacts and workflows connect: enrolment, the data a workflow reads from the CRM, and writing results back. Use when a workflow must act on contact attributes or update them.
-- [Workflows](skill/workflows.md) — Workflow graphs: steps (call, wait, WhatsApp, branch, CRM update), the JSON spec, validation rules and reading runs. Use to design a workflow the user builds on the dashboard.
+- [Workflows](skill/workflows.md) — Workflow graphs: steps (call, wait, WhatsApp, branch, CRM update), the JSON spec, validation rules, versions (draft, publish, which leads run on which) and reading runs. Use to design a workflow the user builds on the dashboard.
 
 ### Agents
 

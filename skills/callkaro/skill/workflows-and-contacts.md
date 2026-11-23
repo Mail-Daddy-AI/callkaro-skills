@@ -63,8 +63,10 @@ on the CallKaro dashboard except where a harness tool is named.
    [contacts.md](contacts.md) § Hand-set values.
 7. **A graph is validated on every save**, but validation can't know your
    business logic — read the saved graph back and walk each branch to an End.
-8. **Don't edit a workflow with leads running** without asking: this pack has
-   not verified how in-flight runs react.
+8. **Don't edit the live version of a workflow with leads running** without asking:
+   leads follow the graph as it stands at each step. Suggest a new version, edit and
+   test that, then publish it. Leads already running stay on their version; new ones
+   get the live one.
 
 ## Finding and acting on outcomes
 
