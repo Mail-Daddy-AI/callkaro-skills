@@ -22,11 +22,13 @@ Part of the [version reference](../AGENT-VERSION-REFERENCE.md) (which document a
 | Field | Type / default | Meaning |
 | --- | --- | --- |
 | `silence_wait` | int, `6` | Seconds of caller silence before the agent says a silence prompt. |
-| `silence_count` | int, `2` | How many times the silence prompt repeats before the call ends. |
-| `silence_mode` | `default` \| `custom` \| `dynamic` \| `ignore`, `default` | `default` = platform prompts; `custom` = pick from `silence_prompts`; `dynamic` = the model generates one from context; `ignore` = never re-prompt on silence. |
+| `silence_count` | int, `2` | How many silence prompts are said before the call ends. If the caller is still silent after the last one, the call ends about 1 second later. |
+| `silence_mode` | `default` \| `custom` \| `dynamic` \| `ignore`, `default` | `default` = platform prompts; `custom` = pick from `silence_prompts`; `dynamic` = the model generates one from context; `ignore` = the model gently re-asks its last question instead of checking whether the caller is there. |
 | `silence_prompts` | string[], `[]` | Used when `silence_mode: "custom"`. |
 | `silence_instructions` | string \| null, `null` | Instructions for how the agent should behave when the caller is silent. Used only when `silence_mode` is `dynamic` or `ignore`. Optional — leave unset unless the user asks for it. |
 | `silence_language` | enum + `multi`, `en` | Language of those prompts. |
+| `silence_strategy` | `basic` \| `advanced`, `basic` | `basic` = every silence prompt uses the fields above. `advanced` = each prompt has its own settings in `silence_steps`. |
+| `silence_steps` | object[], `[]` | Used only when `silence_strategy: "advanced"`. Entry *i* configures silence prompt *i+1*; only the first `silence_count` entries are used, and a prompt with no entry falls back to the fields above. Shape below. |
 | `language_switching` | bool, `false` | Switch language based on the caller's **last message** (reactive, no confirmation). Makes the agent SPEAK a different language mid-call while staying on this SAME version/script — no transfer. Do not confuse with `switchableLanguages` ([§14](variables-memory-whatsapp.md)), which hands the call off to a DIFFERENT PUBLISHED VERSION authored in that language. |
 | `language_switching_instructions` | string \| null, `null` | Instructions for how the agent should switch language mid-call. Used only when `language_switching` is true. Optional — leave unset unless the user asks for it; the platform falls back to a built-in multilingual detection prompt. |
 | `language_lockin_time` | number \| null, `null` | Seconds to lock onto a language after switching, before switching again. Used only when `language_switching` is true. |
@@ -35,9 +37,36 @@ Part of the [version reference](../AGENT-VERSION-REFERENCE.md) (which document a
 | `language_switching_v1` | bool, `false` | Switch language only after the caller's **explicit consent/request**. Pair either flag with `language_switch_snippet` and `switchableLanguages`. |
 | `detect_gender` | bool, `false` | Detect the caller's gender from audio and adapt address forms. |
 | `gender_prompt_snippet` | string \| null | Prompt injected when `detect_gender` is on. |
-| `gender_detection_strategy` | enum `default` \| `advanced`, `default` | How the gender is decided. `default`: on-server voice-pitch estimate. `advanced`: Tazo speech model (more accurate, external API call). Both use the same delay and need ~2s of caller speech after it. Used only when `detect_gender` is on. |
-| `gender_detection_delay` | number (seconds), `30` | Caller audio is ignored for this long after they first speak, so IVR/voicemail greetings don't drive detection. Lower it (e.g. 2–8) for short calls — a call that ends before delay + ~2s of speech never detects. Used only when `detect_gender` is on. |
+| `gender_detection_strategy` | enum `default` \| `advanced`, `default` | How the gender is decided. `default`: on-server voice-pitch estimate. `advanced`: Tazo speech model (more accurate, external API call). Both use the same delay and need `gender_detection_min_audio` seconds (default 2) of caller speech after it. Used only when `detect_gender` is on. |
+| `gender_detection_delay` | number (seconds), `30` | Caller audio is ignored for this long after they first speak, so IVR/voicemail greetings don't drive detection. Lower it (e.g. 2–8) for short calls — a call that ends before delay + `gender_detection_min_audio` of speech never detects. Used only when `detect_gender` is on. |
+| `gender_detection_min_audio` | number (seconds, ≥ 0.1), `2` | How much of the caller's voiced speech is collected after the delay before gender is decided. Lower it (e.g. 0.5–1) when callers only say short sentences; higher is more reliable. Used only when `detect_gender` is on. |
 | `formatToNumberAsIndian` | bool, `false` | Speak/format numbers in the Indian system (lakh/crore, Indian digit grouping). |
+
+**`silence_steps`** entries (advanced silence strategy):
+
+| Key | Type / default | Meaning |
+| --- | --- | --- |
+| `wait` | number (seconds), falls back to `silence_wait` | Caller silence before this prompt is said. |
+| `mode` | `default` \| `custom` \| `dynamic` \| `ignore`, `default` | Same meanings as `silence_mode`, for this prompt only. |
+| `message` | string | The exact line to say. **Required when `mode` is `custom`.** Supports `{{variable}}` placeholders. |
+| `instructions` | string | Model instructions for this prompt. Used only when `mode` is `dynamic` or `ignore`; empty uses the platform default. |
+| `language` | enum + `multi`, falls back to `silence_language` | Language of the platform prompt. Used only when `mode` is `default`. |
+| `allow_interruptions` | bool, `true` | Whether the caller can talk over this prompt. |
+
+```json
+{
+  "silence_strategy": "advanced",
+  "silence_count": 3,
+  "silence_steps": [
+    { "wait": 4, "mode": "default", "language": "hi" },
+    { "wait": 6, "mode": "custom", "message": "{{name}} ji, kya aap line par hain?", "allow_interruptions": true },
+    { "wait": 8, "mode": "dynamic", "instructions": "Say you will call back later and say goodbye.", "allow_interruptions": false }
+  ]
+}
+```
+
+Send the whole `silence_steps` array on update — it replaces the saved array. Switching back to
+`basic` keeps the steps saved but unused.
 
 **`vad_configuration`** — voice-activity / barge-in / endpointing tuning. Treat it as
 **system-owned**: leave it out unless the user explicitly asks to tune interruption behaviour, and
