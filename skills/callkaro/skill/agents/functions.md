@@ -17,11 +17,17 @@ Functions live at version level (`functions[]`, callable everywhere) or on a
 capability (`capabilities[i].functions[]`, callable only inside it). Names must
 be unique **within a scope** and are the update/delete key. Use `snake_case`.
 
+A node can call its own functions and the version's. The runtime names a predefined function by its type
+(`end` → `end_call`, `transfer` → `transfer_call`, `keep_call_on_hold`, `check_availability`,
+`book_a_meeting`), whatever its `name`. Two functions that end up with the same runtime name in one node,
+such as two `end` functions or a transfer at version level and again on a node, crash the call before
+it starts (`duplicate function name`). The harness refuses one an edit adds. Put each in one place.
+
 ## Which function type
 
 | Need | Type |
 |---|---|
-| Hang up | Preferred: closing lines in `end_call_msg` (the call ends when the agent speaks one). The `end` function also works but is not the preference. |
+| Hang up | Closing lines in `end_call_msg`, with no punctuation (the call ends when the agent speaks one). Never an `end` function on a new agent. |
 | Live transfer to a human | `transfer` — **always this type, never custom code** |
 | Put the caller on hold | `keep_call_on_hold` |
 | Check / book a calendar slot | `available` / `booking` |

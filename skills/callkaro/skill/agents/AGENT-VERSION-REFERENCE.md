@@ -101,7 +101,7 @@ Rules:
 | `instructions` | string[], `[]` | Type 1. Standing behavioural rules. |
 | `guardrails` | string[], `[]` | Type 1. Hard boundaries. |
 | `rebuttals` | string[], `[]` | Type 1. Objection-handling lines. |
-| `end_call_msg` | string[], `[]` | **A hang-up trigger, not decoration.** If the agent utters any line in this array the call is cut immediately. Only 2–3 exact final closing lines belong here. |
+| `end_call_msg` | string[], `[]` | **A hang-up trigger, not decoration.** If the agent utters any line in this array the call is cut immediately. Only 2–3 exact final closing lines belong here, with **no punctuation**, each said word for word in a prompt ([prompt-style](../writing/prompt-style.md#closing-lines)). |
 | `callFlow_json` | object \| null | Visual flow-builder graph. Replaced wholesale on update (§16). |
 | `useCallFlow_json` | bool, `false` | Use the builder graph instead of the text `callFlow`. |
 | `default_language` | enum `en hi kn ta te mr gu bn ml`, `"en"` | The language the agent speaks. **Also the publishing key** — one published version per `default_language`. |
@@ -477,7 +477,7 @@ functionLog.response = result.message;
 
 | `type` | Required | Notes |
 | --- | --- | --- |
-| `end` | `name`, `description` | Nothing else. Ends the call. Not the preferred way to end calls: prefer closing lines in `end_call_msg`. |
+| `end` | `name`, `description` | Nothing else. Never use it on a new agent: end calls with closing lines in `end_call_msg`. The runtime names every `end` function `end_call`, so two in one node crash the call at start. |
 | `transfer` | `name`, `description`, `to_number`, `warm_transfer` | `to_number` is E.164 and is the primary destination. The builder also maintains `to_numbers[]` (ordered list, with `to_number` mirroring `to_numbers[0]`) for multi-destination attempts — write both when using a list. `warm_transfer: true` **requires** a non-empty `warm_transfer_prompt` (how to brief the human before handing over); cold transfer uses `false` + `""`. Also carries `msg_while_executing[]` and `msg_while_executing_type: "static"` for what the caller hears while connecting. |
 | `keep_call_on_hold` | `name`, `description` | `hold_duration` seconds (default 20). Pairs with `hold_call_snippet` and `hold_disconnect_timeout`. |
 | `available` | `name`, `description`, `api`, `event_id` | Check calendar availability (cal.com-style). |

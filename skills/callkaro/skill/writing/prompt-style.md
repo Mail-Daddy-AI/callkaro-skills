@@ -61,6 +61,14 @@ For a bot in any language other than English:
 
 This overrides any older guidance that says to write the whole prompt in the target language.
 
+## Closing lines
+
+The call ends when the bot says a line from `end_call_msg`, so the line must come out exactly. Write 2-3 closing
+lines with **no punctuation** (no `.` `,` `?` `!` `।`), put each in `end_call_msg`, and have the prompt tell the bot
+to say it word for word: "At the end say: धन्यवाद आपका दिन शुभ हो". Every ending, including an abusive caller or a
+call with no transfer, ends on one of these lines; never an `end` function. On a new agent the harness refuses an
+`end` function, a punctuated closing line, and a closing line no prompt tells the bot to say.
+
 ```
 STEP 2: CONFIRM IDENTITY
 =========================================
