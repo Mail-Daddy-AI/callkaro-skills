@@ -233,7 +233,7 @@ executor knows exactly which sub-tools to invoke and what to change.
     Use for: silence handling, VAD tuning, barge-in behaviour, gender detection, language switching flags.
 
   callSettings
-    formatToNumberAsIndian      — boolean: format numbers as Indian locale
+    formatToNumberAsIndian      — boolean: format phone numbers to the Indian format before dialling (default false)
     auto_reschedule             — boolean: auto-reschedule on no-answer
     rescheduling_prompt         — prompt shown when rescheduling
     rescheduled_follow_up_prompt — follow-up prompt after reschedule

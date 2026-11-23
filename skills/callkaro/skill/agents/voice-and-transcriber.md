@@ -25,6 +25,7 @@ persona's gender is not stated, ask the user before creating the agent; never gu
 | `model` / `secondary_model` | `callkaro/arjuna-2.5` / `gpt-5.4-mini`; each stage's `llms` the same, temperature 0.2 |
 | `post_call_strategy` | `callkaro/krishna-2.5` for `1-10`, `11-30` and `31-60`; `gpt-6-luna` for `>60`; `only_agent_turns` `DEFAULT_VALUES` |
 | `secondary_post_call_strategy` | `gpt-6-luna` for `1-10`, `11-30` and `31-60`; `callkaro/krishna-2.5` for `>60`; `only_agent_turns` `DEFAULT_VALUES` |
+| `formatToNumberAsIndian` | `false` (phone numbers are dialled as given) |
 
 `voice_language` matches the agent's language: `hi` (Eleven Labs), `hi-IN` (Sarvam). Gnani stays `auto`.
 For any other voice the user asks for, search with `list_voices` and copy its values exactly.

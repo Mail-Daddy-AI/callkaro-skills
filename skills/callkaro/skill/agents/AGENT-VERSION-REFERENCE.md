@@ -677,7 +677,7 @@ Guidance:
 | `silence_mode` | `default` \| `custom` \| `dynamic` \| `ignore`, `default` | `default` = platform prompts; `custom` = pick from `silence_prompts`; `dynamic` = the model generates one from context; `ignore` = never re-prompt on silence. |
 | `silence_prompts` | string[], `[]` | Used when `silence_mode: "custom"`. |
 | `silence_instructions` | string \| null, `null` | Instructions for how the agent should behave when the caller is silent. Used only when `silence_mode` is `dynamic` or `ignore`. Optional — leave unset unless the user asks for it. |
-| `silence_language` | enum + `multi`, `en` | Language of those prompts. |
+| `silence_language` | enum + `multi`, `en` | Language of those prompts. A new agent that speaks several languages gets `multi`, and its custom `silence_prompts` hold a line in each language. |
 | `language_switching` | bool, `false` | Switch language based on the caller's **last message** (reactive, no confirmation). Makes the agent SPEAK a different language mid-call while staying on this SAME version/script — no transfer. Do not confuse with `switchableLanguages` (§14), which hands the call off to a DIFFERENT PUBLISHED VERSION authored in that language. |
 | `language_switching_instructions` | string \| null, `null` | Instructions for how the agent should switch language mid-call. Used only when `language_switching` is true. Optional — leave unset unless the user asks for it; the platform falls back to a built-in multilingual detection prompt. |
 | `language_lockin_time` | number \| null, `null` | Legacy: do not set (leave `null`). |
@@ -686,7 +686,7 @@ Guidance:
 | `language_switching_v1` | bool, `false` | Legacy: leave `false`; switch with `language_switching`. |
 | `detect_gender` | bool, `false` | Detect the caller's gender from audio and adapt address forms. |
 | `gender_prompt_snippet` | string \| null | Prompt injected when `detect_gender` is on. |
-| `formatToNumberAsIndian` | bool, `false` | Speak/format numbers in the Indian system (lakh/crore, Indian digit grouping). |
+| `formatToNumberAsIndian` | bool, `false` | Format **phone numbers** to the Indian format before dialling. It does not change how prices or amounts are spoken. House default for a new agent: `false`. |
 
 **`vad_configuration`** — voice-activity / barge-in / endpointing tuning. Treat it as
 **system-owned**: leave it out unless the user explicitly asks to tune interruption behaviour, and

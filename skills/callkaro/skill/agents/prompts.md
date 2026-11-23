@@ -62,7 +62,9 @@ LLM/temperature/functions/post-call control. Structure a capability set as:
 - **Start capability**: greet, introduce, check availability to talk, decide
   the next step.
 - One capability per phase after that. In type 2, switching is prose inside the
-  prompts ("when X, move to qualification"); in type 3 it's data (`transitions`).
+  prompts ("when X, move to qualification"); in type 3 it's data (`transitions`)
+  only: a pathway node's prompt never names another node or says go, move or
+  switch to one, and on a new agent the harness refuses one that does.
 
 Per-capability toggles that matter while writing: `overwrite` ON = this prompt
 must be fully self-contained (base is excluded); `stick_capability` ON = once
