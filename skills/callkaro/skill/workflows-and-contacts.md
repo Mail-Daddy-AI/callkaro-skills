@@ -87,7 +87,9 @@ ck contacts assign --attr stage=new --workflow <workflowId> --window 10:00-19:00
    leads follow the graph as it stands at each step. Make a draft
    (`ck workflows create-version`), edit it with `--version-id`, test it by enrolling
    one number with `--workflow-version <versionId>`, then `ck workflows publish`. Leads
-   already running stay on their version; new ones get the live one.
+   already running stay on their version; new ones get the live one, or the version A/B
+   testing picks when it is on (see Workflows → A/B testing). Saving A/B settings changes live
+   routing too: ask first.
 
 ## Finding and acting on outcomes
 
