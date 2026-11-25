@@ -85,14 +85,14 @@ nothing is skipped or cancelled. Leads can be enrolled at any time. In the dashb
 clock control beside "Find a node" on the canvas toolbar.
 
 ```json
-{"enabled": true, "timezone": "Asia/Kolkata", "schedule": {
+{"enabled": true, "schedule": {
   "1": {"start": "10:00", "end": "19:00"}, "2": {"start": "10:00", "end": "19:00"},
   "3": {"start": "10:00", "end": "19:00"}, "4": {"start": "10:00", "end": "19:00"},
   "5": {"start": "10:00", "end": "17:00"}, "6": {"start": "11:00", "end": "14:00"}}}
 ```
 
 - `schedule` keys are weekdays, `"0"` = Sunday … `"6"` = Saturday. A day left out is **closed**.
-- Times are `"HH:mm"` in `timezone` (default `Asia/Kolkata`); end after start. `"23:59"` as the
+- Times are `"HH:mm"` India time (IST); end after start. `"23:59"` as the
   end means until midnight. No overnight ranges (`22:00`–`02:00`). At least one day open.
 - No `triggerWindow` (or `enabled: false`) = runs at any time — how every older workflow behaves.
 - Set it: `ck workflows set-node <id> <startNodeId> --set @window.json` with
