@@ -88,6 +88,10 @@ ck contacts assign --attr stage=new --workflow <workflowId> --window 10:00-19:00
    (`ck workflows create-version`), edit it with `--version-id`, test it by enrolling
    one number with `--workflow-version <versionId>`, then `ck workflows publish`. Leads
    already running stay on their version; new ones get the live one.
+9. **`--window` only times the calls.** It limits when Send Call places calls for this
+   batch; WhatsApp, API and other steps still run at any hour. To keep the **whole**
+   journey inside business hours, set the workflow's trigger window on its Start node —
+   see [workflows.md](workflows.md) § Trigger window.
 
 ## Finding and acting on outcomes
 
