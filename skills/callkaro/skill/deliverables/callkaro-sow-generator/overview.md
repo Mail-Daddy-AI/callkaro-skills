@@ -1,28 +1,24 @@
----
-name: callkaro-sow-generator
-description: Turns a client's BRD, PRD, requirement doc, call script, agent JSON, email thread or plain description into CallKaro AI's standard Scope of Work (SoW) PDF for a voice bot - cover page, table of contents, Purpose page, then Voice Bot Flow, Extracted Entities/Variables, Call Outcome/Disposition Variables, Guardrails, Rebuttals, Objection Handling and FAQs, in the exact house layout (navy-header striped tables, Carlito type, CallKaro logo, page X of N footer). Use this whenever someone wants a SoW, scope document, requirement sign-off doc or "standardised doc" for a voice or chat bot from any client input, says "make the SoW", "convert this BRD into our format", or uploads a client requirement document for a CallKaro bot, even if they never say "PDF" or "SoW".
----
+# SoW Generator — client BRD to the standard Scope of Work PDF
+<!-- graph-summary: Turn a client BRD, PRD, script or description into the standard CallKaro Scope of Work PDF (cover, contents, Purpose, then Flow, Variables, Dispositions, Guardrails, Rebuttals, Objection Handling, FAQs). Workflow, writing rules and the PDF build command. Needs no ck login. -->
 
-# CallKaro SoW Generator
-
-Converts whatever the client sent (BRD, PRD, call scripts, sample conversations, emails, spreadsheets, agent JSON, or just a description) into one standardised Scope of Work PDF. The layout, colours, fonts, logo and page furniture are fixed in a bundled renderer, so every client gets an identical-looking document. Your job is the part that changes per client: reading their material and writing precise, testable content for the standard sections.
+Standalone deliverable (no `ck` login needed). Paths below are relative to the `callkaro` skill folder. Converts whatever the client sent (BRD, PRD, call scripts, sample conversations, emails, spreadsheets, agent JSON, or just a description) into one standardised Scope of Work PDF. The layout, colours, fonts, logo and page furniture are fixed in a bundled renderer, so every client gets an identical-looking document. Your job is the part that changes per client: reading their material and writing precise, testable content for the standard sections.
 
 ## Workflow
 
 1. **Collect inputs.** Read every file the user attached or pointed to (extract PDF/DOCX/XLSX text properly rather than skimming). If nothing is attached, ask for the client document or a short description. Ask only for what you cannot infer: client name, bot name, language(s), and who the bot calls.
-2. **Extract the bot's behaviour** into the SoW's structure (see `references/sow_standard.md` for what belongs in each section and the style of wording):
+2. **Extract the bot's behaviour** into the SoW's structure (see [references/sow_standard.md](references/sow_standard.md) for what belongs in each section and the style of wording):
    - Flow: ordered fields/steps, exact scripts, branches, requirement level (Necessary/Optional), eligibility rules and numeric limits, transfer or close logic.
    - Variables the bot captures, and call-outcome/disposition values with precise definitions.
    - Guardrails (what it must never do), rebuttals (caller pushback), objection handling (caller questions), approved FAQ answers.
 3. **Never invent client rules.** If the client document is silent or ambiguous, write the closest defensible wording from what they did say and mark it `(TBC with client)` in the cell, then list every TBC in your chat reply. A SoW is signed by the client; an invented rule becomes a contractual commitment. Scripts must be quoted exactly as given; where only behaviour is given, describe the behaviour rather than writing a script.
-4. **Write the spec JSON** (format in `references/spec_format.md`; complete worked example in `examples/yes_madam_spec.json`). Keep sections numbered "Section N — Title" in the standard order; add or drop a section only if the source genuinely demands it (e.g. no FAQs provided: say so and ask, rather than silently omitting).
+4. **Write the spec JSON** (format in [references/spec_format.md](references/spec_format.md); complete worked example in `skill/deliverables/callkaro-sow-generator/examples/yes_madam_spec.json`). Keep sections numbered "Section N — Title" in the standard order; add or drop a section only if the source genuinely demands it (e.g. no FAQs provided: say so and ask, rather than silently omitting).
 5. **Build the PDF**:
    ```bash
-   python scripts/build_sow.py my_spec.json --out "<Client>_SoW_V<version>.pdf"
+   python skill/deliverables/callkaro-sow-generator/scripts/build_sow.py my_spec.json --out "<Client>_SoW_V<version>.pdf"
    ```
-   Needs `reportlab` (`pip install reportlab`). Run from the skill folder or use its absolute path.
+   Needs `reportlab` (`pip install reportlab`). Run it from the `callkaro` skill folder or use absolute paths.
 6. **Check the result**: open the PDF (render pages to images if you can), confirm no clipped text, sensible page breaks, TOC page numbers match, special characters (₹ → ≥) render, and the cover reads correctly. Fix the spec and rebuild if not.
-7. **Deliver** the PDF, plus a short note: the section list, any TBC items needing client confirmation, and the assumptions you made. Offer the natural next steps: a flow diagram (`conversational-flow-diagram`) or a QA test workbook (`voicebot-qa-testbook`) built from this SoW.
+7. **Deliver** the PDF, plus a short note: the section list, any TBC items needing client confirmation, and the assumptions you made. Offer the natural next steps: a flow diagram ([flow diagram](../conversational-flow-diagram/flow-diagram.md)) or a QA test workbook ([QA test workbook](../voicebot-qa-testbook/overview.md)) built from this SoW.
 
 ## Writing rules that keep SoWs usable
 

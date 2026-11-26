@@ -1,4 +1,5 @@
-# Spec JSON format
+# SoW spec JSON format
+<!-- graph-summary: Spec JSON the SoW renderer reads: cover, purpose, sections, columns, cell blocks (bullets, numbered), inline markup and defaults. -->
 
 ```json
 {

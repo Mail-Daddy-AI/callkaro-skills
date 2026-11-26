@@ -1,24 +1,20 @@
----
-name: voicebot-qa-testbook
-description: Generates the CallKaro "Voice AI Bot QA Testing Framework" Excel workbook (Read Me, Summary Scorecard with 95% certification gate, four pillar sheets P1 Technical / P2 Call Flow / P3 Business / P4 Humanization, Scoring & Certification, Thresholds) pre-filled with test cases for a specific bot. Use this whenever the user wants test cases, a QA sheet, a test plan, a certification scorecard or a UAT checklist for a voice bot, call bot, agent JSON, SoW, PRD or BRD (CallKaro, Yes Madam, Urban Company, NBFC, hiring, collections or any client), even if they don't say "Excel" or "framework". Keeps the exact columns, colours, formulas, weights and gate logic of the original sample, so the user never has to supply the sample workbook again.
----
+# QA Testbook — Voice AI Bot QA workbook (Excel) per bot
+<!-- graph-summary: Generate the CallKaro Voice AI Bot QA Testing Framework Excel workbook (four pillar sheets, scorecard with the 95% certification gate, scoring, thresholds) pre-filled with test cases for a bot from its SoW, agent JSON or description. Needs no ck login. -->
 
-# Voice Bot QA Testbook
-
-Produces one `.xlsx` per bot in the CallKaro QA framework format. The look, columns, dropdowns, colour rules, scoring formulas and certification gate live in a bundled template, so they are identical every time. Your job is the part that changes per bot: reading the bot's source and writing good test cases.
+Standalone deliverable (no `ck` login needed). Paths below are relative to the `callkaro` skill folder. Produces one `.xlsx` per bot in the CallKaro QA framework format. The look, columns, dropdowns, colour rules, scoring formulas and certification gate live in a bundled template, so they are identical every time. Your job is the part that changes per bot: reading the bot's source and writing good test cases.
 
 ## Workflow
 
 1. **Get the source.** Ask for (or locate) the agent JSON, SoW / PRD / BRD, call flow, or a plain description. If the conversation already has one, use it. For a PDF, extract the text (e.g. `pypdf`) rather than guessing.
 2. **Extract the testable facts**: the ordered flow, branches, eligibility rules and boundaries, dispositions/tags, variables captured, scripted lines, FAQs and approved deflections, guardrails, transfer/callback logic, language, and any numeric constants (age range, cut-offs, time windows). Note every gap or contradiction in the source; these become `(TBD)` cases rather than invented rules.
-3. **Read `references/framework.md`** for the pillars, columns, priority/weight rules and coverage checklist, and **`references/baseline_library.json`** for the 95 standard checks every bot gets (adapt their example inputs and pass criteria to this bot; keep their intent).
-4. **Write the spec JSON** (format in `references/spec_format.md`; full worked example in `examples/sonia_spec.json`). Aim for depth where the bot's risk is: usually 30-45 Technical, 30-40 Call Flow, 45-60 Business, 20-25 Humanization for a multi-branch bot; fewer for a simple one. Eligibility rules, dispositions, and guardrails each deserve their own rows because each is a separate way to fail.
+3. **Read [references/framework.md](references/framework.md)** for the pillars, columns, priority/weight rules and coverage checklist, and **`skill/deliverables/voicebot-qa-testbook/references/baseline_library.json`** for the 95 standard checks every bot gets (adapt their example inputs and pass criteria to this bot; keep their intent).
+4. **Write the spec JSON** (format in [references/spec_format.md](references/spec_format.md); full worked example in `skill/deliverables/voicebot-qa-testbook/examples/sonia_spec.json`). Aim for depth where the bot's risk is: usually 30-45 Technical, 30-40 Call Flow, 45-60 Business, 20-25 Humanization for a multi-branch bot; fewer for a simple one. Eligibility rules, dispositions, and guardrails each deserve their own rows because each is a separate way to fail.
 5. **Validate, then build**:
    ```bash
-   python scripts/build_testbook.py my_spec.json --check-only   # fix ERRORs; read WARNs
-   python scripts/build_testbook.py my_spec.json --out "<Bot>_QA_Test_Suite_v1.0.xlsx"
+   python skill/deliverables/voicebot-qa-testbook/scripts/build_testbook.py my_spec.json --check-only   # fix ERRORs; read WARNs
+   python skill/deliverables/voicebot-qa-testbook/scripts/build_testbook.py my_spec.json --out "<Bot>_QA_Test_Suite_v1.0.xlsx"
    ```
-   Needs `openpyxl` (`pip install openpyxl`). Run from the skill folder, or use its absolute path.
+   Needs `openpyxl` (`pip install openpyxl`). Run it from the `callkaro` skill folder or use absolute paths.
 6. **Deliver** the xlsx to the user, with a short summary: case counts per pillar, number of P0s, and the TBD / source-gap list that needs client confirmation.
 
 ## Rules that keep the output trustworthy

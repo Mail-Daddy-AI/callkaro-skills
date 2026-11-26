@@ -5,7 +5,10 @@ description: >
   testing, calling with, or analyzing agents; managing versions, numbers,
   outbound phone number strategies (rolling caller IDs), batches, workflows,
   contacts, secrets, simulations, analytics, embed widgets, and KPI Manager
-  (KPI metrics, RCA, scheduled KPI reports).
+  (KPI metrics, RCA, scheduled KPI reports). Also produces CallKaro
+  deliverables without the CLI: the standard Scope of Work (SoW) PDF from a
+  client BRD/PRD/requirements, the QA test-case Excel workbook with
+  certification scorecard for a bot, and bot flow diagrams (PNG or HTML).
 ---
 # CallKaro skill graph
 
@@ -19,6 +22,15 @@ discover IDs instead of inventing them, use `--versions` for version selection,
 and obtain explicit confirmation before a command spends credits or starts real
 calls/messages. If a command prints a notice that a newer CLI is available,
 tell the user and offer to run `ck update`; do not upgrade without their OK.
+
+## Deliverables (no `ck` or login needed)
+
+Three standalone document tasks live under the Deliverables group below; they
+only need Python/Node, not an account. Open the one that matches the ask:
+a client BRD/PRD to a SoW PDF — [SoW Generator](skill/deliverables/callkaro-sow-generator/overview.md);
+test cases and a certification scorecard for a bot — [QA Testbook](skill/deliverables/voicebot-qa-testbook/overview.md);
+a call/bot flow picture — [Flow Diagram](skill/deliverables/conversational-flow-diagram/flow-diagram.md).
+The invariants above (auth first, credits confirmation) apply to `ck` commands, not to these.
 
 ## Nodes
 
@@ -96,5 +108,16 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 
 - [Chat Simulations & Test Cases](skill/chat-simulations/chat-simulation-playbook.md) — Entry point for testing a WhatsApp chat agent with simulations: which voice phases to reuse and what changes for chat, the chat test templates, the run-and-read order, and the release gate.
 - [How chat simulation works](skill/chat-simulations/how-chat-simulation-works.md) — What a chat simulation run does, the verified facts C1–C12 (user speaks first, the 0000000000 test contact, mocks on by default and switchable off to run real code, nothing sent, 7/10 pass mark, grading failures), the Workflow-agent facts W1–W5 (code steps mocked by key, button taps, counters), the test case fields, ck chat-sim commands and MCP tools. Mandatory first read for chat tests.
+
+### Deliverables
+
+- [SoW Generator — client BRD to the standard Scope of Work PDF](skill/deliverables/callkaro-sow-generator/overview.md) — Turn a client BRD, PRD, script or description into the standard CallKaro Scope of Work PDF (cover, contents, Purpose, then Flow, Variables, Dispositions, Guardrails, Rebuttals, Objection Handling, FAQs). Workflow, writing rules and the PDF build command. Needs no ck login.
+- [The standard CallKaro SoW (what every document contains)](skill/deliverables/callkaro-sow-generator/references/sow_standard.md) — What every CallKaro SoW contains: the fixed skeleton, the seven standard sections with their columns and how to fill each, a wording template for the Purpose paragraph, adapting to other bot types, and a content-quality checklist.
+- [SoW spec JSON format](skill/deliverables/callkaro-sow-generator/references/spec_format.md) — Spec JSON the SoW renderer reads: cover, purpose, sections, columns, cell blocks (bullets, numbered), inline markup and defaults.
+- [Flow Diagram — house style, build and delivery](skill/deliverables/conversational-flow-diagram/flow-diagram-style-and-render.md) — House style (colours, node shapes, board sections), how to build flow.json and lay out, render the diagram to PNG or self-contained HTML, checks before delivery, and the rules. Use after the flow outline is confirmed.
+- [Flow Diagram — bot flow as PNG or HTML (extract and confirm)](skill/deliverables/conversational-flow-diagram/flow-diagram.md) — Make a hand-drawn-style bot flow diagram (one PNG or one self-contained HTML) from an agent JSON, SoW/PRD/BRD, sample flow or prompt: when to use it, questions to ask, input modes and reading an agent JSON, then confirming the outline. Needs no ck login.
+- [QA Testbook — Voice AI Bot QA workbook (Excel) per bot](skill/deliverables/voicebot-qa-testbook/overview.md) — Generate the CallKaro Voice AI Bot QA Testing Framework Excel workbook (four pillar sheets, scorecard with the 95% certification gate, scoring, thresholds) pre-filled with test cases for a bot from its SoW, agent JSON or description. Needs no ck login.
+- [QA Framework reference (what the template encodes)](skill/deliverables/voicebot-qa-testbook/references/framework.md) — The QA workbook framework: sheet structure, pillar columns, the four pillars and their categories, P0/P1/P2 weights, scoring, the 95% certification gate and a per-pillar coverage checklist.
+- [QA testbook spec JSON format](skill/deliverables/voicebot-qa-testbook/references/spec_format.md) — Spec JSON the QA workbook builder reads: bot details, cases per pillar sheet, the eight case fields and extra thresholds.
 
 <!-- END AUTO-GENERATED SKILL GRAPH -->

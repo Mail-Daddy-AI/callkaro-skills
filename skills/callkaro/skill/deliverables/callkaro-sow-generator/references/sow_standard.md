@@ -1,4 +1,5 @@
 # The standard CallKaro SoW (what every document contains)
+<!-- graph-summary: What every CallKaro SoW contains: the fixed skeleton, the seven standard sections with their columns and how to fill each, a wording template for the Purpose paragraph, adapting to other bot types, and a content-quality checklist. -->
 
 Reference: "Yes Madam – AI Voice Bot, Outbound Hiring Screening (Sonia)", v2.0, 13 pages (`examples/yes_madam_spec.json` reproduces it).
 

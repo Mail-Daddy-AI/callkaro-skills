@@ -1,4 +1,5 @@
-# Spec JSON format
+# QA testbook spec JSON format
+<!-- graph-summary: Spec JSON the QA workbook builder reads: bot details, cases per pillar sheet, the eight case fields and extra thresholds. -->
 
 ```json
 {

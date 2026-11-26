@@ -1,4 +1,5 @@
 # QA Framework reference (what the template encodes)
+<!-- graph-summary: The QA workbook framework: sheet structure, pillar columns, the four pillars and their categories, P0/P1/P2 weights, scoring, the 95% certification gate and a per-pillar coverage checklist. -->
 
 ## Workbook structure (fixed by the template)
 | Sheet | Purpose |
