@@ -1,5 +1,5 @@
 # Workflows
-<!-- graph-summary: Build and run workflow graphs per contact: every node type (Send Call, Wait, Conditions, WhatsApp, API, Update Contact, and the Inbound Call, Cancel Workflow and Resume Where They Were nodes for call-backs), the rules that bite, commands, versions (draft, publish, which leads run on which), generating a graph from a request using real ids, editing, and reading results. -->
+<!-- graph-summary: Build and run workflow graphs per contact: every node type (Send Call, Wait, Conditions, WhatsApp, API, Update Contact, and the Inbound Call, Cancel Workflow and Resume Where They Were nodes for call-backs), the rules that bite, commands, versions (draft, publish, which leads run on which), A/B testing between versions (split, rules, JS, results), generating a graph from a request using real ids, editing, and reading results. -->
 
 A workflow is a **graph of steps run per contact**: call them, wait, WhatsApp
 them, branch on what happened, update their CRM record. The dashboard draws it
@@ -114,8 +114,9 @@ A scheduled time outside the window moves to the next window opening when `carry
 
 A workflow holds several versions; each has its own graph. Exactly one is **live**.
 
-- **New leads run on the live version** (enrolled from the CRM, `ck contacts assign`, or the API).
-  To enrol into another one, pass `ck contacts assign … --workflow-version <versionId>`.
+- **New leads run on the live version** (enrolled from the CRM, `ck contacts assign`, or the API),
+  unless [A/B testing](#ab-testing) routes them elsewhere. To enrol into one version, pass
+  `ck contacts assign … --workflow-version <versionId>` (this skips A/B).
 - **A lead already running stays on the version it started on**, even after another version is
   published. Each run records its version, and every later step reads that version's graph.
 - **Editing a version changes the path of leads running on it** — including the live one. To change
@@ -132,6 +133,58 @@ ck workflows publish <id> <versionId>                               # ask the us
 - A new workflow (create, import or duplicate) starts with one live version, `v1`.
 - Commits (the dashboard's history) are per version; reverting one puts the graph back on the version it came from.
 - `ck workflows leads <id> --version-id <versionId>` shows only leads on that version; `--json` gives each lead's `workflow_version_id`.
+
+## A/B testing
+
+A/B testing decides which **version** a lead **starts** on when it is enrolled (`ck contacts assign
+--workflow`, the dashboard, or the public assign API). The lead keeps that version for its whole run.
+For each lead, in order:
+
+1. The enrolment names a version (`--workflow-version <versionId>`): that version, A/B skipped.
+2. A lead re-enrolled into the same workflow keeps its last run's version, if A/B can still reach it
+   (not in JS mode).
+3. **Advanced routing**: rules (first match wins; `else` always matches) or JavaScript `route(context)`.
+4. **Traffic Split** by ratio. One bulk enrolment is shared exactly (1000 leads at 70/30 → 700/300).
+5. The live version.
+
+Workflow versions have no language: there are no language rules (unlike agent A/B), and the split
+is one pool. Rule conditions read the lead's **CRM attributes** as `metadata.<attribute>`, with the
+agent A/B grammar: `(metadata.city == 'Pune')`, `((metadata.score >= 80) AND (metadata.plan == 'pro'))`.
+
+```bash
+ck workflows ab <id>                                     # what is set, with version names
+ck workflows versions <id>                               # SPLIT / IN RULES per version
+ck workflows ab-split <id> --versions "Control=70,Short pitch=30"   # names or ids, total 100
+ck workflows ab-rules <id> --file rules.json             # whole if/elseif/else chain
+ck workflows ab-test-js <id> --file route.js --metadata '{"score":"91"}'   # dry run, saves nothing
+ck workflows ab-js <id> --file route.js                  # JavaScript routing
+ck workflows ab-split <id> --off                         # switch a half off; it stays stored
+ck workflows results <id> --from 2026-11-20 --to 2026-11-27   # per-version runs, calls, connected, converted
+```
+
+```json
+[
+  { "kind": "if",   "condition": "(metadata.tier == 'gold')", "targets": [{ "versionId": "Gold flow" }] },
+  { "kind": "else", "targets": [{ "versionId": "Control", "ratio": 50 }, { "versionId": "Short pitch", "ratio": 50 }] }
+]
+```
+
+- **Every save changes live routing at once** and writes an `ab_testing` commit that cannot be
+  reverted. Show the user the split or rules in version names and **ask before saving** (the CLI
+  asks; `--yes` only when the user said so). Leads already running are never moved.
+- `ab-split` / `ab-rules` **replace** the whole stored list or chain: read `ck workflows ab <id>
+  --json` first and send everything that should stay.
+- Every routed version needs steps; a version in the stored split or a rule **cannot be deleted**
+  (even with A/B off) until it is taken out.
+- JS: `route(context)` gets `{ metadata, versions }` and returns a version id or nothing. 5 s per
+  lead; an error, timeout or unknown id falls through to the split, then the live version. It runs
+  once per lead, so a bulk assign runs it thousands of times: decide from `metadata` where possible.
+  Changed code is reviewed by the server on save.
+- Scoring: compare `results` over the dates the test ran. `CONV %` is converted / connected calls.
+  Give the counts with every rate and don't call a winner on a few dozen connected calls. To keep
+  the winner: `ck workflows publish <id> <versionId>` (ask first), then switch the test off.
+- MCP: `configure_workflow_ab_testing`, `test_workflow_ab_routing_code`, `get_workflow_version_stats`;
+  the config itself is on `get_workflow`.
 
 ## Generate a workflow from a request
 
