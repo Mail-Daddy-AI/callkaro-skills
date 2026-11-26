@@ -30,7 +30,7 @@ user.
 
 | Job | Tool |
 |---|---|
-| New agent | `create_agent_in_db`, then write its fields into the draft |
+| New agent | from a document, `propose_bot_setup` first (the user answers the setup and names the bot); then `create_agent_in_db`, then write its fields into the draft |
 | Write or change fields | `trigger_single_pipeline` (`draftPatch` for fields you wrote; `edits` for one node, function or snippet) |
 | The same change in many places | `edit_draft_script` (Python, jq or sed over /draft/version.json) |
 | Several languages at once | `trigger_parallel_pipeline` (`lanePatches`), then `read_parallel_drafts` (languages group) |
