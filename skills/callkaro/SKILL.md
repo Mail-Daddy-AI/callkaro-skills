@@ -5,7 +5,10 @@ description: >
   testing, calling with, or analyzing agents; managing versions, numbers,
   outbound phone number strategies (rolling caller IDs), batches, workflows,
   contacts, secrets, simulations, analytics, embed widgets, and KPI Manager
-  (KPI metrics, RCA, scheduled KPI reports).
+  (KPI metrics, RCA, scheduled KPI reports). Also produces CallKaro
+  deliverables without the CLI: the standard Scope of Work (SoW) PDF from a
+  client BRD/PRD/requirements, the QA test-case Excel workbook with
+  certification scorecard for a bot, and bot flow diagrams (PNG or HTML).
 ---
 # CallKaro skill graph
 
@@ -19,6 +22,15 @@ discover IDs instead of inventing them, use `--versions` for version selection,
 and obtain explicit confirmation before a command spends credits or starts real
 calls/messages. If a command prints a notice that a newer CLI is available,
 tell the user and offer to run `ck update`; do not upgrade without their OK.
+
+## Deliverables (no `ck` or login needed)
+
+Three standalone document tasks live under the Deliverables group below; they
+only need Python/Node, not an account. Open the one that matches the ask:
+a client BRD/PRD to a SoW PDF — [SoW Generator](skill/deliverables/callkaro-sow-generator/overview.md);
+test cases and a certification scorecard for a bot — [QA Testbook](skill/deliverables/voicebot-qa-testbook/overview.md);
+a call/bot flow picture — [Flow Diagram](skill/deliverables/conversational-flow-diagram/flow-diagram.md).
+The invariants above (auth first, credits confirmation) apply to `ck` commands, not to these.
 
 ## Nodes
 
@@ -39,14 +51,15 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 - [Chat Audit Strategies (WhatsApp AI Auditor)](skill/chat-audit-strategies.md) — Create and manage AI-auditor strategies for WhatsApp chat agents and run manual audit batches; commands, contact filters, daily limits, and the new-messages-only rule.
 - [Contacts (CRM)](skill/contacts.md) — CRM contacts and their attributes: define attributes first, import and export CSV, assign contacts to a workflow or an agent, and the protection of hand-set values from workflows.
 - [How to Work — operating instructions for AI agents using CallKaro](skill/INSTRUCTIONS.md) — Start here. The operating loop, session preamble, agent authoring order, decision rules that prevent damage, standard playbooks (build from a doc, build from scratch, debug a bad agent) and when to ask the user.
-- [KPI Manager](skill/kpi-manager.md) — KPI Manager per voice agent: data sources, KPI metrics with targets, the RCA prompt and model, Auto RCA, the scheduled KPI report (recipients, IST window, gap), RCA preview and on-demand runs, metric history, report preview, PDF export and delivery log; the ck kpi commands and the rules for safe edits.
+- [KPI Manager](skill/kpi-manager.md) — KPI Manager per voice agent: data sources, KPI metrics with targets, the RCA prompt and model, Auto RCA, the scheduled KPI report (recipients, IST window, gap), RCA preview and on-demand runs, metric history, building reports from JSON (ck kpi report variables/save/list/primary), report preview, PDF export and delivery log; the ck kpi commands and the rules for safe edits.
+- [KPI Report Format](skill/kpi-report-format.md) — The JSON format of a KPI report for ck kpi report save and the MCP save tool: elements (charts, tables, text), chart types and their axes, variable refs and bases, compare with previous period, text style, ${token} text, custom variables, page style (UI features), layout and limits, with two complete examples.
 - [Phone Numbers](skill/numbers.md) — Phone numbers: list, browse the buyable catalog, buy, release and spam-flag; assigning a number to an agent (outbound caller ID, inbound); the WhatsApp number pool, which has no buy.
 - [Outbound Phone Number Strategies](skill/outbound-strategies.md) — Outbound phone number strategies (Rolling Strategy in the dashboard): an ordered list of up to 10 numbers with working hours, days and daily limits that an agent dials from instead of one outbound number; how each call picks its number, the fallback to the outbound number, ck outbound-strategies commands, assigning to agents, and the rule that edits apply to every agent on the strategy.
 - [Account Secrets](skill/secrets.md) — The account secrets vault: list names, set, rename and remove secrets, and the xsecrets reference syntax used in function headers and code. Never put a credential in an agent payload.
 - [WhatsApp Campaign & Template Stats](skill/whatsapp-stats.md) — Read-only WhatsApp stats: list campaigns and their status/send counts, one campaign's delivery/read/reply/click totals and daily series, and template link-click stats. Sending, cancelling and template changes are not available here.
 - [Embed Widgets](skill/widgets.md) — Embed widgets put an agent on a website or app: the chat, omni and voice types and which agent each needs, ck widgets commands, omni settings (chips, pre-chat, history, voice agent, Call us teams, launcher), install code, and the rule that edits go live on every embed.
 - [Workflows + Contacts together](skill/workflows-and-contacts.md) — End-to-end recipe for using workflows with contacts: define attributes, gather ids, build the graph, load contacts, test on one number, verify, then scale.
-- [Workflows](skill/workflows.md) — Build and run workflow graphs per contact: every node type (Send Call, Wait, Conditions, WhatsApp, API, Update Contact, and the Inbound Call, Cancel Workflow and Resume Where They Were nodes for call-backs), the trigger window that keeps every node inside set hours, the rules that bite, commands, versions (draft, publish, which leads run on which), generating a graph from a request using real ids, editing, and reading results.
+- [Workflows](skill/workflows.md) — Build and run workflow graphs per contact: every node type (Send Call, Wait, Conditions, WhatsApp, API, Update Contact, and the Inbound Call, Cancel Workflow and Resume Where They Were nodes for call-backs), the trigger window that keeps every node inside set hours, the rules that bite, commands, versions (draft, publish, which leads run on which), A/B testing between versions (split, rules, JS, results), generating a graph from a request using real ids, editing, and reading results.
 
 ### Voice Agents
 
@@ -96,5 +109,16 @@ Every linked file is a graph node. Follow links inside a node only when relevant
 
 - [Chat Simulations & Test Cases](skill/chat-simulations/chat-simulation-playbook.md) — Entry point for testing a WhatsApp chat agent with simulations: which voice phases to reuse and what changes for chat, the chat test templates, the run-and-read order, and the release gate.
 - [How chat simulation works](skill/chat-simulations/how-chat-simulation-works.md) — What a chat simulation run does, the verified facts C1–C12 (user speaks first, the 0000000000 test contact, mocks on by default and switchable off to run real code, nothing sent, 7/10 pass mark, grading failures), the Workflow-agent facts W1–W5 (code steps mocked by key, button taps, counters), the test case fields, ck chat-sim commands and MCP tools. Mandatory first read for chat tests.
+
+### Deliverables
+
+- [SoW Generator — client BRD to the standard Scope of Work PDF](skill/deliverables/callkaro-sow-generator/overview.md) — Turn a client BRD, PRD, script or description into the standard CallKaro Scope of Work PDF (cover, contents, Purpose, then Flow, Variables, Dispositions, Guardrails, Rebuttals, Objection Handling, FAQs). Workflow, writing rules and the PDF build command. Needs no ck login.
+- [The standard CallKaro SoW (what every document contains)](skill/deliverables/callkaro-sow-generator/references/sow_standard.md) — What every CallKaro SoW contains: the fixed skeleton, the seven standard sections with their columns and how to fill each, a wording template for the Purpose paragraph, adapting to other bot types, and a content-quality checklist.
+- [SoW spec JSON format](skill/deliverables/callkaro-sow-generator/references/spec_format.md) — Spec JSON the SoW renderer reads: cover, purpose, sections, columns, cell blocks (bullets, numbered), inline markup and defaults.
+- [Flow Diagram — house style, build and delivery](skill/deliverables/conversational-flow-diagram/flow-diagram-style-and-render.md) — House style (colours, node shapes, board sections), how to build flow.json and lay out, render the diagram to PNG or self-contained HTML, checks before delivery, and the rules. Use after the flow outline is confirmed.
+- [Flow Diagram — bot flow as PNG or HTML (extract and confirm)](skill/deliverables/conversational-flow-diagram/flow-diagram.md) — Make a hand-drawn-style bot flow diagram (one PNG or one self-contained HTML) from an agent JSON, SoW/PRD/BRD, sample flow or prompt: when to use it, questions to ask, input modes and reading an agent JSON, then confirming the outline. Needs no ck login.
+- [QA Testbook — Voice AI Bot QA workbook (Excel) per bot](skill/deliverables/voicebot-qa-testbook/overview.md) — Generate the CallKaro Voice AI Bot QA Testing Framework Excel workbook (four pillar sheets, scorecard with the 95% certification gate, scoring, thresholds) pre-filled with test cases for a bot from its SoW, agent JSON or description. Needs no ck login.
+- [QA Framework reference (what the template encodes)](skill/deliverables/voicebot-qa-testbook/references/framework.md) — The QA workbook framework: sheet structure, pillar columns, the four pillars and their categories, P0/P1/P2 weights, scoring, the 95% certification gate and a per-pillar coverage checklist.
+- [QA testbook spec JSON format](skill/deliverables/voicebot-qa-testbook/references/spec_format.md) — Spec JSON the QA workbook builder reads: bot details, cases per pillar sheet, the eight case fields and extra thresholds.
 
 <!-- END AUTO-GENERATED SKILL GRAPH -->

@@ -1,5 +1,5 @@
 # KPI Manager
-<!-- graph-summary: KPI Manager per voice agent: data sources, KPI metrics with targets, the RCA prompt and model, Auto RCA, the scheduled KPI report (recipients, IST window, gap), RCA preview and on-demand runs, metric history, report preview, PDF export and delivery log; the ck kpi commands and the rules for safe edits. -->
+<!-- graph-summary: KPI Manager per voice agent: data sources, KPI metrics with targets, the RCA prompt and model, Auto RCA, the scheduled KPI report (recipients, IST window, gap), RCA preview and on-demand runs, metric history, building reports from JSON (ck kpi report variables/save/list/primary), report preview, PDF export and delivery log; the ck kpi commands and the rules for safe edits. -->
 
 KPI Manager tracks business numbers for one voice agent. **Data sources**
 supply values, **KPI metrics** compare a value with a target, and when a metric
@@ -21,6 +21,13 @@ Manager.
 | `ck kpi rca-run <agentId> --start <date> [--end <date>] [filters] [--yes]` | Run RCA now. **Uses credits** — confirm with the user first. Results land in RCA History on the dashboard. |
 | `ck kpi report preview <agentId> [--start] [--end] [--report <idOrName>] [--set <json>] [--json]` | Compute a report's values for a window. Sends nothing. |
 | `ck kpi report export <agentId> [--start] [--end] [--report] [--set] [--file out.pdf]` | Save the report as a PDF. |
+| `ck kpi report variables <agentId> [--version-id <id>] [--json]` | Every ref, post-call variable, metadata key, KPI metric, data-source field and axis a report can use. Run before writing a report. |
+| `ck kpi report list <agentId> [--json]` | Saved reports; ★ marks the primary one (the one emailed). |
+| `ck kpi report get <agentId> [--report <idOrName>] [--file r.json]` | One report as JSON (default: primary), ready to edit. |
+| `ck kpi report save <agentId> --file r.json [--report <idOrName> \| --new "Name"] [--name] [--primary] [--force]` | Create (`--new`) or replace (default: the primary) one report. Items without x/y/w are laid out for you. Previews first and refuses if the preview finds problems, unless `--force`. |
+| `ck kpi report rename <agentId> --report <idOrName> --name "New"` | Rename a report. |
+| `ck kpi report primary <agentId> --report <idOrName>` | Choose which report the schedule emails. |
+| `ck kpi report delete <agentId> --report <idOrName> [--yes]` | Delete a report (not the primary). Cannot be undone. |
 | `ck kpi report deliveries <agentId> [--json]` | Last 30 scheduled sends: slot, window, status, attempts, recipients, error. |
 | `ck kpi report check-expression <agentId> '<expr>' [--unique] [--start] [--end] [--post-call a,b] [--metadata k1,k2]` | Test a custom-variable expression against real calls. |
 
@@ -28,8 +35,11 @@ Manager.
 
 MCP has the same through `get_kpi_manager_info`, `update_kpi_manager`,
 `delete_kpi_manager`, `preview_kpi_rca_prompt`, `run_kpi_rca`,
-`preview_kpi_report` and `check_kpi_expression` (no PDF export; use the CLI
-or the dashboard).
+`preview_kpi_report`, `check_kpi_expression`, `get_kpi_report_variables`,
+`save_kpi_report` (save, rename, set_primary), `delete_kpi_report` and
+`export_kpi_report_pdf`. The MCP export returns a download link instead of a
+file. Anyone with the link can open it, and it is deleted after about a day,
+so share it only with the user who asked.
 
 ## `update`: flags and `--set`
 
@@ -66,7 +76,9 @@ ck kpi update <agentId> --set @kpi.json
 
 `report_config` is different: the CLI merges the keys you send onto the saved
 `report_config`, so `--set '{"report_config":{"recipients":["a@x.com"]}}'`
-leaves the report layouts alone.
+leaves the report layouts alone. Change report layouts with `ck kpi report
+save`, not `update --set` (an edit to the top-level copy of the primary report
+is carried into `reports[]`, but editing both at once is refused).
 
 ## Data sources
 
@@ -110,6 +122,16 @@ test: `{ name, mode: "expression", expression, equals: true, consider_for:
 |---|---|---|
 | API endpoint `crm` | `{ data: { conversion_rate: 85 } }` | `crm.data.conversion_rate` |
 | Python source `budget` | `{ l2s: 5.4 }` | `budget.l2s` |
+| Expression source `car_sold` | `{ count: 42, total: 300, pct: 14 }` | `car_sold.pct` (or `.count`, `.total`) |
+
+An **Expression source** counts, each day, the calls that pass its expression:
+- **`count`:** the calls that pass.
+- **`total`:** all calls for its `consider_for` base. For example, connected calls when the base is `connected`.
+- **`pct`:** `count / total × 100`, rounded to 2 decimals, and `null` when `total` is 0.
+
+Use `.pct` for a percentage target. Use `.count` or `.total` only when the target is a
+plain number. Write the source name exactly as saved, with no `.data`.
+Test the expression first with `ck kpi report check-expression`.
 
 `connected_to_conversion_percentage` is built in (connected calls that
 converted). Keep it in the list with `name` and `source` both set to that
@@ -139,9 +161,19 @@ reasons and post-call names from `ck audit-strategies filter-options
 | off | on | KPI report on its schedule, to the report recipients |
 | on | on | both; RCA emails also carry that day's KPI report PDF |
 
-- Build and lay out reports (charts, tables, text, custom variables) in the
-  dashboard's report builder. From the CLI, change the schedule and
-  recipients, turn Auto Report on or off, and preview or export what is saved.
+- Build reports from the CLI the same way as the dashboard's report builder,
+  in this order:
+  1. `ck kpi report variables <agentId>`, to list the refs you can use.
+  2. Write `r.json` in the [KPI Report Format](kpi-report-format.md).
+  3. `ck kpi report preview <agentId> --set @r.json`, and read the values and errors.
+  4. `ck kpi report save <agentId> --file r.json --new "Name"` (or `--report` to
+     replace one).
+  5. `ck kpi report export <agentId> --report "Name"` for the PDF.
+- To change a saved report: `report get --file r.json`, edit it, then `report save
+  --report <id> --file r.json`. `save` replaces the report's whole content.
+  Keep every item you are not removing.
+- The schedule and recipients are set with `ck kpi update` flags and apply to the
+  primary report.
 - Without `--start`, preview/export use the latest scheduled window. `--report`
   picks a saved report other than the primary (scheduled) one.
 - Turning Auto Report on, or changing the schedule, never sends a report for
@@ -152,7 +184,11 @@ reasons and post-call names from `ck audit-strategies filter-options
 ## Rules
 
 - Run `ck kpi get <agentId> --json` before any update, and send whole lists.
-- Confirm with the user before `rca-run` (credits), `delete`, and turning
+- Confirm with the user before `rca-run` (credits), `delete`, `report delete`,
+  `report primary` / `save --primary` (changes what is emailed), and turning
   `--auto-report on` (emails real recipients).
+- Never save a report with refs that `report variables` did not list; do not
+  use `--force` to get past preview errors unless the user agrees (for example,
+  a data source that has not sent data yet).
 - Never invent emails, model names, field names or filter values.
 - `history` is empty until a nightly evaluation has run for that agent.
