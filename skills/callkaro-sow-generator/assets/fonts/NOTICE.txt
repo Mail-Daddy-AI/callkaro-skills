@@ -1,0 +1,2 @@
+Fallback-*.ttf are tiny subsets (rupee sign, degree, plus-minus) of Noto Sans, licensed under the SIL Open Font License 1.1 (https://openfontlicense.org).
+Carlito-*.ttf: see OFL.txt in this folder.

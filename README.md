@@ -30,10 +30,26 @@ ck skills install              # your account (~/.claude/skills) — all project
 ck skills install --project    # just this project — commit .claude/ to share
 ```
 
-**Option C — manual:** copy `skills/callkaro/` into `~/.claude/skills/`.
+**Option C — manual:** copy the folders you want from `skills/` (e.g. `skills/callkaro/`) into `~/.claude/skills/`.
+
+> The extra skills below are installed by the plugin (Option A). They reach `ck skills install` (Option B) once the CLI release that bundles them ships.
 
 Then just ask Claude anything CallKaro-related — *"build me a Hindi sales agent
 and test it"* — and it will load the skill.
+
+## Extra skills (no `ck` CLI needed)
+
+The plugin also ships three standalone skills for the work around building a bot.
+Claude loads them automatically when you ask for the matching thing.
+
+| Skill | What it does | Needs |
+|---|---|---|
+| `callkaro-sow-generator` | Turns a client BRD / PRD / script / description into the standard CallKaro Scope of Work **PDF** (cover, contents, Purpose, then Flow, Variables, Dispositions, Guardrails, Rebuttals, Objection Handling, FAQs). | `pip install reportlab` |
+| `voicebot-qa-testbook` | Builds the Voice AI Bot QA Testing Framework **Excel workbook** (four pillar sheets, scorecard with the 95% certification gate, scoring, thresholds) pre-filled with test cases for a bot, from its SoW, agent JSON or description. | `pip install openpyxl` |
+| `conversational-flow-diagram` | Draws a hand-drawn-style bot flow diagram (PNG or self-contained HTML) from an agent JSON, SoW/PRD/BRD or a prompt. | Node.js |
+
+Typical chain: client BRD → `callkaro-sow-generator` → `conversational-flow-diagram` and
+`voicebot-qa-testbook` from that SoW.
 
 ## What's inside
 
