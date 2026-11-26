@@ -1,5 +1,5 @@
 # Workflows
-<!-- graph-summary: Build and run workflow graphs per contact: every node type (Send Call, Wait, Conditions, WhatsApp, API, Update Contact, and the Inbound Call, Cancel Workflow and Resume Where They Were nodes for call-backs), the rules that bite, commands, versions (draft, publish, which leads run on which), A/B testing between versions (split, rules, JS, results), generating a graph from a request using real ids, editing, and reading results. -->
+<!-- graph-summary: Build and run workflow graphs per contact: every node type (Send Call, Wait, Conditions, WhatsApp, API, Update Contact, and the Inbound Call, Cancel Workflow and Resume Where They Were nodes for call-backs), the trigger window that keeps every node inside set hours, the rules that bite, commands, versions (draft, publish, which leads run on which), A/B testing between versions (split, rules, JS, results), generating a graph from a request using real ids, editing, and reading results. -->
 
 A workflow is a **graph of steps run per contact**: call them, wait, WhatsApp
 them, branch on what happened, update their CRM record. The dashboard draws it
@@ -45,7 +45,7 @@ method.
 
 | Dashboard name | `type` | Must have |
 |---|---|---|
-| (created with the workflow) | `start` | exactly one; never added |
+| (created with the workflow) | `start` | exactly one; never added. Optional `triggerWindow` — see [Trigger window](#trigger-window) |
 | Inbound Call | `inbound` | at most one; the second entry point |
 | End | `end` | an `end` or `cancel` reachable from Start |
 | Cancel Workflow | `cancel` | — (optional `reason`, shown in the run log) |
@@ -75,6 +75,34 @@ method.
 | `metadata` | `[{key, source, value}]` rows sent to the agent as `{{metadata.<key>}}`, on top of what the lead was enrolled with. Sources as in Conditions. |
 
 A scheduled time outside the window moves to the next window opening when `carryOver` is on; with it off, the call is not placed and the step moves on with `placed: false` and the reason in its result.
+
+### Trigger window
+
+`triggerWindow` on the `start` node limits **every node** of the workflow — calls, WhatsApp,
+API calls, Update Contact, Wait, Conditions, End — to the hours it allows. A lead who reaches a
+node outside the window **waits at that step** and carries on when the window next opens;
+nothing is skipped or cancelled. Leads can be enrolled at any time. In the dashboard it is the
+clock control beside "Find a node" on the canvas toolbar.
+
+```json
+{"enabled": true, "schedule": {
+  "1": {"start": "10:00", "end": "19:00"}, "2": {"start": "10:00", "end": "19:00"},
+  "3": {"start": "10:00", "end": "19:00"}, "4": {"start": "10:00", "end": "19:00"},
+  "5": {"start": "10:00", "end": "17:00"}, "6": {"start": "11:00", "end": "14:00"}}}
+```
+
+- `schedule` keys are weekdays, `"0"` = Sunday … `"6"` = Saturday. A day left out is **closed**.
+- Times are `"HH:mm"` India time (IST); end after start. `"23:59"` as the
+  end means until midnight. No overnight ranges (`22:00`–`02:00`). At least one day open.
+- No `triggerWindow` (or `enabled: false`) = runs at any time — how every older workflow behaves.
+- Set it: `ck workflows set-node <id> <startNodeId> --set @window.json` with
+  `{"triggerWindow": {…}}` in the file.
+- It is **separate** from a Send Call's `minTriggerTime`/`maxTriggerTime` and from `--window` on
+  `ck contacts assign`. The trigger window decides when the Send Call **node runs**; the call's
+  own window still decides when the **call is placed**. Use the trigger window when WhatsApp and
+  API steps must respect business hours too.
+- A waiting lead shows in `ck workflows run` as a `waiting` step with the note *Outside the
+  trigger window* and the time it resumes.
 
 ### Rules that bite
 

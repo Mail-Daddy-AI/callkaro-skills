@@ -90,6 +90,10 @@ ck contacts assign --attr stage=new --workflow <workflowId> --window 10:00-19:00
    already running stay on their version; new ones get the live one, or the version A/B
    testing picks when it is on (see Workflows → A/B testing). Saving A/B settings changes live
    routing too: ask first.
+9. **`--window` only times the calls.** It limits when Send Call places calls for this
+   batch; WhatsApp, API and other steps still run at any hour. To keep the **whole**
+   journey inside business hours, set the workflow's trigger window on its Start node —
+   see [workflows.md](workflows.md) § Trigger window.
 
 ## Finding and acting on outcomes
 
